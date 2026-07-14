@@ -12,6 +12,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import TerritoryManagement from './pages/TerritoryManagement';
 import SellerManagement from './pages/SellerManagement';
 import SellerDetail from './pages/SellerDetail';
+import SellerRegister from './pages/SellerRegister';
 import BuyerManagement from './pages/BuyerManagement';
 import BuyerDetail from './pages/BuyerDetail';
 import ProductManagement from './pages/ProductManagement';
@@ -230,6 +231,7 @@ function App() {
             <Route path="/" element={<div style={{ fontSize: 24 }}>대시보드 (준비중)</div>} />
             <Route path="/territory" element={<TerritoryManagement />} />
             <Route path="/seller" element={<SellerManagement />} />
+            <Route path="/seller/register" element={<SellerRegister />} />
             <Route path="/seller/:id" element={<SellerDetail />} />
             <Route path="/buyer" element={<BuyerManagement />} />
             <Route path="/buyer/:id" element={<BuyerDetail />} />

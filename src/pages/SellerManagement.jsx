@@ -21,7 +21,7 @@ function SellerManagement() {
   };
 
   const handleRegister = () => {
-    message.info('셀러 등록 페이지 (준비중)');
+    navigate('/seller/register');
   };
 
   // 셀러 그룹 테이블 컬럼
