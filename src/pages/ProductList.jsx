@@ -29,7 +29,6 @@ function ProductList() {
           productId: product.id,
           categoryId: product.categoryId,
           categoryName: product.categoryName,
-          categoryIcon: product.categoryIcon,
           productName: product.name,
           originId: null,
           originName: productOrigins.length === 0 ? '-' : null,
@@ -61,7 +60,6 @@ function ProductList() {
             productId: product.id,
             categoryId: product.categoryId,
             categoryName: product.categoryName,
-            categoryIcon: product.categoryIcon,
             productName: product.name,
             originId: origin.id,
             originName: origin.name,
@@ -202,12 +200,6 @@ function ProductList() {
       dataIndex: 'categoryName',
       key: 'categoryName',
       width: 150,
-      render: (text, record) => (
-        <span>
-          <span style={{ fontSize: 20, marginRight: 8 }}>{record.categoryIcon}</span>
-          {text}
-        </span>
-      ),
     },
     {
       title: '품목',

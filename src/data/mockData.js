@@ -37,6 +37,7 @@ export const regions = [
 ];
 
 // 품목분류 데이터
+// Note: icon and createdAt fields are deprecated (not shown in UI)
 export const productCategories = [
   { id: 1, icon: '🐟', name: '누운고기', itemCount: 15, status: 'active', createdAt: '2024-01-15' },
   { id: 2, icon: '🦈', name: '뜬고기', itemCount: 12, status: 'active', createdAt: '2024-01-16' },

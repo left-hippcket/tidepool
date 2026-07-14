@@ -28,13 +28,6 @@ function ProductManagement() {
   // ===== 탭 1: 품목분류 관리 =====
   const categoryColumns = [
     {
-      title: '아이콘',
-      dataIndex: 'icon',
-      key: 'icon',
-      width: 80,
-      render: (icon) => <span style={{ fontSize: 24 }}>{icon}</span>,
-    },
-    {
       title: '품목분류명',
       dataIndex: 'name',
       key: 'name',
@@ -57,12 +50,6 @@ function ProductManagement() {
           {status === 'active' ? '활성' : '비활성'}
         </Tag>
       ),
-    },
-    {
-      title: '등록일',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 120,
     },
     {
       title: '수정',
@@ -97,12 +84,6 @@ function ProductManagement() {
       dataIndex: 'categoryName',
       key: 'categoryName',
       width: 150,
-      render: (text, record) => (
-        <span>
-          <span style={{ fontSize: 20, marginRight: 8 }}>{record.categoryIcon}</span>
-          {text}
-        </span>
-      ),
     },
     {
       title: '품목명',
@@ -253,7 +234,6 @@ function ProductManagement() {
             ...values,
             itemCount: 0,
             status: 'active',
-            createdAt: new Date().toISOString().split('T')[0],
           }]);
           message.success(`품목분류 '${values.name}'이 등록되었습니다.`);
         }
@@ -282,7 +262,6 @@ function ProductManagement() {
             id: newId,
             categoryId: values.categoryId,
             categoryName: category.name,
-            categoryIcon: category.icon,
             name: values.name,
             orderUnit: values.orderUnit,
             unitWeight: values.unitWeight,
@@ -337,8 +316,6 @@ function ProductManagement() {
     }
   };
 
-  const iconOptions = ['🐟', '🐠', '🐡', '🐋', '🫍', '🦈', '🦀', '🦞', '🦑', '🐙', '🦐', '🍤', '🦪', '🍣'];
-
   return (
     <div>
       <h2>상품 관리</h2>
@@ -372,7 +349,7 @@ function ProductManagement() {
                 <Select.Option value="all">전체</Select.Option>
                 {categories.filter(c => c.status === 'active').map(c => (
                   <Select.Option key={c.id} value={c.id}>
-                    {c.icon} {c.name}
+                    {c.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -407,7 +384,7 @@ function ProductManagement() {
                   >
                     {categories.map(c => (
                       <Select.Option key={c.id} value={c.id}>
-                        {c.icon} {c.name}
+                        {c.name}
                       </Select.Option>
                     ))}
                   </Select>
@@ -426,7 +403,7 @@ function ProductManagement() {
                         border: selectedProduct?.id === p.id ? '1px solid #1890ff' : '1px solid #f0f0f0',
                       }}
                     >
-                      <div>{p.categoryIcon} {p.categoryName} / {p.name}</div>
+                      <div>{p.categoryName} / {p.name}</div>
                       {p.status === 'inactive' && (
                         <Tag size="small" style={{ marginTop: 4 }}>비활성</Tag>
                       )}
@@ -439,7 +416,7 @@ function ProductManagement() {
             {/* 중앙: 원산지 관리 */}
             <Col span={9}>
               <Card
-                title={selectedProduct ? `선택 품목: ${selectedProduct.categoryIcon} ${selectedProduct.categoryName} / ${selectedProduct.name}` : '원산지 관리'}
+                title={selectedProduct ? `선택 품목: ${selectedProduct.categoryName} / ${selectedProduct.name}` : '원산지 관리'}
                 size="small"
                 extra={
                   selectedProduct && (
@@ -505,7 +482,7 @@ function ProductManagement() {
             {/* 우측: 규격 관리 */}
             <Col span={9}>
               <Card
-                title={selectedProduct ? `선택 품목: ${selectedProduct.categoryIcon} ${selectedProduct.categoryName} / ${selectedProduct.name}` : '규격 관리'}
+                title={selectedProduct ? `선택 품목: ${selectedProduct.categoryName} / ${selectedProduct.name}` : '규격 관리'}
                 size="small"
                 extra={
                   selectedProduct && (
@@ -576,8 +553,8 @@ function ProductManagement() {
         title={
           modalType === 'category' ? (editingItem ? '품목분류 수정' : '품목분류 등록') :
           modalType === 'product' ? (editingItem ? '품목 수정' : '품목 등록') :
-          modalType === 'origin' ? (editingItem ? '원산지 수정' : `원산지 등록 - ${selectedProduct?.categoryIcon} ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
-          modalType === 'spec' ? (editingItem ? '규격 수정' : `규격 등록 - ${selectedProduct?.categoryIcon} ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
+          modalType === 'origin' ? (editingItem ? '원산지 수정' : `원산지 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
+          modalType === 'spec' ? (editingItem ? '규격 수정' : `규격 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
           ''
         }
         open={isModalOpen}
@@ -602,18 +579,6 @@ function ProductManagement() {
                 ]}
               >
                 <Input placeholder="예: 누운고기" />
-              </Form.Item>
-              <Form.Item
-                label="아이콘"
-                name="icon"
-              >
-                <Select placeholder="아이콘 선택 (선택사항)">
-                  {iconOptions.map(icon => (
-                    <Select.Option key={icon} value={icon}>
-                      <span style={{ fontSize: 20 }}>{icon}</span> {icon}
-                    </Select.Option>
-                  ))}
-                </Select>
               </Form.Item>
               {editingItem && (
                 <Form.Item
@@ -641,7 +606,7 @@ function ProductManagement() {
                   <Select placeholder="품목분류 선택">
                     {categories.filter(c => c.status === 'active').map(c => (
                       <Select.Option key={c.id} value={c.id}>
-                        {c.icon} {c.name}
+                        {c.name}
                       </Select.Option>
                     ))}
                   </Select>
