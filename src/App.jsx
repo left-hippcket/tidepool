@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Layout, Menu } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Input, Button, Form, Card } from 'antd';
 import {
   HomeOutlined,
   TeamOutlined,
   ShopOutlined,
   AppstoreOutlined,
   SettingOutlined,
+  LockOutlined,
 } from '@ant-design/icons';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import TerritoryManagement from './pages/TerritoryManagement';
@@ -18,10 +19,97 @@ import ProductList from './pages/ProductList';
 
 const { Header, Sider, Content } = Layout;
 
+const CORRECT_PASSWORD = 'fifa';
+const AUTH_KEY = 'fifa_admin_auth';
+
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    // 페이지 로드 시 sessionStorage에서 인증 상태 확인
+    const authStatus = sessionStorage.getItem(AUTH_KEY);
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (values) => {
+    setLoading(true);
+
+    setTimeout(() => {
+      if (values.password === CORRECT_PASSWORD) {
+        sessionStorage.setItem(AUTH_KEY, 'true');
+        setIsAuthenticated(true);
+      } else {
+        alert('비밀번호가 올바르지 않습니다.');
+      }
+      setLoading(false);
+    }, 300);
+  };
+
+  // 인증되지 않은 경우 로그인 화면 표시
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}>
+        <Card
+          style={{
+            width: 400,
+            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+            borderRadius: 12,
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🐟</div>
+            <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
+              피시파더 ERP
+            </h2>
+            <p style={{ color: '#888', marginTop: 8 }}>
+              활어산지유통 관리시스템
+            </p>
+          </div>
+
+          <Form onFinish={handleLogin} layout="vertical">
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: '비밀번호를 입력해주세요' }]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="비밀번호를 입력하세요"
+                size="large"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                block
+                size="large"
+                style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: 'none',
+                }}
+              >
+                로그인
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </div>
+    );
+  }
 
   const menuItems = [
     {
