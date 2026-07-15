@@ -30,7 +30,10 @@ const AUTH_KEY = 'fifa_admin_auth';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    // 초기값: 모바일(768px 이하)이면 접힌 상태, 웹이면 펼친 상태
+    return window.innerWidth <= 768;
+  });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,7 +43,17 @@ function App() {
     if (authStatus === 'true') {
       setIsAuthenticated(true);
     }
-  }, []);
+
+    // 윈도우 리사이즈 시 모바일/웹 전환 감지
+    const handleResize = () => {
+      if (window.innerWidth <= 768 && !collapsed) {
+        setCollapsed(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [collapsed]);
 
   const handleLogin = (values) => {
     setLoading(true);
