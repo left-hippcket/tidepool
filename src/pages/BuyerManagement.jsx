@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, Select, message } from 'antd';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Select, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { buyerGroups, managers, territories } from '../data/mockData';
 
 function BuyerManagement() {
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState('');
   const [selectedSalesPerson, setSelectedSalesPerson] = useState('전체');
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedTerritory, setSelectedTerritory] = useState('전체');
@@ -26,11 +25,6 @@ function BuyerManagement() {
 
   // 필터링 로직
   const filteredData = buyerGroups.filter(item => {
-    const matchSearch = !searchText ||
-      item.name.includes(searchText) ||
-      item.territory.includes(searchText) ||
-      item.region.includes(searchText);
-
     const matchSalesPerson = selectedSalesPerson === '전체' || item.salesPerson === selectedSalesPerson;
     const matchCategory = selectedCategory === '전체' || item.mainCategory === selectedCategory;
     const matchTerritory = selectedTerritory === '전체' || item.territory === selectedTerritory;
@@ -39,7 +33,7 @@ function BuyerManagement() {
       (selectedStatus === '활성' && item.status === 'active') ||
       (selectedStatus === '비활성' && item.status === 'inactive');
 
-    return matchSearch && matchSalesPerson && matchCategory && matchTerritory && matchRegion && matchStatus;
+    return matchSalesPerson && matchCategory && matchTerritory && matchRegion && matchStatus;
   });
 
   // 정렬 로직
@@ -85,20 +79,7 @@ function BuyerManagement() {
 
       {/* 필터 영역 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm text-gray-700 font-medium">검색어:</span>
-            <Input
-              placeholder="바이어그룹명, 사업권역, 상세지역"
-              className="w-64"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              prefix={<SearchOutlined />}
-              allowClear
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-700">담당영업사원:</span>
               <Select
@@ -168,7 +149,6 @@ function BuyerManagement() {
                 <Select.Option value="비활성">비활성</Select.Option>
               </Select>
             </div>
-          </div>
         </div>
       </div>
 
