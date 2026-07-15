@@ -294,16 +294,34 @@ function ProductManagement() {
           ));
           message.success('규격 정보가 수정되었습니다.');
         } else {
-          const newId = Math.max(...specs.map(s => s.id)) + 1;
-          setSpecs([...specs, {
-            id: newId,
+          // 쉼표로 구분된 여러 규격명 처리
+          const specNames = values.name
+            .split(',')
+            .map(name => name.trim())
+            .filter(name => name.length > 0);
+
+          if (specNames.length === 0) {
+            message.error('규격명을 입력해주세요.');
+            return;
+          }
+
+          let newId = Math.max(...specs.map(s => s.id)) + 1;
+          const newSpecs = specNames.map(name => ({
+            id: newId++,
             productId: selectedProduct.id,
             productName: selectedProduct.name,
-            name: values.name,
+            name: name,
             status: 'active',
             createdAt: new Date().toISOString().split('T')[0],
-          }]);
-          message.success(`규격 '${values.name}'이 등록되었습니다.`);
+          }));
+
+          setSpecs([...specs, ...newSpecs]);
+
+          if (specNames.length === 1) {
+            message.success(`규격 '${specNames[0]}'이 등록되었습니다.`);
+          } else {
+            message.success(`${specNames.length}개의 규격이 등록되었습니다.`);
+          }
         }
       }
 
@@ -722,27 +740,49 @@ function ProductManagement() {
 
           {modalType === 'spec' && (
             <>
-              <Form.Item
-                label="규격명"
-                name="name"
-                rules={[
-                  { required: true, message: '규격명을 입력해주세요' },
-                  { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                ]}
-              >
-                <Input placeholder="예: 1.2kg, 4~5kg" />
-              </Form.Item>
-              {editingItem && (
-                <Form.Item
-                  label="상태"
-                  name="status"
-                  rules={[{ required: true }]}
-                >
-                  <Select>
-                    <Select.Option value="active">활성</Select.Option>
-                    <Select.Option value="inactive">비활성</Select.Option>
-                  </Select>
-                </Form.Item>
+              {editingItem ? (
+                // 수정 모드: 단일 규격명
+                <>
+                  <Form.Item
+                    label="규격명"
+                    name="name"
+                    rules={[
+                      { required: true, message: '규격명을 입력해주세요' },
+                      { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                    ]}
+                  >
+                    <Input placeholder="예: 1.2kg, 4~5kg" />
+                  </Form.Item>
+                  <Form.Item
+                    label="상태"
+                    name="status"
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      <Select.Option value="active">활성</Select.Option>
+                      <Select.Option value="inactive">비활성</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </>
+              ) : (
+                // 추가 모드: 여러 규격명을 쉼표로 구분 입력
+                <>
+                  <Form.Item
+                    label="규격명 (여러 개 입력 시 쉼표로 구분)"
+                    name="name"
+                    rules={[
+                      { required: true, message: '규격명을 입력해주세요' },
+                    ]}
+                  >
+                    <Input.TextArea
+                      placeholder="예: 500g, 700g, 1.0kg, 1.2kg&#10;(쉼표로 구분하여 여러 개를 한 번에 등록할 수 있습니다)"
+                      rows={4}
+                    />
+                  </Form.Item>
+                  <div className="text-xs text-gray-500 mt-1 -mt-4 mb-4">
+                    💡 팁: 쉼표(,)로 구분하여 여러 규격을 한 번에 등록할 수 있습니다.
+                  </div>
+                </>
               )}
             </>
           )}
