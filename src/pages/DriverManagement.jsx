@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Select, Tag, Button } from 'antd';
-import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { drivers } from '../data/mockData';
+import { PlusOutlined, CaretUpOutlined, CaretDownOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { drivers, driverDetails } from '../data/mockData';
 
 function DriverManagement() {
   const navigate = useNavigate();
@@ -133,6 +133,22 @@ function DriverManagement() {
       },
     },
     {
+      title: '등록증',
+      dataIndex: 'id',
+      key: 'certificate',
+      width: 80,
+      align: 'center',
+      render: (id) => {
+        const detail = driverDetails[id];
+        const hasCertificate = detail?.settlementInfo?.hasCertificate;
+        return hasCertificate ? (
+          <CheckCircleFilled style={{ color: '#52c41a', fontSize: 18 }} />
+        ) : (
+          <span style={{ color: '#d9d9d9' }}>-</span>
+        );
+      },
+    },
+    {
       title: '',
       key: 'action',
       width: 80,
@@ -245,13 +261,22 @@ function DriverManagement() {
                 <span className="text-xs text-gray-500">정산사업자: </span>
                 <span className="text-xs text-gray-900">{driver.settlementBusiness || '-'}</span>
               </div>
-              {driver.taxType ? (
-                <Tag color={driver.taxType === '과세' ? '#1890FF' : '#52C41A'} style={{ margin: 0 }}>
-                  {driver.taxType}
-                </Tag>
-              ) : (
-                <Tag color="#D9D9D9" style={{ margin: 0 }}>미등록</Tag>
-              )}
+              <div className="flex items-center gap-2">
+                {driver.taxType ? (
+                  <Tag color={driver.taxType === '과세' ? '#1890FF' : '#52C41A'} style={{ margin: 0 }}>
+                    {driver.taxType}
+                  </Tag>
+                ) : (
+                  <Tag color="#D9D9D9" style={{ margin: 0 }}>미등록</Tag>
+                )}
+                {(() => {
+                  const detail = driverDetails[driver.id];
+                  const hasCertificate = detail?.settlementInfo?.hasCertificate;
+                  return hasCertificate ? (
+                    <CheckCircleFilled style={{ color: '#52c41a', fontSize: 16 }} />
+                  ) : null;
+                })()}
+              </div>
             </div>
           </div>
         ))}

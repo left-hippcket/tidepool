@@ -517,6 +517,16 @@ function DriverDetail() {
                 )}
               </p>
             </div>
+            <div>
+              <span className="text-sm font-medium text-gray-500">사업자등록증</span>
+              <p className="text-base text-gray-900 mt-1">
+                {settlementInfo.hasCertificate ? (
+                  <Tag color="green">등록완료</Tag>
+                ) : (
+                  <Tag color="default">미등록</Tag>
+                )}
+              </p>
+            </div>
             <div className="md:col-span-2">
               <span className="text-sm font-medium text-gray-500">은행계좌정보</span>
               <div className="mt-2 space-y-2">
