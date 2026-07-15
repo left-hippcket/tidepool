@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Input, Select, InputNumber, message, Modal, Tag } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { sellerGroups, sellerDetails, managers, territories, productCategories } from '../data/mockData';
 import { Column } from '@ant-design/charts';
 
@@ -154,6 +154,24 @@ function SellerDetail() {
     priceCompetitive: '가격경쟁력',
     claimCooperation: '클레임협조도',
     lossProvision: '로스제공'
+  };
+
+  // 정성평가 값에 이모지 추가
+  const qualitativeEmojis = {
+    '최상': '👑',
+    '좋음': '👍',
+    '보통': '😐',
+    '나쁨': '👎',
+    '높음': '🔥',
+    '낮음': '❄️',
+    '넉넉함': '💯',
+    '적당함': '⭐',
+    '부족함': '⚠️'
+  };
+
+  const addEmoji = (value) => {
+    const emoji = qualitativeEmojis[value];
+    return emoji ? `${emoji} ${value}` : value;
   };
 
   if (!sellerGroup || !detail) {
@@ -323,7 +341,7 @@ function SellerDetail() {
             {Object.entries(detail.qualitativeRatings).map(([key, value]) => (
               <div key={key} className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
                 <div className="text-xs text-blue-600 mb-2">{qualitativeLabels[key]}</div>
-                <div className="text-base font-bold text-blue-700">{value}</div>
+                <div className="text-base font-bold text-blue-700">{addEmoji(value)}</div>
               </div>
             ))}
           </div>
@@ -353,7 +371,7 @@ function SellerDetail() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">소속 사업자 정보</h2>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {detail.businesses.map((business, index) => (
             <div key={business.id} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
               <div className="bg-white px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -487,14 +505,18 @@ function SellerDetail() {
               )}
             </div>
           ))}
-        </div>
 
-        <button
-          onClick={handleAddBusiness}
-          className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors font-medium"
-        >
-          + 사업자 추가
-        </button>
+          {/* 사업자 추가 카드 */}
+          <button
+            onClick={handleAddBusiness}
+            className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-all min-h-[200px] flex flex-col items-center justify-center gap-3 text-gray-500 hover:text-gray-700"
+          >
+            <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+              <PlusOutlined className="text-2xl" />
+            </div>
+            <span className="text-base font-medium">사업자 추가</span>
+          </button>
+        </div>
       </div>
 
       {/* 섹션 3: 거래 실적 (P2 샘플) */}

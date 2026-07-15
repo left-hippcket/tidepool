@@ -2,21 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Form, Input, Select, Button, Radio, Space, Divider,
-  message, AutoComplete, Upload, InputNumber, Tag
+  message, AutoComplete, Upload
 } from 'antd';
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
-import { sellerGroups, managers, territories, productCategories, products } from '../data/mockData';
+import { buyerGroups, managers, territories, regions, productCategories, products } from '../data/mockData';
 
-function SellerRegister() {
+function BuyerRegister() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [registrationType, setRegistrationType] = useState('new'); // 'new' | 'existing'
   const [selectedGroup, setSelectedGroup] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [availableProducts, setAvailableProducts] = useState([]);
+  const [selectedTerritory, setSelectedTerritory] = useState(null);
+  const [availableRegions, setAvailableRegions] = useState([]);
 
   // URL 쿼리 파라미터 처리
   useEffect(() => {
@@ -24,11 +26,8 @@ function SellerRegister() {
     const mode = searchParams.get('mode');
 
     if (groupId && mode === 'add') {
-      // 기존 그룹에 사업자 추가 모드
       setRegistrationType('existing');
-
-      // 해당 그룹 찾아서 자동 선택
-      const group = sellerGroups.find(g => g.id === parseInt(groupId));
+      const group = buyerGroups.find(g => g.id === parseInt(groupId));
       if (group) {
         setSelectedGroup(group);
         form.setFieldsValue({ searchGroup: group.name });
@@ -41,28 +40,60 @@ function SellerRegister() {
     setRegistrationType(e.target.value);
     form.resetFields();
     setSelectedGroup(null);
+    setSelectedCategory(null);
+    setAvailableProducts([]);
+    setSelectedTerritory(null);
+    setAvailableRegions([]);
   };
 
   // 기존 그룹 검색
   const handleGroupSearch = (value) => {
-    const group = sellerGroups.find(g => g.name === value);
+    const group = buyerGroups.find(g => g.name === value);
     setSelectedGroup(group);
   };
 
   // 주요품목분류 변경 시 주요품목 필터링
-  const handleCategoryChange = (values) => {
-    setSelectedCategory(values);
-    // 선택된 품목분류에 해당하는 품목만 필터링
-    if (values && values.length > 0) {
-      const filtered = products.filter(p =>
-        values.includes(p.categoryName)
-      );
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+    if (value) {
+      const filtered = products.filter(p => p.categoryName === value);
       setAvailableProducts(filtered);
     } else {
       setAvailableProducts([]);
     }
-    // 기존 선택된 주요품목 초기화
     form.setFieldsValue({ mainProducts: [] });
+  };
+
+  // 사업권역 변경 시 상세지역 필터링
+  const handleTerritoryChange = (value) => {
+    setSelectedTerritory(value);
+    if (value) {
+      const filtered = regions.filter(r => r.territoryName === value && r.status === 'active');
+      setAvailableRegions(filtered);
+    } else {
+      setAvailableRegions([]);
+    }
+    form.setFieldsValue({ region: undefined });
+  };
+
+  // 중요 평가 요소 중복 체크
+  const validatePriorityFactors = (_, value) => {
+    const values = form.getFieldsValue();
+    const factors = [
+      values.priority1,
+      values.priority2,
+      values.priority3,
+      values.priority4,
+      values.priority5,
+      values.priority6,
+      values.priority7
+    ].filter(Boolean);
+
+    const uniqueFactors = new Set(factors);
+    if (factors.length !== uniqueFactors.size) {
+      return Promise.reject(new Error('중요 평가 요소는 중복 선택할 수 없습니다.'));
+    }
+    return Promise.resolve();
   };
 
   // 저장
@@ -70,8 +101,8 @@ function SellerRegister() {
     try {
       const values = await form.validateFields();
 
-      // ticker 중복 체크 (간단 구현 - 실제로는 4개 유형 전체 체크)
-      const existingTicker = sellerGroups.find(g =>
+      // ticker 중복 체크
+      const existingTicker = buyerGroups.find(g =>
         g.ticker === values.ticker && (!selectedGroup || g.id !== selectedGroup.id)
       );
 
@@ -80,20 +111,28 @@ function SellerRegister() {
         return;
       }
 
-      // 사업자등록번호 중복 체크
-      // TODO: 실제 구현 필요
-
       if (registrationType === 'new') {
-        message.success(`셀러 그룹 '${values.groupName}'이 등록되었습니다.`);
+        message.success(`바이어 그룹 '${values.groupName}'이 등록되었습니다.`);
+        // TODO: 상세 페이지로 이동
+        navigate('/buyer');
       } else {
         message.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        navigate(`/buyer/${selectedGroup.id}`);
       }
-
-      navigate('/seller');
     } catch (error) {
       console.error('Validation failed:', error);
     }
   };
+
+  const priorityOptions = [
+    { value: '로스', label: '🗑️ 로스' },
+    { value: '살밥', label: '🍚 살밥' },
+    { value: '단가', label: '💰 단가' },
+    { value: '색깔', label: '🎨 색깔' },
+    { value: '평체', label: '📏 평체' },
+    { value: '외관', label: '👁️ 외관' },
+    { value: '기타', label: '📌 기타' }
+  ];
 
   return (
     <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
@@ -101,41 +140,41 @@ function SellerRegister() {
       <div className="mb-6">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/seller')}
+            onClick={() => navigate('/buyer')}
             className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <ArrowLeftOutlined />
             목록으로
           </button>
-          <h2 className="text-2xl font-bold text-gray-900">셀러 등록</h2>
+          <h2 className="text-2xl font-bold text-gray-900">바이어 등록</h2>
         </div>
       </div>
 
       {/* 등록 유형 선택 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
         <Radio.Group value={registrationType} onChange={handleTypeChange}>
-          <Radio value="new">신규 셀러그룹 생성</Radio>
-          <Radio value="existing">기존 셀러그룹에 사업자 추가</Radio>
+          <Radio value="new">신규 바이어그룹 생성</Radio>
+          <Radio value="existing">기존 바이어그룹에 사업자 추가</Radio>
         </Radio.Group>
       </div>
 
       <Form form={form} layout="vertical">
-        {/* 기존 그룹 검색 (기존 그룹 추가 시) */}
+        {/* 기존 그룹 검색 */}
         {registrationType === 'existing' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">셀러그룹 검색</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">바이어그룹 검색</h3>
             <Form.Item
               name="searchGroup"
-              label="셀러그룹 검색"
-              rules={[{ required: true, message: '셀러그룹을 선택해주세요' }]}
+              label="바이어그룹 검색"
+              rules={[{ required: true, message: '바이어그룹을 선택해주세요' }]}
             >
               <AutoComplete
-                options={sellerGroups.map(g => ({
+                options={buyerGroups.map(g => ({
                   value: g.name,
-                  label: `${g.name} (담당자: ${g.manager})`
+                  label: `${g.name} (담당자: ${g.salesPerson})`
                 }))}
                 onSelect={handleGroupSearch}
-                placeholder="셀러그룹명 입력"
+                placeholder="바이어그룹명 입력"
                 filterOption={(inputValue, option) =>
                   option.value.toLowerCase().includes(inputValue.toLowerCase())
                 }
@@ -145,8 +184,8 @@ function SellerRegister() {
             {selectedGroup && (
               <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-semibold text-gray-700">셀러그룹명:</span> <span className="text-gray-900">{selectedGroup.name}</span></div>
-                  <div><span className="font-semibold text-gray-700">소싱담당자:</span> <span className="text-gray-900">{selectedGroup.manager}</span></div>
+                  <div><span className="font-semibold text-gray-700">바이어그룹명:</span> <span className="text-gray-900">{selectedGroup.name}</span></div>
+                  <div><span className="font-semibold text-gray-700">담당영업사원:</span> <span className="text-gray-900">{selectedGroup.salesPerson}</span></div>
                   <div><span className="font-semibold text-gray-700">사업권역:</span> <span className="text-gray-900">{selectedGroup.territory}</span></div>
                   <div><span className="font-semibold text-gray-700">상세지역:</span> <span className="text-gray-900">{selectedGroup.region}</span></div>
                 </div>
@@ -155,28 +194,21 @@ function SellerRegister() {
           </div>
         )}
 
-        {/* 셀러그룹 기본 정보 (신규 생성 시) */}
+        {/* 바이어그룹 기본 정보 (신규) */}
         {registrationType === 'new' && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">셀러그룹 기본 정보</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">바이어그룹 기본 정보</h3>
+
             <Form.Item
               name="groupName"
-              label="셀러그룹명"
+              label="바이어그룹명"
               rules={[
-                { required: true, message: '셀러그룹명을 입력해주세요' },
+                { required: true, message: '바이어그룹명을 입력해주세요' },
                 { max: 30, message: '최대 30자까지 입력 가능합니다' },
                 { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
               ]}
             >
-              <Input placeholder="예: 성호수산" />
-            </Form.Item>
-
-            <Form.Item
-              name="ticker"
-              label="Ticker"
-              rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
-            >
-              <Input placeholder="예: SH" maxLength={10} />
+              <Input placeholder="예: 명성횟집 그룹" />
             </Form.Item>
 
             <Divider orientation="left">키맨 정보</Divider>
@@ -190,18 +222,19 @@ function SellerRegister() {
                           {...field}
                           name={[field.name, 'name']}
                           label="이름"
-                          rules={[{ required: true, message: '이름 입력' }]}
+                          rules={[{ required: true, message: '이름 입력' }, { max: 20, message: '최대 20자' }]}
                           style={{ marginBottom: 0 }}
                         >
-                          <Input placeholder="김철수" maxLength={20} />
+                          <Input placeholder="김철수" />
                         </Form.Item>
                         <Form.Item
                           {...field}
                           name={[field.name, 'position']}
                           label="직책"
+                          rules={[{ max: 20, message: '최대 20자' }]}
                           style={{ marginBottom: 0 }}
                         >
-                          <Input placeholder="광어 사무장" maxLength={20} />
+                          <Input placeholder="대표" />
                         </Form.Item>
                         <Form.Item
                           {...field}
@@ -237,7 +270,10 @@ function SellerRegister() {
               label="사업권역"
               rules={[{ required: true, message: '사업권역을 선택해주세요' }]}
             >
-              <Select placeholder="사업권역 선택">
+              <Select
+                placeholder="사업권역 선택"
+                onChange={handleTerritoryChange}
+              >
                 {territories.filter(t => t.status === 'active').map(t => (
                   <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
                 ))}
@@ -249,19 +285,20 @@ function SellerRegister() {
               label="상세지역"
               rules={[{ required: true, message: '상세지역을 선택해주세요' }]}
             >
-              <Select placeholder="상세지역 선택">
-                <Select.Option value="인천">인천</Select.Option>
-                <Select.Option value="완도/진도">완도/진도</Select.Option>
-                <Select.Option value="통영">통영</Select.Option>
-                <Select.Option value="거제">거제</Select.Option>
-                <Select.Option value="고흥">고흥</Select.Option>
+              <Select
+                placeholder="상세지역 선택"
+                disabled={!selectedTerritory}
+              >
+                {availableRegions.map(r => (
+                  <Select.Option key={r.id} value={r.name}>{r.name}</Select.Option>
+                ))}
               </Select>
             </Form.Item>
 
             <Form.Item
-              name="manager"
-              label="소싱담당자"
-              rules={[{ required: true, message: '소싱담당자를 선택해주세요' }]}
+              name="salesPerson"
+              label="담당영업사원"
+              rules={[{ required: true, message: '담당영업사원을 선택해주세요' }]}
             >
               <Select placeholder="담당자 선택">
                 {managers.map(m => (
@@ -276,8 +313,7 @@ function SellerRegister() {
               rules={[{ required: true, message: '주요품목분류를 선택해주세요' }]}
             >
               <Select
-                mode="multiple"
-                placeholder="품목분류 선택 (복수 선택 가능)"
+                placeholder="품목분류 선택"
                 onChange={handleCategoryChange}
               >
                 {productCategories.map(c => (
@@ -293,70 +329,88 @@ function SellerRegister() {
               <Select
                 mode="multiple"
                 placeholder="주요품목 선택 (선택사항)"
-                disabled={selectedCategory.length === 0}
+                disabled={!selectedCategory}
               >
                 {availableProducts.map(p => (
                   <Select.Option key={p.id} value={p.name}>
-                    {p.categoryName} / {p.name}
+                    {p.name}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
 
-            <Divider orientation="left">정성적 평가</Divider>
-            <Form.Item name="financial" label="재무상황">
+            <Form.Item
+              name="arrivalPricePolicy"
+              label="도착단가 정책"
+            >
               <Select placeholder="선택">
-                <Select.Option value="좋음">👍 좋음</Select.Option>
-                <Select.Option value="보통">😐 보통</Select.Option>
-                <Select.Option value="나쁨">👎 나쁨</Select.Option>
+                <Select.Option value="상차단가 + 0원">상차단가 + 0원</Select.Option>
+                <Select.Option value="상차단가 + 700원">상차단가 + 700원</Select.Option>
+                <Select.Option value="상차단가 + 800원">상차단가 + 800원</Select.Option>
+                <Select.Option value="상차단가 + 900원">상차단가 + 900원</Select.Option>
               </Select>
             </Form.Item>
 
-            <Form.Item name="quality" label="품질수준">
+            <Divider orientation="left">거래 정보</Divider>
+
+            <Form.Item
+              name="kakaoGroupName"
+              label="카톡단톡방이름"
+              rules={[{ max: 50, message: '최대 50자' }]}
+            >
+              <Input placeholder="예: [용인]대박수산 거래방" />
+            </Form.Item>
+
+            <Form.Item
+              name="paymentCycle"
+              label="결제주기(조건)"
+              rules={[{ max: 200, message: '최대 200자' }]}
+            >
+              <Input.TextArea
+                rows={3}
+                placeholder="예: 기본 미수 2천 요구, 2천 초과분에 대해 랜덤하게 입금"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="complaintIntensity"
+              label="컴플레인강도"
+            >
               <Select placeholder="선택">
-                <Select.Option value="최상">👑 최상</Select.Option>
-                <Select.Option value="좋음">👍 좋음</Select.Option>
-                <Select.Option value="보통">😐 보통</Select.Option>
-                <Select.Option value="나쁨">👎 나쁨</Select.Option>
+                <Select.Option value="매우강함">매우강함</Select.Option>
+                <Select.Option value="강함">강함</Select.Option>
+                <Select.Option value="보통">보통</Select.Option>
+                <Select.Option value="약함">약함</Select.Option>
+                <Select.Option value="매우약함">매우약함</Select.Option>
               </Select>
             </Form.Item>
 
-            <Form.Item name="priceCompetitive" label="가격경쟁력">
-              <Select placeholder="선택">
-                <Select.Option value="높음">🔥 높음</Select.Option>
-                <Select.Option value="보통">😐 보통</Select.Option>
-                <Select.Option value="낮음">❄️ 낮음</Select.Option>
-              </Select>
+            <Form.Item
+              name="mainSuppliers"
+              label="메인공급처"
+              rules={[{ max: 100, message: '최대 100자' }]}
+            >
+              <Input placeholder="쉼표로 구분 (예: 호경유통, ING)" />
             </Form.Item>
 
-            <Form.Item name="claimCooperation" label="클레임협조도">
-              <Select placeholder="선택">
-                <Select.Option value="좋음">👍 좋음</Select.Option>
-                <Select.Option value="보통">😐 보통</Select.Option>
-                <Select.Option value="나쁨">👎 나쁨</Select.Option>
-              </Select>
-            </Form.Item>
+            <Divider orientation="left">중요 평가 요소 (1-7순위)</Divider>
 
-            <Form.Item name="lossProvision" label="로스제공">
-              <Select placeholder="선택">
-                <Select.Option value="넉넉함">💯 넉넉함</Select.Option>
-                <Select.Option value="적당함">⭐ 적당함</Select.Option>
-                <Select.Option value="부족함">⚠️ 부족함</Select.Option>
-              </Select>
-            </Form.Item>
-
-            <Divider orientation="left">기타 정보</Divider>
-            <Form.Item name="farmArea" label="양식장 수면적(평)">
-              <InputNumber style={{ width: '100%' }} min={0} placeholder="15000" />
-            </Form.Item>
-
-            <Form.Item name="annualProduction" label="연간생산량(톤)">
-              <InputNumber style={{ width: '100%' }} min={0} placeholder="120" />
-            </Form.Item>
-
-            <Form.Item name="mainDistributors" label="메인 유통사">
-              <Input placeholder="노량진수산, 가락시장 (쉼표로 구분)" />
-            </Form.Item>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2, 3, 4, 5, 6, 7].map(num => (
+                <Form.Item
+                  key={num}
+                  name={`priority${num}`}
+                  label={`${num}순위`}
+                  rules={[{ validator: validatePriorityFactors }]}
+                >
+                  <Select placeholder="선택" allowClear>
+                    {priorityOptions.map(opt => (
+                      <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              ))}
+            </div>
           </div>
         )}
 
@@ -364,6 +418,7 @@ function SellerRegister() {
         {(registrationType === 'new' || selectedGroup) && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
+
             <Form.Item
               name="businessNumber"
               label="사업자등록번호"
@@ -380,10 +435,10 @@ function SellerRegister() {
               label="사업자등록상호"
               rules={[
                 { required: true, message: '사업자등록상호를 입력해주세요' },
-                { max: 50, message: '최대 50자까지 입력 가능합니다' }
+                { max: 50, message: '최대 50자' }
               ]}
             >
-              <Input placeholder="영어조합법인 성호수산" />
+              <Input placeholder="(주)대박수산" />
             </Form.Item>
 
             <Form.Item
@@ -391,109 +446,62 @@ function SellerRegister() {
               label="대표자"
               rules={[
                 { required: true, message: '대표자를 입력해주세요' },
-                { max: 10, message: '최대 10자까지 입력 가능합니다' }
+                { max: 10, message: '최대 10자' }
               ]}
             >
-              <Input placeholder="박성호" />
+              <Input placeholder="박대박" />
             </Form.Item>
 
             <Form.Item
               name="businessAddress"
-              label="사업자등록주소"
-              rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
+              label="사업장등록주소"
+              rules={[{ max: 100, message: '최대 100자' }]}
             >
-              <Input placeholder="경기도 수지구 동천동 230-3" />
+              <Input placeholder="서울시 강남구 테헤란로 123" />
             </Form.Item>
 
             <Form.Item
-              name="sellerName"
-              label="셀러명"
+              name="buyerName"
+              label="바이어명"
               rules={[
-                { required: true, message: '셀러명을 입력해주세요' },
-                { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
+                { required: true, message: '바이어명을 입력해주세요' },
+                { max: 20, message: '최대 20자' },
+                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용' }
               ]}
             >
-              <Input placeholder="성호1호" />
+              <Input placeholder="대박집" />
             </Form.Item>
 
             <Form.Item
-              name="loadingAddress"
-              label="상차지 주소"
-              rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
-            >
-              <Input placeholder="전라남도 완도군 신지면 2-3" />
-            </Form.Item>
-
-            <Form.Item
-              name="commissionRate"
-              label="상차 수수료율(%)"
+              name="buyerId"
+              label="ticker (ticker)"
               rules={[
-                { required: true, message: '상차 수수료율을 입력해주세요' },
-                { type: 'number', min: 0, max: 100, message: '0-100% 범위 입력' }
+                { required: true, message: 'ticker를 입력해주세요' },
+                { max: 10, message: '최대 10자' },
+                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
               ]}
             >
-              <InputNumber
-                style={{ width: '100%' }}
-                min={0}
-                max={100}
-                step={0.1}
-                placeholder="1.0"
-              />
+              <Input placeholder="DBBK01" />
             </Form.Item>
 
-            <Divider orientation="left">은행계좌정보</Divider>
-            <Form.List name="bankAccounts" initialValue={[{}]}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map((field, index) => (
-                    <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
-                      <Space align="start" style={{ width: '100%' }}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'bank']}
-                          label="은행명"
-                          rules={[{ required: true, message: '은행명 입력' }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <Input placeholder="하나은행" />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'accountNumber']}
-                          label="계좌번호"
-                          rules={[{ required: true, message: '계좌번호 입력' }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <Input placeholder="39484448392049" />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'holder']}
-                          label="예금주"
-                          rules={[{ required: true, message: '예금주 입력' }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <Input placeholder="박성호" />
-                        </Form.Item>
-                        {fields.length > 1 && (
-                          <MinusCircleOutlined
-                            onClick={() => remove(field.name)}
-                            style={{ marginTop: 30 }}
-                          />
-                        )}
-                      </Space>
-                      {index === 0 && <Tag color="gold" style={{ marginTop: 8 }}>주사용 계좌</Tag>}
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                    계좌 추가하기
-                  </Button>
-                </>
-              )}
-            </Form.List>
+            <Form.Item
+              name="unloadingAddress"
+              label="하차지 주소"
+              rules={[{ max: 100, message: '최대 100자' }]}
+            >
+              <Input placeholder="서울시 용산구 한남동 339" />
+            </Form.Item>
 
-            <Divider />
+            <Form.Item
+              name="taxInvoiceEmail"
+              label="세금계산서 발행 이메일주소"
+              rules={[
+                { required: true, message: '이메일주소를 입력해주세요' },
+                { type: 'email', message: '올바른 이메일 형식이 아닙니다' }
+              ]}
+            >
+              <Input placeholder="daebak@email.com" />
+            </Form.Item>
 
             <Form.Item
               name="certificate"
@@ -506,7 +514,7 @@ function SellerRegister() {
                 maxCount={1}
                 accept="image/*,.pdf"
               >
-                <Button icon={<UploadOutlined />}>사업자등록증 첨부하기</Button>
+                <Button icon={<UploadOutlined />}>사업자등록증 첨부하기 (최대 10MB)</Button>
               </Upload>
             </Form.Item>
           </div>
@@ -514,7 +522,7 @@ function SellerRegister() {
 
         {/* 하단 버튼 */}
         <Space>
-          <Button size="large" onClick={() => navigate('/seller')}>
+          <Button size="large" onClick={() => navigate('/buyer')}>
             취소
           </Button>
           <Button type="primary" size="large" onClick={handleSubmit}>
@@ -526,4 +534,4 @@ function SellerRegister() {
   );
 }
 
-export default SellerRegister;
+export default BuyerRegister;

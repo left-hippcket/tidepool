@@ -21,7 +21,7 @@ function BuyerManagement() {
   };
 
   const handleRegister = () => {
-    message.info('바이어 등록 페이지 (준비중)');
+    navigate('/buyer/register');
   };
 
   // 필터링 로직

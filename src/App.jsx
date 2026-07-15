@@ -15,6 +15,7 @@ import SellerDetail from './pages/SellerDetail';
 import SellerRegister from './pages/SellerRegister';
 import BuyerManagement from './pages/BuyerManagement';
 import BuyerDetail from './pages/BuyerDetail';
+import BuyerRegister from './pages/BuyerRegister';
 import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
 
@@ -234,6 +235,7 @@ function App() {
             <Route path="/seller/register" element={<SellerRegister />} />
             <Route path="/seller/:id" element={<SellerDetail />} />
             <Route path="/buyer" element={<BuyerManagement />} />
+            <Route path="/buyer/register" element={<BuyerRegister />} />
             <Route path="/buyer/:id" element={<BuyerDetail />} />
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
