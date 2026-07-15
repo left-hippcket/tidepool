@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, Button, Tag, Form, Input, Select, Space, message, Modal,
-  Upload, Timeline, InputNumber, DatePicker, Table, Statistic
+  Upload, Timeline, InputNumber, DatePicker, Table, Statistic, Image
 } from 'antd';
 import {
   ArrowLeftOutlined, EditOutlined, UploadOutlined, PlusOutlined,
