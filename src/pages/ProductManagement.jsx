@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tabs, Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space, Card, Row, Col } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import {
   productCategories as initialCategories,
@@ -7,8 +7,6 @@ import {
   origins as initialOrigins,
   specifications as initialSpecs
 } from '../data/mockData';
-
-const { TabPane } = Tabs;
 
 function ProductManagement() {
   const [categories, setCategories] = useState(initialCategories);
@@ -317,13 +315,47 @@ function ProductManagement() {
   };
 
   return (
-    <div>
-      <h2>상품 관리</h2>
+    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">상품 관리</h2>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        {/* 탭 1: 품목분류 관리 */}
-        <TabPane tab="품목분류 관리" key="category">
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+      {/* 탭 버튼 */}
+      <div className="flex gap-2 mb-6 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('category')}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'category'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          품목분류 관리
+        </button>
+        <button
+          onClick={() => setActiveTab('product')}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'product'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          품목 관리
+        </button>
+        <button
+          onClick={() => setActiveTab('origin-spec')}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'origin-spec'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          원산지/규격 관리
+        </button>
+      </div>
+
+      {/* 탭 1: 품목분류 관리 */}
+      {activeTab === 'category' && (
+        <div>
+          <div className="flex justify-end mb-4">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory}>
               품목분류 등록
             </Button>
@@ -334,13 +366,15 @@ function ProductManagement() {
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
-        </TabPane>
+        </div>
+      )}
 
-        {/* 탭 2: 품목 관리 */}
-        <TabPane tab="품목 관리" key="product">
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+      {/* 탭 2: 품목 관리 */}
+      {activeTab === 'product' && (
+        <div>
+          <div className="flex justify-between items-center mb-4">
             <Space>
-              <span>품목분류:</span>
+              <span className="text-sm text-gray-700">품목분류:</span>
               <Select
                 style={{ width: 150 }}
                 value={selectedCategoryFilter}
@@ -364,189 +398,185 @@ function ProductManagement() {
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
-        </TabPane>
+        </div>
+      )}
 
-        {/* 탭 3: 원산지/규격 관리 */}
-        <TabPane tab="원산지/규격 관리" key="origin-spec">
-          <Row gutter={16}>
-            {/* 왼쪽: 품목 선택 */}
-            <Col span={6}>
-              <Card title="품목 선택" size="small">
-                <div style={{ marginBottom: 8 }}>
-                  <Select
-                    style={{ width: '100%' }}
-                    placeholder="품목분류 필터"
-                    allowClear
-                    onChange={(value) => {
-                      setSelectedCategoryFilter(value || 'all');
-                      setSelectedProduct(null);
-                    }}
-                  >
-                    {categories.map(c => (
-                      <Select.Option key={c.id} value={c.id}>
-                        {c.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </div>
-                <div style={{ maxHeight: 500, overflow: 'auto' }}>
-                  {filteredProducts.map(p => (
-                    <div
-                      key={p.id}
-                      onClick={() => handleProductSelect(p)}
-                      style={{
-                        padding: '8px 12px',
-                        cursor: 'pointer',
-                        background: selectedProduct?.id === p.id ? '#e6f7ff' : '#fff',
-                        borderRadius: 4,
-                        marginBottom: 4,
-                        border: selectedProduct?.id === p.id ? '1px solid #1890ff' : '1px solid #f0f0f0',
-                      }}
-                    >
-                      <div>{p.categoryName} / {p.name}</div>
-                      {p.status === 'inactive' && (
-                        <Tag size="small" style={{ marginTop: 4 }}>비활성</Tag>
-                      )}
-                    </div>
+      {/* 탭 3: 원산지/규격 관리 */}
+      {activeTab === 'origin-spec' && (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* 왼쪽: 품목 선택 */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">품목 선택</h3>
+              <div className="mb-3">
+                <Select
+                  style={{ width: '100%' }}
+                  placeholder="품목분류 필터"
+                  allowClear
+                  onChange={(value) => {
+                    setSelectedCategoryFilter(value || 'all');
+                    setSelectedProduct(null);
+                  }}
+                >
+                  {categories.map(c => (
+                    <Select.Option key={c.id} value={c.id}>
+                      {c.name}
+                    </Select.Option>
                   ))}
+                </Select>
+              </div>
+              <div className="max-h-[500px] overflow-auto space-y-2">
+                {filteredProducts.map(p => (
+                  <div
+                    key={p.id}
+                    onClick={() => handleProductSelect(p)}
+                    className={`p-3 cursor-pointer rounded-lg border transition-colors ${
+                      selectedProduct?.id === p.id
+                        ? 'bg-blue-50 border-blue-500'
+                        : 'bg-white border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="text-sm font-medium text-gray-900">
+                      {p.categoryName} / {p.name}
+                    </div>
+                    {p.status === 'inactive' && (
+                      <Tag size="small" className="mt-1">비활성</Tag>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 중앙: 원산지 관리 */}
+          <div className="lg:col-span-1.5">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base font-semibold text-gray-900">
+                  {selectedProduct ? `${selectedProduct.categoryName} / ${selectedProduct.name}` : '원산지 관리'}
+                </h3>
+                {selectedProduct && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={handleAddOrigin}
+                    disabled={selectedProduct?.status === 'inactive'}
+                  >
+                    원산지 추가
+                  </Button>
+                )}
+              </div>
+              {!selectedProduct ? (
+                <div className="text-center py-10 text-gray-500">
+                  왼쪽에서 품목을 선택해주세요.
                 </div>
-              </Card>
-            </Col>
-
-            {/* 중앙: 원산지 관리 */}
-            <Col span={9}>
-              <Card
-                title={selectedProduct ? `선택 품목: ${selectedProduct.categoryName} / ${selectedProduct.name}` : '원산지 관리'}
-                size="small"
-                extra={
-                  selectedProduct && (
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<PlusOutlined />}
-                      onClick={handleAddOrigin}
-                      disabled={selectedProduct?.status === 'inactive'}
-                    >
-                      원산지 추가
-                    </Button>
-                  )
-                }
-              >
-                {!selectedProduct ? (
-                  <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>
-                    왼쪽에서 품목을 선택해주세요.
-                  </div>
-                ) : (
-                  <div style={{ maxHeight: 500, overflow: 'auto' }}>
-                    {selectedOrigins.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
-                        등록된 원산지가 없습니다.
-                      </div>
-                    ) : (
-                      selectedOrigins.map(origin => (
-                        <Card
-                          key={origin.id}
-                          size="small"
-                          style={{
-                            marginBottom: 8,
-                            background: origin.status === 'active' ? '#fff' : '#f5f5f5'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <strong>{origin.name}</strong>
-                              <Tag
-                                color={origin.status === 'active' ? 'green' : 'default'}
-                                style={{ marginLeft: 8 }}
-                              >
-                                {origin.status === 'active' ? '활성' : '비활성'}
-                              </Tag>
-                            </div>
-                            <Button
-                              type="link"
-                              size="small"
-                              icon={<EditOutlined />}
-                              onClick={() => handleEditOrigin(origin)}
+              ) : (
+                <div className="max-h-[500px] overflow-auto space-y-2">
+                  {selectedOrigins.length === 0 ? (
+                    <div className="text-center py-6 text-gray-500">
+                      등록된 원산지가 없습니다.
+                    </div>
+                  ) : (
+                    selectedOrigins.map(origin => (
+                      <div
+                        key={origin.id}
+                        className={`p-3 rounded-lg border ${
+                          origin.status === 'active' ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-200'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="font-medium text-gray-900">{origin.name}</span>
+                            <Tag
+                              color={origin.status === 'active' ? 'green' : 'default'}
+                              className="ml-2"
                             >
-                              수정
-                            </Button>
+                              {origin.status === 'active' ? '활성' : '비활성'}
+                            </Tag>
                           </div>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                )}
-              </Card>
-            </Col>
-
-            {/* 우측: 규격 관리 */}
-            <Col span={9}>
-              <Card
-                title={selectedProduct ? `선택 품목: ${selectedProduct.categoryName} / ${selectedProduct.name}` : '규격 관리'}
-                size="small"
-                extra={
-                  selectedProduct && (
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<PlusOutlined />}
-                      onClick={handleAddSpec}
-                      disabled={selectedProduct?.status === 'inactive'}
-                    >
-                      규격 추가
-                    </Button>
-                  )
-                }
-              >
-                {!selectedProduct ? (
-                  <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>
-                    왼쪽에서 품목을 선택해주세요.
-                  </div>
-                ) : (
-                  <div style={{ maxHeight: 500, overflow: 'auto' }}>
-                    {selectedSpecs.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: 20, color: '#999' }}>
-                        등록된 규격이 없습니다.
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditOrigin(origin)}
+                          >
+                            수정
+                          </Button>
+                        </div>
                       </div>
-                    ) : (
-                      selectedSpecs.map(spec => (
-                        <Card
-                          key={spec.id}
-                          size="small"
-                          style={{
-                            marginBottom: 8,
-                            background: spec.status === 'active' ? '#fff' : '#f5f5f5'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <strong>{spec.name}</strong>
-                              <Tag
-                                color={spec.status === 'active' ? 'green' : 'default'}
-                                style={{ marginLeft: 8 }}
-                              >
-                                {spec.status === 'active' ? '활성' : '비활성'}
-                              </Tag>
-                            </div>
-                            <Button
-                              type="link"
-                              size="small"
-                              icon={<EditOutlined />}
-                              onClick={() => handleEditSpec(spec)}
-                            >
-                              수정
-                            </Button>
-                          </div>
-                        </Card>
-                      ))
-                    )}
-                  </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 우측: 규격 관리 */}
+          <div className="lg:col-span-1.5">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base font-semibold text-gray-900">
+                  {selectedProduct ? `${selectedProduct.categoryName} / ${selectedProduct.name}` : '규격 관리'}
+                </h3>
+                {selectedProduct && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={handleAddSpec}
+                    disabled={selectedProduct?.status === 'inactive'}
+                  >
+                    규격 추가
+                  </Button>
                 )}
-              </Card>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
+              </div>
+              {!selectedProduct ? (
+                <div className="text-center py-10 text-gray-500">
+                  왼쪽에서 품목을 선택해주세요.
+                </div>
+              ) : (
+                <div className="max-h-[500px] overflow-auto space-y-2">
+                  {selectedSpecs.length === 0 ? (
+                    <div className="text-center py-6 text-gray-500">
+                      등록된 규격이 없습니다.
+                    </div>
+                  ) : (
+                    selectedSpecs.map(spec => (
+                      <div
+                        key={spec.id}
+                        className={`p-3 rounded-lg border ${
+                          spec.status === 'active' ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-200'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="font-medium text-gray-900">{spec.name}</span>
+                            <Tag
+                              color={spec.status === 'active' ? 'green' : 'default'}
+                              className="ml-2"
+                            >
+                              {spec.status === 'active' ? '활성' : '비활성'}
+                            </Tag>
+                          </div>
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditSpec(spec)}
+                          >
+                            수정
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 공통 모달 */}
       <Modal
