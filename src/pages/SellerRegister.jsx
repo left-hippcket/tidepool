@@ -357,6 +357,23 @@ function SellerRegister() {
             <Form.Item name="mainDistributors" label="메인 유통사">
               <Input placeholder="노량진수산, 가락시장 (쉼표로 구분)" />
             </Form.Item>
+
+            <Form.Item
+              name="commissionRate"
+              label="상차 수수료율(%)"
+              rules={[
+                { required: true, message: '상차 수수료율을 입력해주세요' },
+                { type: 'number', min: 0, max: 100, message: '0-100% 범위 입력' }
+              ]}
+            >
+              <InputNumber
+                style={{ width: '100%' }}
+                min={0}
+                max={100}
+                step={0.1}
+                placeholder="1.0"
+              />
+            </Form.Item>
           </div>
         )}
 
@@ -423,23 +440,6 @@ function SellerRegister() {
               rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
             >
               <Input placeholder="전라남도 완도군 신지면 2-3" />
-            </Form.Item>
-
-            <Form.Item
-              name="commissionRate"
-              label="상차 수수료율(%)"
-              rules={[
-                { required: true, message: '상차 수수료율을 입력해주세요' },
-                { type: 'number', min: 0, max: 100, message: '0-100% 범위 입력' }
-              ]}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                min={0}
-                max={100}
-                step={0.1}
-                placeholder="1.0"
-              />
             </Form.Item>
 
             <Divider orientation="left">은행계좌정보</Divider>

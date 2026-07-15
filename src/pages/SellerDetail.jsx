@@ -30,6 +30,7 @@ function SellerDetail() {
       mainCategory: sellerGroup.mainCategory,
       territory: sellerGroup.territory,
       region: sellerGroup.region,
+      commissionRate: sellerGroup.commissionRate,
       status: sellerGroup.status
     });
     setEditMode(true);
@@ -77,7 +78,6 @@ function SellerDetail() {
       representative: business.representative,
       businessAddress: business.businessAddress,
       loadingAddress: business.loadingAddress,
-      commissionRate: business.commissionRate,
       status: business.status
     });
     setEditingBusinessId(business.id);
@@ -272,6 +272,9 @@ function SellerDetail() {
                   <Select.Option value="고흥">고흥</Select.Option>
                 </Select>
               </Form.Item>
+              <Form.Item label="상차 수수료율(%)" name="commissionRate" rules={[{ required: true }]}>
+                <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} />
+              </Form.Item>
               <Form.Item label="상태" name="status" rules={[{ required: true }]}>
                 <Select onChange={handleStatusChange}>
                   <Select.Option value="active">활성</Select.Option>
@@ -301,6 +304,10 @@ function SellerDetail() {
             <div>
               <div className="text-sm text-gray-500 mb-1">상세지역</div>
               <div className="text-base font-semibold text-gray-900">{sellerGroup.region}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-1">상차 수수료율</div>
+              <div className="text-base font-semibold text-gray-900">{sellerGroup.commissionRate}%</div>
             </div>
             <div>
               <div className="text-sm text-gray-500 mb-1">사업자 수</div>
@@ -442,9 +449,6 @@ function SellerDetail() {
                       <Form.Item label="상차지 주소" name="loadingAddress" className="md:col-span-2">
                         <Input />
                       </Form.Item>
-                      <Form.Item label="상차 수수료율(%)" name="commissionRate">
-                        <InputNumber min={0} max={100} step={0.1} className="w-full" />
-                      </Form.Item>
                       <Form.Item label="상태" name="status">
                         <Select>
                           <Select.Option value="active">활성</Select.Option>
@@ -480,10 +484,6 @@ function SellerDetail() {
                     <div className="md:col-span-2">
                       <div className="text-sm text-gray-500 mb-1">상차지 주소</div>
                       <div className="text-base font-medium text-gray-900">{business.loadingAddress}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">상차 수수료율</div>
-                      <div className="text-base font-medium text-gray-900">{business.commissionRate}%</div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-500 mb-1">은행계좌</div>
