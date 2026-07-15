@@ -276,16 +276,34 @@ function ProductManagement() {
           ));
           message.success('원산지 정보가 수정되었습니다.');
         } else {
-          const newId = Math.max(...origins.map(o => o.id)) + 1;
-          setOrigins([...origins, {
-            id: newId,
+          // 쉼표로 구분된 여러 원산지명 처리
+          const originNames = values.name
+            .split(',')
+            .map(name => name.trim())
+            .filter(name => name.length > 0);
+
+          if (originNames.length === 0) {
+            message.error('원산지명을 입력해주세요.');
+            return;
+          }
+
+          let newId = Math.max(...origins.map(o => o.id)) + 1;
+          const newOrigins = originNames.map(name => ({
+            id: newId++,
             productId: selectedProduct.id,
             productName: selectedProduct.name,
-            name: values.name,
+            name: name,
             status: 'active',
             createdAt: new Date().toISOString().split('T')[0],
-          }]);
-          message.success(`원산지 '${values.name}'이 등록되었습니다.`);
+          }));
+
+          setOrigins([...origins, ...newOrigins]);
+
+          if (originNames.length === 1) {
+            message.success(`원산지 '${originNames[0]}'이 등록되었습니다.`);
+          } else {
+            message.success(`${originNames.length}개의 원산지가 등록되었습니다.`);
+          }
         }
       } else if (modalType === 'spec') {
         if (editingItem) {
@@ -713,27 +731,49 @@ function ProductManagement() {
 
           {modalType === 'origin' && (
             <>
-              <Form.Item
-                label="원산지명"
-                name="name"
-                rules={[
-                  { required: true, message: '원산지명을 입력해주세요' },
-                  { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                ]}
-              >
-                <Input placeholder="예: 완도" />
-              </Form.Item>
-              {editingItem && (
-                <Form.Item
-                  label="상태"
-                  name="status"
-                  rules={[{ required: true }]}
-                >
-                  <Select>
-                    <Select.Option value="active">활성</Select.Option>
-                    <Select.Option value="inactive">비활성</Select.Option>
-                  </Select>
-                </Form.Item>
+              {editingItem ? (
+                // 수정 모드: 단일 원산지명
+                <>
+                  <Form.Item
+                    label="원산지명"
+                    name="name"
+                    rules={[
+                      { required: true, message: '원산지명을 입력해주세요' },
+                      { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                    ]}
+                  >
+                    <Input placeholder="예: 완도" />
+                  </Form.Item>
+                  <Form.Item
+                    label="상태"
+                    name="status"
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      <Select.Option value="active">활성</Select.Option>
+                      <Select.Option value="inactive">비활성</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </>
+              ) : (
+                // 추가 모드: 여러 원산지명을 쉼표로 구분 입력
+                <>
+                  <Form.Item
+                    label="원산지명 (여러 개 입력 시 쉼표로 구분)"
+                    name="name"
+                    rules={[
+                      { required: true, message: '원산지명을 입력해주세요' },
+                    ]}
+                  >
+                    <Input.TextArea
+                      placeholder="예: 완도, 진도, 통영, 거제&#10;(쉼표로 구분하여 여러 개를 한 번에 등록할 수 있습니다)"
+                      rows={4}
+                    />
+                  </Form.Item>
+                  <div className="text-xs text-gray-500 mt-1 -mt-4 mb-4">
+                    💡 팁: 쉼표(,)로 구분하여 여러 원산지를 한 번에 등록할 수 있습니다.
+                  </div>
+                </>
               )}
             </>
           )}
