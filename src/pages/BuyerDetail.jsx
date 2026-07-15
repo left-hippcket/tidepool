@@ -1,6 +1,5 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Descriptions, Tag, Button, Row, Col, Space, Divider } from 'antd';
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
 import { buyerGroups, buyerDetails } from '../data/mockData';
 
@@ -13,153 +12,252 @@ function BuyerDetail() {
 
   if (!buyerGroup || !detail) {
     return (
-      <div>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/buyer')}>
+      <div className="min-h-screen bg-[#f9fafb] p-6">
+        <button
+          onClick={() => navigate('/buyer')}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <ArrowLeftOutlined />
           목록으로 돌아가기
-        </Button>
-        <div style={{ marginTop: 20, fontSize: 18 }}>바이어 그룹을 찾을 수 없습니다.</div>
+        </button>
+        <div className="mt-8 text-lg text-gray-600">바이어 그룹을 찾을 수 없습니다.</div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
       {/* 헤더 */}
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Space>
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/buyer')}>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/buyer')}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <ArrowLeftOutlined />
             목록으로
-          </Button>
-          <h2 style={{ margin: 0 }}>{buyerGroup.name} 상세 정보</h2>
-        </Space>
-        <Tag color={buyerGroup.status === 'active' ? 'green' : 'default'} style={{ fontSize: 14, padding: '4px 12px' }}>
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">{buyerGroup.name}</h1>
+        </div>
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+          buyerGroup.status === 'active'
+            ? 'bg-green-50 text-green-700 border border-green-200'
+            : 'bg-gray-50 text-gray-700 border border-gray-200'
+        }`}>
           {buyerGroup.status === 'active' ? '활성' : '비활성'}
-        </Tag>
+        </span>
       </div>
 
       {/* 섹션 1: 바이어그룹 기본 정보 */}
-      <Card
-        title="바이어그룹 기본 정보"
-        extra={<Button icon={<EditOutlined />} type="link">수정</Button>}
-        style={{ marginBottom: 24 }}
-      >
-        <Descriptions bordered column={2}>
-          <Descriptions.Item label="바이어그룹명">{buyerGroup.name}</Descriptions.Item>
-          <Descriptions.Item label="담당영업사원">{buyerGroup.salesPerson}</Descriptions.Item>
-          <Descriptions.Item label="주요품목분류">{buyerGroup.mainCategory}</Descriptions.Item>
-          <Descriptions.Item label="사업권역">{buyerGroup.territory}</Descriptions.Item>
-          <Descriptions.Item label="상세지역">{buyerGroup.region}</Descriptions.Item>
-          <Descriptions.Item label="사업자 수">{buyerGroup.businessCount}개</Descriptions.Item>
-        </Descriptions>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">바이어그룹 기본 정보</h2>
+          <button className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            <EditOutlined />
+            수정
+          </button>
+        </div>
 
-        <Divider orientation="left">키맨 정보</Divider>
-        {detail.keymen.map((keyman, index) => (
-          <Card key={index} size="small" style={{ marginBottom: 8, backgroundColor: '#fafafa' }}>
-            <Space size="large">
-              <span><strong>이름:</strong> {keyman.name}</span>
-              <span><strong>직책:</strong> {keyman.position}</span>
-              <span><strong>연락처:</strong> {keyman.phone}</span>
-            </Space>
-          </Card>
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <div className="text-sm text-gray-500 mb-1">바이어그룹명</div>
+            <div className="text-base font-semibold text-gray-900">{buyerGroup.name}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 mb-1">담당영업사원</div>
+            <div className="text-base font-semibold text-gray-900">{buyerGroup.salesPerson}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 mb-1">주요품목분류</div>
+            <div className="text-base font-semibold text-gray-900">{buyerGroup.mainCategory}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 mb-1">사업권역</div>
+            <div className="text-base font-semibold text-gray-900">{buyerGroup.territory}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 mb-1">상세지역</div>
+            <div className="text-base font-semibold text-gray-900">{buyerGroup.region}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-500 mb-1">사업자 수</div>
+            <div className="text-base font-semibold text-gray-900">{buyerGroup.businessCount}개</div>
+          </div>
+        </div>
 
-        <Divider orientation="left">거래 정보</Divider>
-        <Descriptions bordered column={2}>
-          <Descriptions.Item label="카톡단톡방이름">{detail.kakaoGroupName}</Descriptions.Item>
-          <Descriptions.Item label="결제주기">{detail.paymentCycle}</Descriptions.Item>
-          <Descriptions.Item label="컴플레인강도">{detail.complaintIntensity}</Descriptions.Item>
-          <Descriptions.Item label="도착단가 정책">{detail.arrivalPricePolicy}</Descriptions.Item>
-          <Descriptions.Item label="메인공급처" span={2}>{detail.mainSuppliers}</Descriptions.Item>
-        </Descriptions>
+        {/* 키맨 정보 */}
+        <div className="mt-8">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
+          <div className="space-y-3">
+            {detail.keymen.map((keyman, index) => (
+              <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">이름</div>
+                    <div className="text-sm font-medium text-gray-900">{keyman.name}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">직책</div>
+                    <div className="text-sm font-medium text-gray-900">{keyman.position}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">연락처</div>
+                    <div className="text-sm font-medium text-gray-900">{keyman.phone}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <Divider orientation="left">중요 평가 요소 (우선순위)</Divider>
-        <Space>
-          {detail.priorityFactors.map((factor, index) => (
-            <Tag key={index} color="blue" style={{ fontSize: 14, padding: '4px 12px' }}>
-              {index + 1}순위: {factor}
-            </Tag>
-          ))}
-        </Space>
-      </Card>
+        {/* 거래 정보 */}
+        <div className="mt-8">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">거래 정보</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="text-sm text-gray-500 mb-1">카톡단톡방이름</div>
+              <div className="text-base font-semibold text-gray-900">{detail.kakaoGroupName}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-1">결제주기</div>
+              <div className="text-base font-semibold text-gray-900">{detail.paymentCycle}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-1">컴플레인강도</div>
+              <div className="text-base font-semibold text-gray-900">{detail.complaintIntensity}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-1">도착단가 정책</div>
+              <div className="text-base font-semibold text-gray-900">{detail.arrivalPricePolicy}</div>
+            </div>
+            <div className="md:col-span-2">
+              <div className="text-sm text-gray-500 mb-1">메인공급처</div>
+              <div className="text-base font-semibold text-gray-900">{detail.mainSuppliers}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 중요 평가 요소 */}
+        <div className="mt-8">
+          <h3 className="text-base font-semibold text-gray-900 mb-4">중요 평가 요소 (우선순위)</h3>
+          <div className="flex flex-wrap gap-2">
+            {detail.priorityFactors.map((factor, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200"
+              >
+                {index + 1}순위: {factor}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* 섹션 2: 소속 사업자 정보 */}
-      <Card title="소속 사업자 정보" style={{ marginBottom: 24 }}>
-        <Row gutter={[16, 16]}>
-          {detail.businesses.map((business, index) => (
-            <Col span={24} key={business.id}>
-              <Card
-                size="small"
-                type="inner"
-                title={
-                  <Space>
-                    <span>{business.buyerName}</span>
-                    <Tag color={business.status === 'active' ? 'green' : 'default'}>
-                      {business.status === 'active' ? '활성' : '비활성'}
-                    </Tag>
-                    {business.hasCertificate && <Tag color="blue">사업자등록증 첨부</Tag>}
-                  </Space>
-                }
-                extra={<Button icon={<EditOutlined />} type="link" size="small">수정</Button>}
-              >
-                <Descriptions bordered column={2} size="small">
-                  <Descriptions.Item label="사업자등록번호">{business.businessNumber}</Descriptions.Item>
-                  <Descriptions.Item label="바이어ID">{business.buyerId}</Descriptions.Item>
-                  <Descriptions.Item label="사업자등록상호">{business.businessName}</Descriptions.Item>
-                  <Descriptions.Item label="대표자">{business.representative}</Descriptions.Item>
-                  <Descriptions.Item label="사업장등록주소" span={2}>{business.businessAddress}</Descriptions.Item>
-                  <Descriptions.Item label="하차지 주소" span={2}>{business.unloadingAddress}</Descriptions.Item>
-                  <Descriptions.Item label="세금계산서 발행 이메일" span={2}>{business.taxInvoiceEmail}</Descriptions.Item>
-                </Descriptions>
-              </Card>
-              {index < detail.businesses.length - 1 && <Divider />}
-            </Col>
-          ))}
-        </Row>
-        <Button type="dashed" block style={{ marginTop: 16 }}>
-          + 사업자 추가
-        </Button>
-      </Card>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">소속 사업자 정보</h2>
 
-      {/* 섹션 3: 거래 실적 (준비중) */}
-      <Card title="거래 실적" style={{ marginBottom: 24 }}>
-        <Row gutter={[16, 16]}>
-          <Col span={6}>
-            <Card size="small" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 12, color: '#999' }}>매출액 (누적)</div>
-              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#1890ff' }}>
-                {(buyerGroup.totalSales / 100000000).toFixed(1)}억
+        <div className="space-y-4">
+          {detail.businesses.map((business, index) => (
+            <div key={business.id} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+              <div className="bg-white px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-gray-900">{business.buyerName}</span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                    business.status === 'active'
+                      ? 'bg-green-50 text-green-700 border border-green-200'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {business.status === 'active' ? '활성' : '비활성'}
+                  </span>
+                  {business.hasCertificate && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                      사업자등록증 첨부
+                    </span>
+                  )}
+                </div>
+                <button className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+                  <EditOutlined />
+                  수정
+                </button>
               </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card size="small" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 12, color: '#999' }}>매출액 (최근 3개월)</div>
-              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#52c41a' }}>
-                {(buyerGroup.sales3M / 100000000).toFixed(1)}억
+
+              <div className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">사업자등록번호</div>
+                    <div className="text-base font-medium text-gray-900">{business.businessNumber}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">바이어ID</div>
+                    <div className="text-base font-medium text-gray-900">{business.buyerId}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">사업자등록상호</div>
+                    <div className="text-base font-medium text-gray-900">{business.businessName}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">대표자</div>
+                    <div className="text-base font-medium text-gray-900">{business.representative}</div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="text-sm text-gray-500 mb-1">사업장등록주소</div>
+                    <div className="text-base font-medium text-gray-900">{business.businessAddress}</div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="text-sm text-gray-500 mb-1">하차지 주소</div>
+                    <div className="text-base font-medium text-gray-900">{business.unloadingAddress}</div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="text-sm text-gray-500 mb-1">세금계산서 발행 이메일</div>
+                    <div className="text-base font-medium text-gray-900">{business.taxInvoiceEmail}</div>
+                  </div>
+                </div>
               </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card size="small" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 12, color: '#999' }}>매출액 (최근 1개월)</div>
-              <div style={{ fontSize: 20, fontWeight: 'bold', color: '#faad14' }}>
-                {(buyerGroup.sales1M / 100000000).toFixed(1)}억
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card size="small" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 12, color: '#999' }}>최근거래일</div>
-              <div style={{ fontSize: 20, fontWeight: 'bold' }}>
-                {buyerGroup.lastTradeDate}
-              </div>
-            </Card>
-          </Col>
-        </Row>
-        <div style={{ marginTop: 16, padding: 20, background: '#fafafa', textAlign: 'center', borderRadius: 8 }}>
-          상세 거래 내역 및 판매 세부내역은 추후 구현 예정
+            </div>
+          ))}
         </div>
-      </Card>
+
+        <button className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors font-medium">
+          + 사업자 추가
+        </button>
+      </div>
+
+      {/* 섹션 3: 거래 실적 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">거래 실적</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
+            <div className="text-xs text-blue-600 mb-2">매출액 (누적)</div>
+            <div className="text-2xl font-bold text-blue-700">
+              {(buyerGroup.totalSales / 100000000).toFixed(1)}억
+            </div>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4 text-center border border-green-100">
+            <div className="text-xs text-green-600 mb-2">매출액 (최근 3개월)</div>
+            <div className="text-2xl font-bold text-green-700">
+              {(buyerGroup.sales3M / 100000000).toFixed(1)}억
+            </div>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-4 text-center border border-yellow-100">
+            <div className="text-xs text-yellow-600 mb-2">매출액 (최근 1개월)</div>
+            <div className="text-2xl font-bold text-yellow-700">
+              {(buyerGroup.sales1M / 100000000).toFixed(1)}억
+            </div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+            <div className="text-xs text-gray-600 mb-2">최근거래일</div>
+            <div className="text-2xl font-bold text-gray-900">
+              {buyerGroup.lastTradeDate}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 p-6 bg-gray-50 text-center rounded-lg border border-gray-200">
+          <p className="text-gray-600">상세 거래 내역 및 판매 세부내역은 추후 구현 예정</p>
+        </div>
+      </div>
     </div>
   );
 }
