@@ -152,9 +152,10 @@ function DriverManagement() {
       },
     },
     {
-      title: '',
+      title: '상세',
       key: 'action',
       width: 80,
+      align: 'center',
       render: (_, record) => (
         <Button size="small" onClick={() => navigate(`/driver/${record.id}`)}>
           상세
