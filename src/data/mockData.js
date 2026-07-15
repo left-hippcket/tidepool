@@ -1011,3 +1011,185 @@ export const salesHistoryMemos = {
     }
   ]
 };
+
+// 조인유통 그룹
+export const joinGroups = [
+  {
+    id: 1,
+    name: '동주유통 그룹',
+    businessCount: 2,
+    salesPerson: '노원진',
+    territory: '수도권',
+    region: '서울',
+    totalPurchase: 1850000000,
+    totalSales: 2150000000,
+    purchase3M: 450000000,
+    sales3M: 520000000,
+    lastTradeDate: '2024-07-12',
+    status: 'active',
+    hasCertificate: true
+  },
+  {
+    id: 2,
+    name: 'ING 그룹',
+    businessCount: 3,
+    salesPerson: '노원진',
+    territory: '수도권',
+    region: '경기',
+    totalPurchase: 2950000000,
+    totalSales: 3250000000,
+    purchase3M: 780000000,
+    sales3M: 850000000,
+    lastTradeDate: '2024-07-14',
+    status: 'active',
+    hasCertificate: true
+  },
+  {
+    id: 3,
+    name: '호경유통 그룹',
+    businessCount: 1,
+    salesPerson: '노원진',
+    territory: '수도권',
+    region: '서울',
+    totalPurchase: 850000000,
+    totalSales: 950000000,
+    purchase3M: 220000000,
+    sales3M: 250000000,
+    lastTradeDate: '2024-07-11',
+    status: 'active',
+    hasCertificate: true
+  }
+];
+
+// 조인유통 상세 정보
+export const joinDetails = {
+  1: { // 동주유통 그룹
+    keymen: [
+      { name: '김동주', position: '대표', phone: '010-1111-2222' },
+      { name: '박과장', position: '영업담당', phone: '010-2222-3333' }
+    ],
+    kakaoGroupName: '[강남]동주유통 거래방',
+    paymentCycle: '기본 미수 2천 요구, 2천 초과분에 대해 랜덤하게 입금',
+    arrivalPricePolicy: 0,
+    commissionRate: 0.0,
+    mainSuppliers: '해금 그룹, 갑운 그룹',
+    mainFarms: '성호수산, 거제양식',
+    financial: '좋음',
+    businesses: [
+      {
+        id: 1,
+        businessNumber: '123-45-67890',
+        businessName: '(주)동주유통',
+        representative: '김동주',
+        businessAddress: '서울시 강남구 테헤란로 123',
+        joinName: '동주본점',
+        ticker: 'DJ01',
+        taxInvoiceEmail: 'dongju@email.com',
+        bankAccounts: [
+          { bank: '하나은행', accountNumber: '39484448392049', holder: '김동주' }
+        ],
+        status: 'active'
+      },
+      {
+        id: 2,
+        businessNumber: '345-67-89012',
+        businessName: '동주수산',
+        representative: '김동주',
+        businessAddress: '서울시 강서구 공항대로 45-2',
+        joinName: '동주2호',
+        ticker: 'DJ02',
+        taxInvoiceEmail: 'dongju2@email.com',
+        bankAccounts: [
+          { bank: '농협', accountNumber: '123-456-789-012', holder: '김동주' }
+        ],
+        status: 'active'
+      }
+    ]
+  },
+  2: { // ING 그룹
+    keymen: [
+      { name: '이인규', position: '대표', phone: '010-3333-4444' },
+      { name: '최팀장', position: '물류팀장', phone: '010-4444-5555' }
+    ],
+    kakaoGroupName: '[경기]ING 거래방',
+    paymentCycle: '월 2회 결제 (15일, 말일)',
+    arrivalPricePolicy: 0,
+    commissionRate: 0.0,
+    mainSuppliers: '통영수산 그룹',
+    mainFarms: '해금수산, 성호수산',
+    financial: '보통',
+    businesses: [
+      {
+        id: 3,
+        businessNumber: '567-89-01234',
+        businessName: '(주)아이앤지',
+        representative: '이인규',
+        businessAddress: '경기도 용인시 기흥구 동백로 456',
+        joinName: 'ING본점',
+        ticker: 'ING01',
+        taxInvoiceEmail: 'ing@email.com',
+        bankAccounts: [
+          { bank: '신한은행', accountNumber: '110-234-567890', holder: '이인규' }
+        ],
+        status: 'active'
+      },
+      {
+        id: 4,
+        businessNumber: '678-90-12345',
+        businessName: 'ING유통',
+        representative: '이인규',
+        businessAddress: '경기도 성남시 분당구 판교로 789',
+        joinName: 'ING분당',
+        ticker: 'ING02',
+        taxInvoiceEmail: 'ing-bd@email.com',
+        bankAccounts: [
+          { bank: '국민은행', accountNumber: '987-654-321098', holder: '이인규' }
+        ],
+        status: 'active'
+      },
+      {
+        id: 5,
+        businessNumber: '789-01-23456',
+        businessName: 'ING수산',
+        representative: '이인규',
+        businessAddress: '경기도 수원시 영통구 광교로 101',
+        joinName: 'ING수원',
+        ticker: 'ING03',
+        taxInvoiceEmail: 'ing-sw@email.com',
+        bankAccounts: [
+          { bank: '우리은행', accountNumber: '1002-345-678901', holder: '이인규' }
+        ],
+        status: 'active'
+      }
+    ]
+  },
+  3: { // 호경유통 그룹
+    keymen: [
+      { name: '김호경', position: '대표', phone: '010-2222-3424' },
+      { name: '박과장', position: '영업담당', phone: '010-3333-4444' }
+    ],
+    kakaoGroupName: '[강남]호경유통 거래방',
+    paymentCycle: '기본 미수 3천 요구, 3천 초과분에 대해 랜덤하게 입금',
+    arrivalPricePolicy: 0,
+    commissionRate: 0.0,
+    mainSuppliers: '동주유통, ING',
+    mainFarms: '성호수산, 갑운수산',
+    financial: '좋음',
+    businesses: [
+      {
+        id: 6,
+        businessNumber: '890-12-34567',
+        businessName: '(주)호경유통',
+        representative: '김호경',
+        businessAddress: '서울시 강남구 테헤란로 123',
+        joinName: '호경',
+        ticker: 'HK01',
+        taxInvoiceEmail: 'hokyung@email.com',
+        bankAccounts: [
+          { bank: '하나은행', accountNumber: '39484448392049', holder: '김호경' }
+        ],
+        status: 'active'
+      }
+    ]
+  }
+};

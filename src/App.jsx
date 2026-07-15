@@ -16,6 +16,7 @@ import SellerRegister from './pages/SellerRegister';
 import BuyerManagement from './pages/BuyerManagement';
 import BuyerDetail from './pages/BuyerDetail';
 import BuyerRegister from './pages/BuyerRegister';
+import JoinDistribution from './pages/JoinDistribution';
 import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
 
@@ -126,6 +127,7 @@ function App() {
       children: [
         { key: '/seller', label: '셀러' },
         { key: '/buyer', label: '바이어' },
+        { key: '/join-distribution', label: '조인유통' },
       ],
     },
     {
@@ -156,7 +158,7 @@ function App() {
   };
 
   const getOpenKeys = () => {
-    if (location.pathname === '/seller' || location.pathname === '/buyer') {
+    if (location.pathname === '/seller' || location.pathname === '/buyer' || location.pathname === '/join-distribution') {
       return ['partners'];
     }
     if (location.pathname === '/territory') {
@@ -237,6 +239,7 @@ function App() {
             <Route path="/buyer" element={<BuyerManagement />} />
             <Route path="/buyer/register" element={<BuyerRegister />} />
             <Route path="/buyer/:id" element={<BuyerDetail />} />
+            <Route path="/join-distribution" element={<JoinDistribution />} />
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
           </Routes>
