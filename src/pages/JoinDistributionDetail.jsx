@@ -346,150 +346,146 @@ function JoinDistributionDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {detail.businesses.map((business) => (
-            <div
-              key={business.id}
-              className={`rounded-lg border-2 p-4 ${
-                business.status === 'inactive'
-                  ? 'bg-gray-100 border-gray-300'
-                  : 'bg-white border-gray-200'
-              }`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="text-lg font-semibold text-gray-900">{business.joinName}</div>
-                    {business.status === 'inactive' && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
-                        비활성
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-sm text-gray-600">ticker: {business.ticker}</div>
-                </div>
-                <div className="flex gap-2">
-                  {editingBusinessId === business.id ? (
-                    <>
-                      <Button
-                        icon={<SaveOutlined />}
-                        type="primary"
-                        onClick={() => handleSaveBusiness(business)}
-                        size="small"
-                      >
-                        저장
-                      </Button>
-                      <Button
-                        icon={<CloseOutlined />}
-                        onClick={handleCancelBusinessEdit}
-                        size="small"
-                      >
-                        취소
-                      </Button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleEditBusiness(business)}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+            <div key={business.id} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+              <div className="bg-white px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-gray-900">{business.joinName}</span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                    business.status === 'active'
+                      ? 'bg-green-50 text-green-700 border border-green-200'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {business.status === 'active' ? '활성' : '비활성'}
+                  </span>
+                  <Image.PreviewGroup>
+                    <Image
+                      src="/images/business-certificate-sample.png"
+                      alt={`사업자등록증-${business.id}`}
+                      width={0}
+                      height={0}
+                      style={{ display: 'none' }}
+                      preview={{
+                        mask: null
+                      }}
+                    />
+                    <Button
+                      size="small"
+                      icon={<FileImageOutlined />}
+                      type="primary"
+                      ghost
+                      onClick={() => {
+                        const img = document.querySelector(`img[alt="사업자등록증-${business.id}"]`);
+                        if (img) img.click();
+                      }}
                     >
-                      <EditOutlined />
-                      수정
-                    </button>
-                  )}
+                      사업자등록증
+                    </Button>
+                  </Image.PreviewGroup>
                 </div>
+
+                {editingBusinessId === business.id ? (
+                  <div className="flex gap-2">
+                    <Button
+                      icon={<SaveOutlined />}
+                      type="primary"
+                      size="small"
+                      onClick={() => handleSaveBusiness(business)}
+                    >
+                      저장
+                    </Button>
+                    <Button
+                      icon={<CloseOutlined />}
+                      size="small"
+                      onClick={handleCancelBusinessEdit}
+                    >
+                      취소
+                    </Button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleEditBusiness(business)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    <EditOutlined />
+                    수정
+                  </button>
+                )}
               </div>
 
               {editingBusinessId === business.id ? (
-                <Form form={businessForm} layout="vertical" className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <Form.Item label="사업자등록번호" name="businessNumber" style={{ marginBottom: 0 }}>
-                      <Input disabled />
-                    </Form.Item>
-                    <Form.Item label="ticker" name="ticker" style={{ marginBottom: 0 }}>
-                      <Input disabled />
-                    </Form.Item>
-                    <Form.Item label="사업자등록상호" name="businessName" style={{ marginBottom: 0 }}>
-                      <Input maxLength={50} />
-                    </Form.Item>
-                    <Form.Item label="대표자" name="representative" style={{ marginBottom: 0 }}>
-                      <Input maxLength={10} />
-                    </Form.Item>
-                    <Form.Item label="사업자등록주소" name="businessAddress" className="md:col-span-2" style={{ marginBottom: 0 }}>
-                      <Input maxLength={100} />
-                    </Form.Item>
-                    <Form.Item label="조인유통명" name="joinName" style={{ marginBottom: 0 }}>
-                      <Input maxLength={20} />
-                    </Form.Item>
-                    <Form.Item label="세금계산서 이메일" name="taxInvoiceEmail" style={{ marginBottom: 0 }}>
-                      <Input type="email" />
-                    </Form.Item>
-                    <Form.Item label="상태" name="status" style={{ marginBottom: 0 }}>
-                      <Select>
-                        <Select.Option value="active">활성</Select.Option>
-                        <Select.Option value="inactive">비활성</Select.Option>
-                      </Select>
-                    </Form.Item>
-                  </div>
-                </Form>
+                <div className="p-4">
+                  <Form form={businessForm} layout="vertical">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Form.Item label="사업자등록번호" name="businessNumber">
+                        <Input disabled className="bg-gray-100" />
+                      </Form.Item>
+                      <Form.Item label="ticker" name="ticker">
+                        <Input disabled className="bg-gray-100" />
+                      </Form.Item>
+                      <Form.Item label="사업자등록상호" name="businessName">
+                        <Input maxLength={50} />
+                      </Form.Item>
+                      <Form.Item label="대표자" name="representative">
+                        <Input maxLength={10} />
+                      </Form.Item>
+                      <Form.Item label="사업자등록주소" name="businessAddress" className="md:col-span-2">
+                        <Input maxLength={100} />
+                      </Form.Item>
+                      <Form.Item label="조인유통명" name="joinName">
+                        <Input maxLength={20} />
+                      </Form.Item>
+                      <Form.Item label="세금계산서 이메일" name="taxInvoiceEmail">
+                        <Input type="email" />
+                      </Form.Item>
+                      <Form.Item label="상태" name="status">
+                        <Select>
+                          <Select.Option value="active">활성</Select.Option>
+                          <Select.Option value="inactive">비활성</Select.Option>
+                        </Select>
+                      </Form.Item>
+                    </div>
+                  </Form>
+                </div>
               ) : (
-                <div className="space-y-2 text-sm">
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <span className="text-gray-500">사업자등록번호:</span>
-                      <span className="ml-2 text-gray-900 font-medium">{business.businessNumber}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">사업자등록상호:</span>
-                      <span className="ml-2 text-gray-900 font-medium">{business.businessName}</span>
+                      <div className="text-sm text-gray-500 mb-1">사업자등록번호</div>
+                      <div className="text-base font-medium text-gray-900">{business.businessNumber}</div>
                     </div>
                     <div>
-                      <span className="text-gray-500">대표자:</span>
-                      <span className="ml-2 text-gray-900 font-medium">{business.representative}</span>
+                      <div className="text-sm text-gray-500 mb-1">ticker</div>
+                      <div className="text-base font-medium text-gray-900">{business.ticker}</div>
                     </div>
-                    <div className="col-span-2">
-                      <span className="text-gray-500">사업자등록주소:</span>
-                      <span className="ml-2 text-gray-900 font-medium">{business.businessAddress}</span>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">사업자등록상호</div>
+                      <div className="text-base font-medium text-gray-900">{business.businessName}</div>
                     </div>
-                    <div className="col-span-2">
-                      <span className="text-gray-500">세금계산서 이메일:</span>
-                      <span className="ml-2 text-gray-900 font-medium">{business.taxInvoiceEmail}</span>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">대표자</div>
+                      <div className="text-base font-medium text-gray-900">{business.representative}</div>
                     </div>
-                    <div className="col-span-2">
-                      <span className="text-gray-500">은행계좌:</span>
-                      <div className="mt-1 space-y-1">
+                    <div className="md:col-span-2">
+                      <div className="text-sm text-gray-500 mb-1">사업자등록주소</div>
+                      <div className="text-base font-medium text-gray-900">{business.businessAddress}</div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <div className="text-sm text-gray-500 mb-1">세금계산서 이메일</div>
+                      <div className="text-base font-medium text-gray-900">{business.taxInvoiceEmail}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">은행계좌</div>
+                      <div className="space-y-1">
                         {business.bankAccounts.map((account, idx) => (
-                          <div key={idx} className="text-gray-900 font-medium">
-                            {account.bank} {account.accountNumber} ({account.holder})
-                            {idx === 0 && <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">주사용</span>}
+                          <div key={idx} className="text-base font-medium text-gray-900 flex items-center gap-2 flex-wrap">
+                            <span>{account.bank} {account.accountNumber} ({account.holder})</span>
+                            {idx === 0 && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                주사용
+                              </span>
+                            )}
                           </div>
                         ))}
-                      </div>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-gray-500">사업자등록증:</span>
-                      <div className="mt-1">
-                        <Image.PreviewGroup>
-                          <Image
-                            src="/images/business-certificate-sample.png"
-                            alt={`사업자등록증-${business.id}`}
-                            width={0}
-                            height={0}
-                            style={{ display: 'none' }}
-                            preview={{
-                              mask: null
-                            }}
-                          />
-                          <Button
-                            size="small"
-                            icon={<FileImageOutlined />}
-                            type="primary"
-                            ghost
-                            onClick={() => {
-                              const img = document.querySelector(`img[alt="사업자등록증-${business.id}"]`);
-                              if (img) img.click();
-                            }}
-                          >
-                            사업자등록증
-                          </Button>
-                        </Image.PreviewGroup>
                       </div>
                     </div>
                   </div>

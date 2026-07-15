@@ -485,11 +485,20 @@ function BuyerDetail() {
                   </button>
                 ) : (
                   <div className="flex gap-2">
-                    <Button onClick={handleCancelBusinessEdit} icon={<CloseOutlined />} size="small">
-                      취소
-                    </Button>
-                    <Button type="primary" onClick={() => handleSaveBusiness(business.id)} icon={<SaveOutlined />} size="small">
+                    <Button
+                      icon={<SaveOutlined />}
+                      type="primary"
+                      size="small"
+                      onClick={() => handleSaveBusiness(business.id)}
+                    >
                       저장
+                    </Button>
+                    <Button
+                      icon={<CloseOutlined />}
+                      size="small"
+                      onClick={handleCancelBusinessEdit}
+                    >
+                      취소
                     </Button>
                   </div>
                 )}
