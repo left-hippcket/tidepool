@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, Button, Tag, Form, Input, Select, Space, message, Modal,
-  Upload, Timeline, InputNumber, DatePicker
+  Upload, Timeline, InputNumber, DatePicker, Table, Statistic
 } from 'antd';
 import {
   ArrowLeftOutlined, EditOutlined, UploadOutlined, PlusOutlined,
   MinusCircleOutlined
 } from '@ant-design/icons';
-import { driverDetails, claimHistory } from '../data/mockData';
+import { driverDetails, claimHistory, driverTransactionDetails } from '../data/mockData';
 import dayjs from 'dayjs';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const { TextArea } = Input;
 
@@ -21,18 +22,63 @@ function DriverDetail() {
   const [claimForm] = Form.useForm();
 
   const driverData = driverDetails[id];
+  const transactionData = driverTransactionDetails[id];
 
   const [editingBasic, setEditingBasic] = useState(false);
   const [editingSettlement, setEditingSettlement] = useState(false);
   const [claimModalVisible, setClaimModalVisible] = useState(false);
   const [editingClaimId, setEditingClaimId] = useState(null);
   const [claims, setClaims] = useState(claimHistory[id] || []);
+  const [periodFilter, setPeriodFilter] = useState('최근 3개월');
 
   if (!driverData) {
     return <div className="p-6">드라이버를 찾을 수 없습니다.</div>;
   }
 
   const { basicInfo, settlementInfo } = driverData;
+
+  // P2: 기간별 데이터 계산
+  const filteredPeriods = useMemo(() => {
+    if (!transactionData) return [];
+
+    const allPeriods = transactionData.periods;
+    const now = dayjs();
+
+    switch (periodFilter) {
+      case '최근 1개월':
+        return allPeriods.slice(-3); // 최근 3순
+      case '최근 3개월':
+        return allPeriods.slice(-9); // 최근 9순
+      case '최근 6개월':
+        return allPeriods.slice(-18); // 최근 18순
+      case '이번달':
+        const thisMonth = now.format('M월');
+        return allPeriods.filter(p => p.period.startsWith(thisMonth));
+      case '이번분기':
+        const thisQuarter = Math.ceil(now.month() / 3);
+        const quarterMonths = [thisQuarter * 3 - 2, thisQuarter * 3 - 1, thisQuarter * 3];
+        return allPeriods.filter(p => {
+          const month = parseInt(p.period);
+          return quarterMonths.includes(month);
+        });
+      case '올해':
+        return allPeriods; // 모든 데이터 (샘플은 4월~6월)
+      case '누적':
+        return allPeriods; // 모든 데이터
+      default:
+        return allPeriods.slice(-9);
+    }
+  }, [transactionData, periodFilter]);
+
+  const metrics = useMemo(() => {
+    if (!filteredPeriods.length) return { totalFreight: 0, totalTripCount: 0, averageFreight: 0 };
+
+    const totalFreight = filteredPeriods.reduce((sum, p) => sum + p.freight, 0);
+    const totalTripCount = filteredPeriods.reduce((sum, p) => sum + p.tripCount, 0);
+    const averageFreight = totalTripCount > 0 ? Math.round(totalFreight / totalTripCount) : 0;
+
+    return { totalFreight, totalTripCount, averageFreight };
+  }, [filteredPeriods]);
 
   // 기본 정보 수정
   const handleBasicEdit = () => {
@@ -520,6 +566,119 @@ function DriverDetail() {
           <p className="text-gray-500">등록된 클레임/사고 이력이 없습니다.</p>
         )}
       </Card>
+
+      {/* P2: 거래 실적 */}
+      {transactionData && (
+        <>
+          {/* 기간 필터 */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+            <Space wrap>
+              {['최근 1개월', '최근 3개월', '최근 6개월', '이번달', '이번분기', '올해', '누적'].map((period) => (
+                <Button
+                  key={period}
+                  type={periodFilter === period ? 'primary' : 'default'}
+                  onClick={() => setPeriodFilter(period)}
+                >
+                  {period}
+                </Button>
+              ))}
+            </Space>
+          </div>
+
+          {/* 통합 지표 카드 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <Card>
+              <Statistic
+                title="운임 (총액)"
+                value={metrics.totalFreight}
+                suffix="원"
+                valueStyle={{ color: '#1890ff' }}
+              />
+            </Card>
+            <Card>
+              <Statistic
+                title="운송횟수"
+                value={metrics.totalTripCount}
+                suffix="회"
+                valueStyle={{ color: '#52c41a' }}
+              />
+            </Card>
+            <Card>
+              <Statistic
+                title="평균 운임"
+                value={metrics.averageFreight}
+                suffix="원"
+                valueStyle={{ color: '#faad14' }}
+              />
+            </Card>
+          </div>
+
+          {/* 거래 상세 테이블 */}
+          <Card title="거래 상세 내역" className="mb-4">
+            <Table
+              dataSource={filteredPeriods}
+              rowKey="period"
+              pagination={false}
+              scroll={{ x: 800 }}
+              columns={[
+                {
+                  title: '기간',
+                  dataIndex: 'period',
+                  key: 'period',
+                  fixed: 'left',
+                  width: 100
+                },
+                {
+                  title: '운임',
+                  dataIndex: 'freight',
+                  key: 'freight',
+                  render: (val) => `${val.toLocaleString()}원`,
+                  width: 120
+                },
+                {
+                  title: '운송횟수',
+                  dataIndex: 'tripCount',
+                  key: 'tripCount',
+                  render: (val) => `${val}회`,
+                  width: 100
+                },
+                {
+                  title: '운송 셀러',
+                  dataIndex: 'sellers',
+                  key: 'sellers',
+                  width: 200
+                },
+                {
+                  title: '운송 바이어',
+                  dataIndex: 'buyers',
+                  key: 'buyers',
+                  width: 200
+                },
+                {
+                  title: '운송 품목',
+                  dataIndex: 'products',
+                  key: 'products',
+                  width: 150
+                }
+              ]}
+            />
+          </Card>
+
+          {/* 운임 차트 */}
+          <Card title="운임 추이">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={filteredPeriods}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="period" />
+                <YAxis />
+                <Tooltip formatter={(value) => `${value.toLocaleString()}원`} />
+                <Legend />
+                <Bar dataKey="freight" name="운임" fill="#1890ff" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </>
+      )}
 
       {/* 클레임/사고 이력 추가/수정 모달 */}
       <Modal
