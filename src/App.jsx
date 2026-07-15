@@ -215,14 +215,41 @@ function App() {
           background: '#fff',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: 18, fontWeight: 500 }}>
-            활어산지유통 관리시스템
-          </div>
-          <div style={{ color: '#888' }}>
-            관리자님 환영합니다
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: 14,
+                fontWeight: 600
+              }}>
+                관
+              </div>
+              <span style={{ color: '#333', fontSize: 14, fontWeight: 500 }}>
+                관리자님
+              </span>
+            </div>
+            <Button
+              onClick={() => {
+                sessionStorage.removeItem(AUTH_KEY);
+                setIsAuthenticated(false);
+              }}
+              style={{
+                borderColor: '#d9d9d9',
+                color: '#666'
+              }}
+            >
+              로그아웃
+            </Button>
           </div>
         </Header>
         <Content style={{
