@@ -169,12 +169,11 @@ function DriverDetail() {
     setEditingSettlement(false);
   };
 
-  // 클레임/사고 이력 추가/수정
+  // 이슈 히스토리 추가/수정
   const handleClaimAdd = () => {
     claimForm.resetFields();
     claimForm.setFieldsValue({
       occurredAt: dayjs(),
-      incidentType: undefined,
       content: ''
     });
     setEditingClaimId(null);
@@ -183,8 +182,7 @@ function DriverDetail() {
 
   const handleClaimEdit = (claim) => {
     claimForm.setFieldsValue({
-      occurredAt: dayjs(claim.occurredAt, 'YYYY-MM-DD HH:mm'),
-      incidentType: claim.incidentType,
+      occurredAt: dayjs(claim.occurredAt.split(' ')[0], 'YYYY-MM-DD'),
       content: claim.content
     });
     setEditingClaimId(claim.id);
@@ -195,9 +193,9 @@ function DriverDetail() {
     try {
       const values = await claimForm.validateFields();
       if (editingClaimId) {
-        message.success('클레임/사고 이력이 수정되었습니다.');
+        message.success('이슈 히스토리가 수정되었습니다.');
       } else {
-        message.success('클레임/사고 이력이 등록되었습니다.');
+        message.success('이슈 히스토리가 등록되었습니다.');
       }
       setClaimModalVisible(false);
       claimForm.resetFields();
@@ -214,7 +212,7 @@ function DriverDetail() {
       cancelText: '취소',
       onOk: () => {
         setClaims(prev => prev.filter(c => c.id !== claimId));
-        message.success('클레임/사고 이력이 삭제되었습니다.');
+        message.success('이슈 히스토리가 삭제되었습니다.');
       }
     });
   };
@@ -536,9 +534,9 @@ function DriverDetail() {
         )}
       </Card>
 
-      {/* 클레임/사고 이력 */}
+      {/* 이슈 히스토리 */}
       <Card
-        title="클레임/사고 이력"
+        title="이슈 히스토리"
         extra={<Button icon={<PlusOutlined />} onClick={handleClaimAdd}>이력 추가</Button>}
       >
         {claims.length > 0 ? (
@@ -548,7 +546,7 @@ function DriverDetail() {
                 <div className="mb-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <span className="text-sm font-medium text-gray-900">{claim.occurredAt}</span>
+                      <span className="text-sm font-medium text-gray-900">{claim.occurredAt.split(' ')[0]}</span>
                       <span className="text-xs text-gray-500 ml-2">작성자: {claim.author}</span>
                     </div>
                     <Space>
@@ -556,14 +554,13 @@ function DriverDetail() {
                       <Button size="small" danger onClick={() => handleClaimDelete(claim.id)}>삭제</Button>
                     </Space>
                   </div>
-                  <Tag color="red" style={{ marginBottom: 8 }}>{claim.incidentType}</Tag>
                   <p className="text-sm text-gray-700 whitespace-pre-wrap">{claim.content}</p>
                 </div>
               </Timeline.Item>
             ))}
           </Timeline>
         ) : (
-          <p className="text-gray-500">등록된 클레임/사고 이력이 없습니다.</p>
+          <p className="text-gray-500">등록된 이슈 히스토리가 없습니다.</p>
         )}
       </Card>
 
@@ -680,9 +677,9 @@ function DriverDetail() {
         </>
       )}
 
-      {/* 클레임/사고 이력 추가/수정 모달 */}
+      {/* 이슈 히스토리 추가/수정 모달 */}
       <Modal
-        title={editingClaimId ? '클레임/사고 이력 수정' : '클레임/사고 이력 추가'}
+        title={editingClaimId ? '이슈 히스토리 수정' : '이슈 히스토리 추가'}
         open={claimModalVisible}
         onOk={handleClaimSave}
         onCancel={() => {
@@ -696,26 +693,10 @@ function DriverDetail() {
         <Form form={claimForm} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
             name="occurredAt"
-            label="발생일시"
-            rules={[{ required: true, message: '발생일시를 선택해주세요' }]}
+            label="발생일"
+            rules={[{ required: true, message: '발생일을 선택해주세요' }]}
           >
-            <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="incidentType"
-            label="사고유형"
-            rules={[{ required: true, message: '사고유형을 선택해주세요' }]}
-          >
-            <Select
-              options={[
-                { value: '산소농도 조절 실패', label: '산소농도 조절 실패' },
-                { value: '운송 지연', label: '운송 지연' },
-                { value: '활어 폐사', label: '활어 폐사' },
-                { value: '교통사고', label: '교통사고' },
-                { value: '기타', label: '기타' }
-              ]}
-            />
+            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item
@@ -726,7 +707,7 @@ function DriverDetail() {
               { max: 500, message: '최대 500자' }
             ]}
           >
-            <TextArea rows={5} placeholder="사고 내용을 입력하세요" />
+            <TextArea rows={5} placeholder="이슈 내용을 입력하세요" />
           </Form.Item>
 
           <Form.Item name="images" label="이미지" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList}>
