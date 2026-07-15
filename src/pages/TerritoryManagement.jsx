@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { Tabs, Table, Button, Modal, Form, Input, Select, message, Tag, Space } from 'antd';
+import { Table, Button, Modal, Form, Input, Select, message, Tag, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { territories as initialTerritories, regions as initialRegions } from '../data/mockData';
-
-const { TabPane } = Tabs;
 
 function TerritoryManagement() {
   const [territories, setTerritories] = useState(initialTerritories);
@@ -225,12 +223,37 @@ function TerritoryManagement() {
     : regions.filter(r => r.territoryId === parseInt(selectedTerritoryFilter));
 
   return (
-    <div>
-      <h2>사업권역 관리</h2>
+    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">사업권역 관리</h2>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <TabPane tab={`사업권역 (${territories.length})`} key="territory">
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+      {/* 탭 버튼 */}
+      <div className="flex gap-2 mb-6 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('territory')}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'territory'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          사업권역 ({territories.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('region')}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'region'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          상세지역 ({regions.length})
+        </button>
+      </div>
+
+      {/* 탭 1: 사업권역 */}
+      {activeTab === 'territory' && (
+        <div>
+          <div className="flex justify-end mb-4">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTerritory}>
               권역 추가
             </Button>
@@ -241,12 +264,15 @@ function TerritoryManagement() {
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
-        </TabPane>
+        </div>
+      )}
 
-        <TabPane tab={`상세지역 (${regions.length})`} key="region">
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+      {/* 탭 2: 상세지역 */}
+      {activeTab === 'region' && (
+        <div>
+          <div className="flex justify-between items-center mb-4">
             <Space>
-              <span>권역 필터:</span>
+              <span className="text-sm text-gray-700">권역 필터:</span>
               <Select
                 style={{ width: 150 }}
                 value={selectedTerritoryFilter}
@@ -270,8 +296,8 @@ function TerritoryManagement() {
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
-        </TabPane>
-      </Tabs>
+        </div>
+      )}
 
       <Modal
         title={
