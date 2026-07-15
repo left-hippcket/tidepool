@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Card, Form, Input, Select, Button, Radio, Space, Divider,
   message, AutoComplete, Upload, InputNumber, Tag
@@ -11,11 +11,30 @@ import { sellerGroups, managers, territories, productCategories, products } from
 
 function SellerRegister() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [registrationType, setRegistrationType] = useState('new'); // 'new' | 'existing'
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
+
+  // URL 쿼리 파라미터 처리
+  useEffect(() => {
+    const groupId = searchParams.get('groupId');
+    const mode = searchParams.get('mode');
+
+    if (groupId && mode === 'add') {
+      // 기존 그룹에 사업자 추가 모드
+      setRegistrationType('existing');
+
+      // 해당 그룹 찾아서 자동 선택
+      const group = sellerGroups.find(g => g.id === parseInt(groupId));
+      if (group) {
+        setSelectedGroup(group);
+        form.setFieldsValue({ searchGroup: group.name });
+      }
+    }
+  }, [searchParams, form]);
 
   // 등록 유형 변경
   const handleTypeChange = (e) => {

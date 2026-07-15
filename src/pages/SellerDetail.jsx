@@ -17,6 +17,11 @@ function SellerDetail() {
   const sellerGroup = sellerGroups.find(s => s.id === parseInt(id));
   const detail = sellerDetails[id];
 
+  // 사업자 추가
+  const handleAddBusiness = () => {
+    navigate(`/seller/register?groupId=${id}&mode=add`);
+  };
+
   // 편집 모드 진입
   const handleEditGroup = () => {
     form.setFieldsValue({
@@ -484,7 +489,10 @@ function SellerDetail() {
           ))}
         </div>
 
-        <button className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors font-medium">
+        <button
+          onClick={handleAddBusiness}
+          className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors font-medium"
+        >
           + 사업자 추가
         </button>
       </div>

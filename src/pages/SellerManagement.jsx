@@ -159,7 +159,7 @@ function SellerManagement() {
   const handleTableChange = (pagination, filters, sorter) => {
     if (sorter.field) {
       setSortField(sorter.field);
-      setSortOrder(sorter.order || 'descend');
+      setSortOrder(sorter.order);
     }
   };
 
