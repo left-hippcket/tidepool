@@ -5,6 +5,7 @@ import { ConfigProvider } from 'antd'
 import koKR from 'antd/locale/ko_KR'
 import App from './App'
 import 'dayjs/locale/ko'
+import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
