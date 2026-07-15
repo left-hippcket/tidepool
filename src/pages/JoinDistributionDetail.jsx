@@ -466,28 +466,30 @@ function JoinDistributionDetail() {
                     <div className="col-span-2">
                       <span className="text-gray-500">사업자등록증:</span>
                       <div className="mt-1">
-                        <Button
-                          size="small"
-                          icon={<FileImageOutlined />}
-                          onClick={() => {
-                            Modal.info({
-                              title: '사업자등록증',
-                              content: (
-                                <div style={{ marginTop: 16 }}>
-                                  <Image
-                                    src="/images/business-certificate-sample.png"
-                                    alt="사업자등록증"
-                                    style={{ width: '100%' }}
-                                  />
-                                </div>
-                              ),
-                              width: 800,
-                              okText: '닫기'
-                            });
-                          }}
-                        >
-                          사업자등록증
-                        </Button>
+                        <Image.PreviewGroup>
+                          <Image
+                            src="/images/business-certificate-sample.png"
+                            alt={`사업자등록증-${business.id}`}
+                            width={0}
+                            height={0}
+                            style={{ display: 'none' }}
+                            preview={{
+                              mask: null
+                            }}
+                          />
+                          <Button
+                            size="small"
+                            icon={<FileImageOutlined />}
+                            type="primary"
+                            ghost
+                            onClick={() => {
+                              const img = document.querySelector(`img[alt="사업자등록증-${business.id}"]`);
+                              if (img) img.click();
+                            }}
+                          >
+                            사업자등록증
+                          </Button>
+                        </Image.PreviewGroup>
                       </div>
                     </div>
                   </div>

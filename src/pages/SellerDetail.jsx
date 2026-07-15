@@ -391,29 +391,35 @@ function SellerDetail() {
                   }`}>
                     {business.status === 'active' ? '활성' : '비활성'}
                   </span>
-                  {business.hasCertificate && (
-                    <Button
-                      size="small"
-                      icon={<FileImageOutlined />}
-                      onClick={() => {
-                        Modal.info({
-                          title: '사업자등록증',
-                          content: (
-                            <div style={{ marginTop: 16 }}>
-                              <Image
-                                src="/images/business-certificate-sample.png"
-                                alt="사업자등록증"
-                                style={{ width: '100%' }}
-                              />
-                            </div>
-                          ),
-                          width: 800,
-                          okText: '닫기'
-                        });
-                      }}
-                    >
-                      사업자등록증
-                    </Button>
+                  {business.hasCertificate ? (
+                    <Image.PreviewGroup>
+                      <Image
+                        src="/images/business-certificate-sample.png"
+                        alt="사업자등록증"
+                        width={0}
+                        height={0}
+                        style={{ display: 'none' }}
+                        preview={{
+                          mask: null
+                        }}
+                      />
+                      <Button
+                        size="small"
+                        icon={<FileImageOutlined />}
+                        type="primary"
+                        ghost
+                        onClick={() => {
+                          const img = document.querySelector(`img[alt="사업자등록증"]`);
+                          if (img) img.click();
+                        }}
+                      >
+                        사업자등록증
+                      </Button>
+                    </Image.PreviewGroup>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500 border border-gray-300">
+                      사업자등록증 미첨부
+                    </span>
                   )}
                 </div>
 
