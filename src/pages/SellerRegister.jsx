@@ -385,7 +385,6 @@ function SellerRegister() {
               name="businessNumber"
               label="사업자등록번호"
               rules={[
-                { required: true, message: '사업자등록번호를 입력해주세요' },
                 { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
               ]}
             >
@@ -396,7 +395,6 @@ function SellerRegister() {
               name="businessName"
               label="사업자등록상호"
               rules={[
-                { required: true, message: '사업자등록상호를 입력해주세요' },
                 { max: 50, message: '최대 50자까지 입력 가능합니다' }
               ]}
             >
@@ -407,7 +405,6 @@ function SellerRegister() {
               name="representative"
               label="대표자"
               rules={[
-                { required: true, message: '대표자를 입력해주세요' },
                 { max: 10, message: '최대 10자까지 입력 가능합니다' }
               ]}
             >
