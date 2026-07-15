@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, InputNumber, message, Modal } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Select, InputNumber, message, Modal, Image } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined } from '@ant-design/icons';
 import { joinGroups, joinDetails, managers, territories, joinSalesDetails, joinSalesHistoryMemos } from '../data/mockData';
 
 function JoinDistributionDetail() {
@@ -355,16 +355,18 @@ function JoinDistributionDetail() {
               }`}
             >
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="text-lg font-semibold text-gray-900 mb-1">{business.joinName}</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="text-lg font-semibold text-gray-900">{business.joinName}</div>
+                    {business.status === 'inactive' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
+                        비활성
+                      </span>
+                    )}
+                  </div>
                   <div className="text-sm text-gray-600">ticker: {business.ticker}</div>
                 </div>
                 <div className="flex gap-2">
-                  {business.status === 'inactive' && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700">
-                      비활성
-                    </span>
-                  )}
                   {editingBusinessId === business.id ? (
                     <>
                       <Button
@@ -450,7 +452,7 @@ function JoinDistributionDetail() {
                       <span className="text-gray-500">세금계산서 이메일:</span>
                       <span className="ml-2 text-gray-900 font-medium">{business.taxInvoiceEmail}</span>
                     </div>
-                    <div>
+                    <div className="col-span-2">
                       <span className="text-gray-500">은행계좌:</span>
                       <div className="mt-1 space-y-1">
                         {business.bankAccounts.map((account, idx) => (
@@ -459,6 +461,33 @@ function JoinDistributionDetail() {
                             {idx === 0 && <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">주사용</span>}
                           </div>
                         ))}
+                      </div>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-gray-500">사업자등록증:</span>
+                      <div className="mt-1">
+                        <Button
+                          size="small"
+                          icon={<FileImageOutlined />}
+                          onClick={() => {
+                            Modal.info({
+                              title: '사업자등록증',
+                              content: (
+                                <div style={{ marginTop: 16 }}>
+                                  <Image
+                                    src="/images/business-certificate-sample.png"
+                                    alt="사업자등록증"
+                                    style={{ width: '100%' }}
+                                  />
+                                </div>
+                              ),
+                              width: 800,
+                              okText: '닫기'
+                            });
+                          }}
+                        >
+                          사업자등록증
+                        </Button>
                       </div>
                     </div>
                   </div>
