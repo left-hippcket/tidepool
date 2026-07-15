@@ -19,6 +19,9 @@ import BuyerRegister from './pages/BuyerRegister';
 import JoinDistribution from './pages/JoinDistribution';
 import JoinDistributionDetail from './pages/JoinDistributionDetail';
 import JoinDistributionRegister from './pages/JoinDistributionRegister';
+import DriverManagement from './pages/DriverManagement';
+import DriverDetail from './pages/DriverDetail';
+import DriverRegister from './pages/DriverRegister';
 import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
 
@@ -143,6 +146,7 @@ function App() {
         { key: '/seller', label: '셀러' },
         { key: '/buyer', label: '바이어' },
         { key: '/join-distribution', label: '조인유통' },
+        { key: '/driver', label: '드라이버' },
       ],
     },
     {
@@ -173,7 +177,7 @@ function App() {
   };
 
   const getOpenKeys = () => {
-    if (location.pathname === '/seller' || location.pathname === '/buyer' || location.pathname === '/join-distribution') {
+    if (location.pathname === '/seller' || location.pathname === '/buyer' || location.pathname === '/join-distribution' || location.pathname === '/driver') {
       return ['partners'];
     }
     if (location.pathname === '/territory') {
@@ -284,6 +288,9 @@ function App() {
             <Route path="/join-distribution" element={<JoinDistribution />} />
             <Route path="/join-distribution/register" element={<JoinDistributionRegister />} />
             <Route path="/join-distribution/:id" element={<JoinDistributionDetail />} />
+            <Route path="/driver" element={<DriverManagement />} />
+            <Route path="/driver/register" element={<DriverRegister />} />
+            <Route path="/driver/:id" element={<DriverDetail />} />
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
           </Routes>

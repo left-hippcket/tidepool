@@ -1323,3 +1323,317 @@ export const joinSalesHistoryMemos = {
     }
   ]
 };
+
+// 드라이버 데이터
+export const drivers = [
+  {
+    id: 1,
+    name: '정훈',
+    ticker: 'JH01',
+    vehicleType: '5.0톤',
+    tankCount: 10,
+    phone: '010-1234-5678',
+    settlementBusiness: '만진수산',
+    taxType: '과세',
+    driverLevel: '잘함',
+    status: 'active'
+  },
+  {
+    id: 2,
+    name: '영민',
+    ticker: 'YM01',
+    vehicleType: '5.0톤',
+    tankCount: 10,
+    phone: '010-2345-6789',
+    settlementBusiness: '영민운송',
+    taxType: '면세',
+    driverLevel: '보통',
+    status: 'active'
+  },
+  {
+    id: 3,
+    name: '호붕',
+    ticker: 'HB01',
+    vehicleType: '1.0톤',
+    tankCount: 4,
+    phone: '010-3456-7890',
+    settlementBusiness: '호붕물류',
+    taxType: '과세',
+    driverLevel: '잘함',
+    status: 'active'
+  },
+  {
+    id: 4,
+    name: '성훈',
+    ticker: 'SH02',
+    vehicleType: '5.0톤',
+    tankCount: 10,
+    phone: '010-4567-8901',
+    settlementBusiness: '만진수산',
+    taxType: '과세',
+    driverLevel: '못함',
+    status: 'active'
+  },
+  {
+    id: 5,
+    name: '민수',
+    ticker: 'MS01',
+    vehicleType: '1.0톤',
+    tankCount: 4,
+    phone: '010-5678-9012',
+    settlementBusiness: null,
+    taxType: null,
+    driverLevel: '모름',
+    status: 'active'
+  },
+  {
+    id: 6,
+    name: '철호',
+    ticker: 'CH01',
+    vehicleType: '5.0톤',
+    tankCount: 10,
+    phone: '010-6789-0123',
+    settlementBusiness: '철호운송',
+    taxType: '면세',
+    driverLevel: '보통',
+    status: 'inactive'
+  }
+];
+
+// 드라이버 상세 정보
+export const driverDetails = {
+  1: { // 정훈
+    basicInfo: {
+      name: '정훈',
+      ticker: 'JH01',
+      phone: '010-1234-5678',
+      vehicleType: '5.0톤',
+      tankCount: 10,
+      driverLevel: '잘함',
+      status: 'active'
+    },
+    settlementInfo: {
+      businessNumber: '123-45-67890',
+      businessName: '만진수산',
+      representative: '김만진',
+      businessAddress: '경기도 수지구 동천동 230-3',
+      taxType: '과세',
+      bankAccounts: [
+        { bank: '하나은행', accountNumber: '123-456789-01234', holder: '김만진', isPrimary: true },
+        { bank: '농협', accountNumber: '352-1234-5678-90', holder: '김만진', isPrimary: false }
+      ],
+      hasCertificate: true
+    }
+  },
+  2: { // 영민
+    basicInfo: {
+      name: '영민',
+      ticker: 'YM01',
+      phone: '010-2345-6789',
+      vehicleType: '5.0톤',
+      tankCount: 10,
+      driverLevel: '보통',
+      status: 'active'
+    },
+    settlementInfo: {
+      businessNumber: '234-56-78901',
+      businessName: '영민운송',
+      representative: '이영민',
+      businessAddress: '서울시 강남구 테헤란로 456',
+      taxType: '면세',
+      bankAccounts: [
+        { bank: '신한은행', accountNumber: '110-987-654321', holder: '이영민', isPrimary: true }
+      ],
+      hasCertificate: true
+    }
+  },
+  3: { // 호붕
+    basicInfo: {
+      name: '호붕',
+      ticker: 'HB01',
+      phone: '010-3456-7890',
+      vehicleType: '1.0톤',
+      tankCount: 4,
+      driverLevel: '잘함',
+      status: 'active'
+    },
+    settlementInfo: {
+      businessNumber: '345-67-89012',
+      businessName: '호붕물류',
+      representative: '박호붕',
+      businessAddress: '인천광역시 남동구 구월동 789',
+      taxType: '과세',
+      bankAccounts: [
+        { bank: '농협', accountNumber: '352-2345-6789-01', holder: '박호붕', isPrimary: true }
+      ],
+      hasCertificate: true
+    }
+  },
+  4: { // 성훈
+    basicInfo: {
+      name: '성훈',
+      ticker: 'SH02',
+      phone: '010-4567-8901',
+      vehicleType: '5.0톤',
+      tankCount: 10,
+      driverLevel: '못함',
+      status: 'active'
+    },
+    settlementInfo: {
+      businessNumber: '123-45-67890',
+      businessName: '만진수산',
+      representative: '김만진',
+      businessAddress: '경기도 수지구 동천동 230-3',
+      taxType: '과세',
+      bankAccounts: [
+        { bank: '하나은행', accountNumber: '123-456789-01234', holder: '김만진', isPrimary: true }
+      ],
+      hasCertificate: true
+    }
+  },
+  5: { // 민수 (정산사업자 미등록)
+    basicInfo: {
+      name: '민수',
+      ticker: 'MS01',
+      phone: '010-5678-9012',
+      vehicleType: '1.0톤',
+      tankCount: 4,
+      driverLevel: '모름',
+      status: 'active'
+    },
+    settlementInfo: null
+  },
+  6: { // 철호 (비활성)
+    basicInfo: {
+      name: '철호',
+      ticker: 'CH01',
+      phone: '010-6789-0123',
+      vehicleType: '5.0톤',
+      tankCount: 10,
+      driverLevel: '보통',
+      status: 'inactive'
+    },
+    settlementInfo: {
+      businessNumber: '456-78-90123',
+      businessName: '철호운송',
+      representative: '최철호',
+      businessAddress: '경기도 용인시 수지구 성복동 123',
+      taxType: '면세',
+      bankAccounts: [
+        { bank: '국민은행', accountNumber: '987-654-321098', holder: '최철호', isPrimary: true }
+      ],
+      hasCertificate: true
+    }
+  }
+};
+
+// 클레임/사고 이력
+export const claimHistory = {
+  1: [ // 정훈
+    {
+      id: 1001,
+      occurredAt: '2024-07-10 14:30',
+      author: '노원진',
+      incidentType: '산소농도 조절 실패',
+      content: '5.0톤 차량으로 여수에서 인천까지 운송 중 산소농도 조절 실패로 광어 2마리(약 2.4kg) 폐사. 바이어(소라수산)에게 로스 보상 처리함. 드라이버에게 산소 관리 재교육 필요.',
+      images: []
+    },
+    {
+      id: 1002,
+      occurredAt: '2024-06-25 09:15',
+      author: '최용환',
+      incidentType: '운송 지연',
+      content: '교통체증으로 30분 지연 도착. 바이어 측 양해 구함. 특이사항 없음.',
+      images: []
+    }
+  ],
+  2: [ // 영민
+    {
+      id: 2001,
+      occurredAt: '2024-07-05 16:45',
+      author: '이시호',
+      incidentType: '교통사고',
+      content: '고속도로 접촉사고 발생. 차량 경미한 손상. 활어 상태 정상. 보험 처리 진행중.',
+      images: []
+    }
+  ],
+  3: [], // 호붕 (이력 없음)
+  4: [ // 성훈
+    {
+      id: 4001,
+      occurredAt: '2024-07-12 11:20',
+      author: '노원진',
+      incidentType: '활어 폐사',
+      content: '운송 중 급정거로 인한 활어 폐사 2마리. 운전 주의 필요.',
+      images: []
+    },
+    {
+      id: 4002,
+      occurredAt: '2024-06-28 15:00',
+      author: '고영석',
+      incidentType: '산소농도 조절 실패',
+      content: '산소통 교체 지연으로 활어 상태 불량. 바이어 클레임 접수. 재교육 완료.',
+      images: []
+    }
+  ],
+  5: [], // 민수 (이력 없음)
+  6: [] // 철호 (이력 없음)
+};
+
+// 드라이버 거래 세부내역 (P2)
+export const driverTransactionDetails = {
+  1: { // 정훈
+    periods: [
+      { period: '4월상순', freight: 2500000, tripCount: 5, sellers: '해금 그룹, 갑운 그룹', buyers: '소라 그룹', products: '광어, 우럭' },
+      { period: '4월중순', freight: 3000000, tripCount: 6, sellers: '해금 그룹', buyers: '소라 그룹, 명성횟집', products: '광어' },
+      { period: '4월하순', freight: 2800000, tripCount: 5, sellers: '해금 그룹, 갑운 그룹', buyers: '소라 그룹', products: '광어, 돔' },
+      { period: '5월상순', freight: 3200000, tripCount: 6, sellers: '해금 그룹', buyers: '소라 그룹', products: '광어, 우럭' },
+      { period: '5월중순', freight: 3500000, tripCount: 7, sellers: '해금 그룹, 갑운 그룹', buyers: '소라 그룹, 명성횟집', products: '광어' },
+      { period: '5월하순', freight: 3000000, tripCount: 6, sellers: '해금 그룹', buyers: '소라 그룹', products: '광어, 돔' },
+      { period: '6월상순', freight: 3800000, tripCount: 7, sellers: '해금 그룹, 갑운 그룹', buyers: '소라 그룹', products: '광어, 우럭' },
+      { period: '6월중순', freight: 4000000, tripCount: 8, sellers: '해금 그룹', buyers: '소라 그룹, 명성횟집', products: '광어' },
+      { period: '6월하순', freight: 3500000, tripCount: 7, sellers: '해금 그룹', buyers: '소라 그룹', products: '광어, 돔' }
+    ],
+    metrics: {
+      totalFreight: 29300000,
+      totalTripCount: 57,
+      averageFreight: 514035
+    }
+  },
+  2: { // 영민
+    periods: [
+      { period: '4월상순', freight: 2000000, tripCount: 4, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어' },
+      { period: '4월중순', freight: 2200000, tripCount: 4, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어, 우럭' },
+      { period: '4월하순', freight: 2100000, tripCount: 4, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어' },
+      { period: '5월상순', freight: 2400000, tripCount: 5, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어, 돔' },
+      { period: '5월중순', freight: 2500000, tripCount: 5, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어' },
+      { period: '5월하순', freight: 2200000, tripCount: 4, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어, 우럭' },
+      { period: '6월상순', freight: 2600000, tripCount: 5, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어' },
+      { period: '6월중순', freight: 2800000, tripCount: 6, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어, 돔' },
+      { period: '6월하순', freight: 2500000, tripCount: 5, sellers: '통영수산 그룹', buyers: '대박 그룹', products: '광어' }
+    ],
+    metrics: {
+      totalFreight: 21300000,
+      totalTripCount: 42,
+      averageFreight: 507143
+    }
+  },
+  3: { // 호붕
+    periods: [
+      { period: '4월상순', freight: 800000, tripCount: 4, sellers: '인천수산', buyers: '인천횟집', products: '광어' },
+      { period: '4월중순', freight: 900000, tripCount: 4, sellers: '인천수산', buyers: '인천횟집', products: '광어, 우럭' },
+      { period: '4월하순', freight: 850000, tripCount: 4, sellers: '인천수산', buyers: '인천횟집', products: '광어' },
+      { period: '5월상순', freight: 950000, tripCount: 5, sellers: '인천수산', buyers: '인천횟집', products: '광어' },
+      { period: '5월중순', freight: 1000000, tripCount: 5, sellers: '인천수산', buyers: '인천횟집', products: '광어, 돔' },
+      { period: '5월하순', freight: 900000, tripCount: 4, sellers: '인천수산', buyers: '인천횟집', products: '광어' },
+      { period: '6월상순', freight: 1050000, tripCount: 5, sellers: '인천수산', buyers: '인천횟집', products: '광어, 우럭' },
+      { period: '6월중순', freight: 1100000, tripCount: 6, sellers: '인천수산', buyers: '인천횟집', products: '광어' },
+      { period: '6월하순', freight: 1000000, tripCount: 5, sellers: '인천수산', buyers: '인천횟집', products: '광어' }
+    ],
+    metrics: {
+      totalFreight: 8550000,
+      totalTripCount: 42,
+      averageFreight: 203571
+    }
+  }
+};
