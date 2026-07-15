@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import {
   ArrowLeftOutlined, EditOutlined, UploadOutlined, PlusOutlined,
-  MinusCircleOutlined
+  MinusCircleOutlined, FileImageOutlined
 } from '@ant-design/icons';
 import { driverDetails, claimHistory, driverTransactionDetails } from '../data/mockData';
 import dayjs from 'dayjs';
@@ -521,7 +521,28 @@ function DriverDetail() {
               <span className="text-sm font-medium text-gray-500">사업자등록증</span>
               <p className="text-base text-gray-900 mt-1">
                 {settlementInfo.hasCertificate ? (
-                  <Tag color="green">등록완료</Tag>
+                  <Button
+                    size="small"
+                    icon={<FileImageOutlined />}
+                    onClick={() => {
+                      Modal.info({
+                        title: '사업자등록증',
+                        content: (
+                          <div style={{ marginTop: 16 }}>
+                            <Image
+                              src="/images/business-certificate-sample.png"
+                              alt="사업자등록증"
+                              style={{ width: '100%' }}
+                            />
+                          </div>
+                        ),
+                        width: 800,
+                        okText: '닫기'
+                      });
+                    }}
+                  >
+                    사업자등록증
+                  </Button>
                 ) : (
                   <Tag color="default">미등록</Tag>
                 )}

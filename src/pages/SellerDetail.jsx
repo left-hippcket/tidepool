@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, InputNumber, message, Modal, Tag } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined } from '@ant-design/icons';
 import { sellerGroups, sellerDetails, managers, territories, productCategories } from '../data/mockData';
 import { Column } from '@ant-design/charts';
 
@@ -392,9 +392,28 @@ function SellerDetail() {
                     {business.status === 'active' ? '활성' : '비활성'}
                   </span>
                   {business.hasCertificate && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                      사업자등록증 첨부
-                    </span>
+                    <Button
+                      size="small"
+                      icon={<FileImageOutlined />}
+                      onClick={() => {
+                        Modal.info({
+                          title: '사업자등록증',
+                          content: (
+                            <div style={{ marginTop: 16 }}>
+                              <Image
+                                src="/images/business-certificate-sample.png"
+                                alt="사업자등록증"
+                                style={{ width: '100%' }}
+                              />
+                            </div>
+                          ),
+                          width: 800,
+                          okText: '닫기'
+                        });
+                      }}
+                    >
+                      사업자등록증
+                    </Button>
                   )}
                 </div>
 
