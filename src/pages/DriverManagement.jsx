@@ -167,17 +167,7 @@ function DriverManagement() {
   return (
     <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
       {/* 헤더 */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">드라이버 관리</h2>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate('/driver/register')}
-          size="large"
-        >
-          드라이버 등록
-        </Button>
-      </div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">드라이버 관리</h2>
 
       {/* 필터 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
@@ -223,6 +213,16 @@ function DriverManagement() {
             />
           </div>
         </div>
+      </div>
+
+      {/* 상단 버튼 영역 */}
+      <div className="flex justify-between items-center mb-4">
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">
+          총 {sortedDrivers.length}명
+        </span>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/driver/register')}>
+          드라이버 등록
+        </Button>
       </div>
 
       {/* 테이블 (데스크톱) */}
