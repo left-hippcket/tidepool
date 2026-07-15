@@ -17,6 +17,8 @@ import BuyerManagement from './pages/BuyerManagement';
 import BuyerDetail from './pages/BuyerDetail';
 import BuyerRegister from './pages/BuyerRegister';
 import JoinDistribution from './pages/JoinDistribution';
+import JoinDistributionDetail from './pages/JoinDistributionDetail';
+import JoinDistributionRegister from './pages/JoinDistributionRegister';
 import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
 
@@ -240,6 +242,8 @@ function App() {
             <Route path="/buyer/register" element={<BuyerRegister />} />
             <Route path="/buyer/:id" element={<BuyerDetail />} />
             <Route path="/join-distribution" element={<JoinDistribution />} />
+            <Route path="/join-distribution/register" element={<JoinDistributionRegister />} />
+            <Route path="/join-distribution/:id" element={<JoinDistributionDetail />} />
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
           </Routes>
