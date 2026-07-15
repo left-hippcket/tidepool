@@ -1193,3 +1193,133 @@ export const joinDetails = {
     ]
   }
 };
+
+// 조인유통 거래 세부내역 (P2)
+export const joinSalesDetails = {
+  1: { // 동주유통 그룹
+    periods: [
+      { period: '4월상순', purchase: 45000000, sales: 52000000, profit: 7000000, purchaseWeight: 18, salesWeight: 20, specs: '500g, 700g, 1.0kg', sellers: '해금 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '4월중순', purchase: 48000000, sales: 55000000, profit: 7000000, purchaseWeight: 19, salesWeight: 21, specs: '500g, 700g', sellers: '해금 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '4월하순', purchase: 50000000, sales: 58000000, profit: 8000000, purchaseWeight: 20, salesWeight: 22, specs: '500g, 700g, 1.0kg', sellers: '해금 그룹, 갑운 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '5월상순', purchase: 52000000, sales: 60000000, profit: 8000000, purchaseWeight: 21, salesWeight: 23, specs: '500g, 1.0kg', sellers: '해금 그룹', buyers: '소라 그룹, 명성횟집', products: '광어' },
+      { period: '5월중순', purchase: 48000000, sales: 56000000, profit: 8000000, purchaseWeight: 19, salesWeight: 21, specs: '700g, 1.0kg', sellers: '갑운 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '5월하순', purchase: 50000000, sales: 57000000, profit: 7000000, purchaseWeight: 20, salesWeight: 22, specs: '500g, 700g', sellers: '해금 그룹', buyers: '명성횟집', products: '광어' },
+      { period: '6월상순', purchase: 55000000, sales: 63000000, profit: 8000000, purchaseWeight: 22, salesWeight: 24, specs: '500g, 700g, 1.0kg', sellers: '해금 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '6월중순', purchase: 53000000, sales: 61000000, profit: 8000000, purchaseWeight: 21, salesWeight: 23, specs: '700g, 1.0kg', sellers: '해금 그룹, 갑운 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '6월하순', purchase: 49000000, sales: 58000000, profit: 9000000, purchaseWeight: 20, salesWeight: 22, specs: '500g, 1.0kg', sellers: '해금 그룹', buyers: '소라 그룹, 명성횟집', products: '광어' }
+    ],
+    metrics: {
+      totalPurchase: 450000000,
+      totalSales: 520000000,
+      adjustedProfit: 70000000,
+      adjustedProfitRate: 13.5,
+      receivable: 28000000,
+      turnoverRate: 18.6
+    },
+    grade: {
+      purchaseRank: 15,
+      salesRank: 12,
+      profitRank: 8,
+      turnoverGrade: 'A'
+    }
+  },
+  2: { // ING 그룹
+    periods: [
+      { period: '4월상순', purchase: 75000000, sales: 82000000, profit: 7000000, purchaseWeight: 30, salesWeight: 33, specs: '500g, 700g, 1.0kg', sellers: '통영수산 그룹', buyers: '소라 그룹, 대박', products: '광어, 우럭' },
+      { period: '4월중순', purchase: 78000000, sales: 85000000, profit: 7000000, purchaseWeight: 31, salesWeight: 34, specs: '500g, 700g', sellers: '통영수산 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '4월하순', purchase: 80000000, sales: 88000000, profit: 8000000, purchaseWeight: 32, salesWeight: 35, specs: '700g, 1.0kg', sellers: '통영수산 그룹', buyers: '대박', products: '광어, 우럭' },
+      { period: '5월상순', purchase: 85000000, sales: 93000000, profit: 8000000, purchaseWeight: 34, salesWeight: 37, specs: '500g, 1.0kg', sellers: '통영수산 그룹, 해금 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '5월중순', purchase: 82000000, sales: 90000000, profit: 8000000, purchaseWeight: 33, salesWeight: 36, specs: '500g, 700g, 1.0kg', sellers: '통영수산 그룹', buyers: '소라 그룹, 대박', products: '광어, 우럭' },
+      { period: '5월하순', purchase: 80000000, sales: 87000000, profit: 7000000, purchaseWeight: 32, salesWeight: 35, specs: '700g, 1.0kg', sellers: '통영수산 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '6월상순', purchase: 88000000, sales: 96000000, profit: 8000000, purchaseWeight: 35, salesWeight: 38, specs: '500g, 700g, 1.0kg', sellers: '통영수산 그룹, 해금 그룹', buyers: '소라 그룹, 대박', products: '광어, 우럭' },
+      { period: '6월중순', purchase: 85000000, sales: 93000000, profit: 8000000, purchaseWeight: 34, salesWeight: 37, specs: '500g, 1.0kg', sellers: '통영수산 그룹', buyers: '소라 그룹', products: '광어' },
+      { period: '6월하순', purchase: 87000000, sales: 96000000, profit: 9000000, purchaseWeight: 35, salesWeight: 38, specs: '700g, 1.0kg', sellers: '통영수산 그룹', buyers: '대박', products: '광어, 우럭' }
+    ],
+    metrics: {
+      totalPurchase: 740000000,
+      totalSales: 810000000,
+      adjustedProfit: 70000000,
+      adjustedProfitRate: 8.6,
+      receivable: 45000000,
+      turnoverRate: 18.0
+    },
+    grade: {
+      purchaseRank: 8,
+      salesRank: 5,
+      profitRank: 10,
+      turnoverGrade: 'A'
+    }
+  },
+  3: { // 호경유통 그룹
+    periods: [
+      { period: '4월상순', purchase: 22000000, sales: 25000000, profit: 3000000, purchaseWeight: 9, salesWeight: 10, specs: '500g, 700g', sellers: '동주유통', buyers: '명성횟집', products: '광어' },
+      { period: '4월중순', purchase: 24000000, sales: 27000000, profit: 3000000, purchaseWeight: 10, salesWeight: 11, specs: '700g, 1.0kg', sellers: 'ING', buyers: '명성횟집', products: '광어' },
+      { period: '4월하순', purchase: 23000000, sales: 26000000, profit: 3000000, purchaseWeight: 9, salesWeight: 10, specs: '500g, 1.0kg', sellers: '동주유통', buyers: '명성횟집', products: '광어' },
+      { period: '5월상순', purchase: 25000000, sales: 28000000, profit: 3000000, purchaseWeight: 10, salesWeight: 11, specs: '500g, 700g', sellers: '동주유통, ING', buyers: '명성횟집', products: '광어' },
+      { period: '5월중순', purchase: 24000000, sales: 27000000, profit: 3000000, purchaseWeight: 10, salesWeight: 11, specs: '700g, 1.0kg', sellers: '동주유통', buyers: '명성횟집', products: '광어' },
+      { period: '5월하순', purchase: 23000000, sales: 26000000, profit: 3000000, purchaseWeight: 9, salesWeight: 10, specs: '500g, 700g', sellers: 'ING', buyers: '명성횟집', products: '광어' },
+      { period: '6월상순', purchase: 26000000, sales: 29000000, profit: 3000000, purchaseWeight: 10, salesWeight: 12, specs: '500g, 700g, 1.0kg', sellers: '동주유통', buyers: '명성횟집', products: '광어' },
+      { period: '6월중순', purchase: 25000000, sales: 28000000, profit: 3000000, purchaseWeight: 10, salesWeight: 11, specs: '700g, 1.0kg', sellers: '동주유통, ING', buyers: '명성횟집', products: '광어' },
+      { period: '6월하순', purchase: 24000000, sales: 27000000, profit: 3000000, purchaseWeight: 10, salesWeight: 11, specs: '500g, 1.0kg', sellers: '동주유통', buyers: '명성횟집', products: '광어' }
+    ],
+    metrics: {
+      totalPurchase: 216000000,
+      totalSales: 243000000,
+      adjustedProfit: 27000000,
+      adjustedProfitRate: 11.1,
+      receivable: 15000000,
+      turnoverRate: 16.2
+    },
+    grade: {
+      purchaseRank: 25,
+      salesRank: 28,
+      profitRank: 18,
+      turnoverGrade: 'B'
+    }
+  }
+};
+
+// 조인유통 세일즈 히스토리 메모 (P2)
+export const joinSalesHistoryMemos = {
+  1: [ // 동주유통 그룹
+    {
+      id: 1001,
+      date: '2024-07-10',
+      author: '노원진',
+      content: '김동주 대표와 미팅. 하반기 물량 20% 증량 요청. 해금 그룹 공급 안정성 확인.',
+      images: []
+    },
+    {
+      id: 1002,
+      date: '2024-06-25',
+      author: '노원진',
+      content: '동주2호 신규 사업자 추가 완료. 세금계산서 발행 이메일 변경 요청 받음.',
+      images: []
+    }
+  ],
+  2: [ // ING 그룹
+    {
+      id: 2001,
+      date: '2024-07-12',
+      author: '노원진',
+      content: 'ING수원 지점 방문. 수원 지역 바이어 확대 가능성 논의. 통영수산과 직거래 선호.',
+      images: []
+    },
+    {
+      id: 2002,
+      date: '2024-07-05',
+      author: '노원진',
+      content: '이인규 대표 전화 통화. 7월 물량 30% 증량 확정. 소라 그룹 외 대박 그룹 추가 납품.',
+      images: []
+    }
+  ],
+  3: [ // 호경유통 그룹
+    {
+      id: 3001,
+      date: '2024-07-08',
+      author: '노원진',
+      content: '호경유통 신규 거래 시작. 명성횟집 단독 공급. 품질 요구사항 까다로움.',
+      images: []
+    }
+  ]
+};

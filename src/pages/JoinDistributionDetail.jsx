@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Input, Select, InputNumber, message, Modal } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import { joinGroups, joinDetails, managers, territories } from '../data/mockData';
+import { joinGroups, joinDetails, managers, territories, joinSalesDetails, joinSalesHistoryMemos } from '../data/mockData';
 
 function JoinDistributionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [editingBusinessId, setEditingBusinessId] = useState(null);
+  const [periodFilter, setPeriodFilter] = useState('3M');
+  const [isAddingMemo, setIsAddingMemo] = useState(false);
+  const [editingMemoId, setEditingMemoId] = useState(null);
+  const [memoContent, setMemoContent] = useState('');
   const [form] = Form.useForm();
   const [businessForm] = Form.useForm();
 
@@ -475,6 +479,331 @@ function JoinDistributionDetail() {
           </button>
         </div>
       </div>
+
+      {/* P2 섹션 시작 */}
+      {joinSalesDetails[id] && (
+        <>
+          {/* 기간 필터 버튼 */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+            <div className="flex flex-wrap gap-2">
+              {['1M', '3M', '6M', 'thisMonth', 'thisQuarter', 'thisYear', 'all'].map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setPeriodFilter(period)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    periodFilter === period
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {period === '1M' && '최근 1개월'}
+                  {period === '3M' && '최근 3개월'}
+                  {period === '6M' && '최근 6개월'}
+                  {period === 'thisMonth' && '이번달'}
+                  {period === 'thisQuarter' && '이번분기'}
+                  {period === 'thisYear' && '올해'}
+                  {period === 'all' && '누적'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 섹션 3: 통합지표 & 등급 정보 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* 통합지표 */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">통합지표 (최근 3개월)</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">매입액</div>
+                  <div className="text-xl font-bold text-gray-900">
+                    {(joinSalesDetails[id].metrics.totalPurchase / 100000000).toFixed(1)}억
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">매출액</div>
+                  <div className="text-xl font-bold text-gray-900">
+                    {(joinSalesDetails[id].metrics.totalSales / 100000000).toFixed(1)}억
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">조정손익액</div>
+                  <div className="text-xl font-bold text-blue-600">
+                    {(joinSalesDetails[id].metrics.adjustedProfit / 100000000).toFixed(1)}억
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">조정손익률</div>
+                  <div className="text-xl font-bold text-blue-600">
+                    {joinSalesDetails[id].metrics.adjustedProfitRate}%
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">기말미수금</div>
+                  <div className="text-xl font-bold text-orange-600">
+                    {(joinSalesDetails[id].metrics.receivable / 100000000).toFixed(1)}억
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500 mb-1">자본회전율</div>
+                  <div className="text-xl font-bold text-green-600">
+                    {joinSalesDetails[id].metrics.turnoverRate}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 등급 정보 */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">조인유통 등급</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <div className="text-sm text-blue-700 mb-1">매입액 순위</div>
+                  <div className="text-2xl font-bold text-blue-900">
+                    상위 {joinSalesDetails[id].grade.purchaseRank}%
+                  </div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <div className="text-sm text-green-700 mb-1">매출액 순위</div>
+                  <div className="text-2xl font-bold text-green-900">
+                    상위 {joinSalesDetails[id].grade.salesRank}%
+                  </div>
+                </div>
+                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                  <div className="text-sm text-purple-700 mb-1">거래손익 순위</div>
+                  <div className="text-2xl font-bold text-purple-900">
+                    상위 {joinSalesDetails[id].grade.profitRank}%
+                  </div>
+                </div>
+                <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                  <div className="text-sm text-orange-700 mb-1">자본회전율 등급</div>
+                  <div className="text-2xl font-bold text-orange-900">
+                    {joinSalesDetails[id].grade.turnoverGrade}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 섹션 4: 거래 세부내역 */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">거래 세부내역</h2>
+
+            {/* 테이블 */}
+            <div className="overflow-x-auto mb-6">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">기간</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-700">매입액</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-700">조정손익액</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-700">매입총중량(톤)</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-700">매출총중량(톤)</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">출하규격</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">출하셀러</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">판매바이어</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-700">거래품목</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {joinSalesDetails[id].periods.map((period, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-gray-900 font-medium">{period.period}</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{(period.purchase / 10000000).toFixed(1)}백만</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{(period.sales / 10000000).toFixed(1)}백만</td>
+                      <td className="px-4 py-3 text-right text-blue-600 font-medium">{(period.profit / 10000000).toFixed(1)}백만</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{period.purchaseWeight}</td>
+                      <td className="px-4 py-3 text-right text-gray-900">{period.salesWeight}</td>
+                      <td className="px-4 py-3 text-gray-700 text-xs">{period.specs}</td>
+                      <td className="px-4 py-3 text-gray-700 text-xs">{period.sellers}</td>
+                      <td className="px-4 py-3 text-gray-700 text-xs">{period.buyers}</td>
+                      <td className="px-4 py-3 text-gray-700 text-xs">{period.products}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 차트 */}
+            <div className="mt-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">매입액/매출액 추이</h3>
+              <div className="flex items-end justify-between gap-2 h-64 border-l-2 border-b-2 border-gray-300 pl-2 pb-2 relative">
+                <div className="absolute -left-16 top-0 bottom-12 flex items-center">
+                  <span className="text-sm text-gray-600 transform -rotate-90 whitespace-nowrap">금액 (백만원)</span>
+                </div>
+                {joinSalesDetails[id].periods.map((p, idx) => {
+                  const maxAmount = Math.max(...joinSalesDetails[id].periods.map(period => Math.max(period.purchase, period.sales)));
+                  const purchaseHeight = (p.purchase / maxAmount) * 100;
+                  const salesHeight = (p.sales / maxAmount) * 100;
+
+                  return (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full">
+                      <div className="w-full flex gap-1 items-end justify-center h-full">
+                        <div className="flex-1 flex flex-col items-center justify-end h-full">
+                          <div className="text-xs text-gray-700 font-medium mb-1">
+                            {(p.purchase / 10000000).toFixed(0)}
+                          </div>
+                          <div
+                            className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t hover:from-blue-700 hover:to-blue-500 transition-all cursor-pointer shadow-sm"
+                            style={{ height: `${purchaseHeight}%`, minHeight: '4px' }}
+                            title={`매입: ${(p.purchase / 10000000).toFixed(1)}백만원`}
+                          />
+                        </div>
+                        <div className="flex-1 flex flex-col items-center justify-end h-full">
+                          <div className="text-xs text-gray-700 font-medium mb-1">
+                            {(p.sales / 10000000).toFixed(0)}
+                          </div>
+                          <div
+                            className="w-full bg-gradient-to-t from-green-600 to-green-400 rounded-t hover:from-green-700 hover:to-green-500 transition-all cursor-pointer shadow-sm"
+                            style={{ height: `${salesHeight}%`, minHeight: '4px' }}
+                            title={`매출: ${(p.sales / 10000000).toFixed(1)}백만원`}
+                          />
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-600 mt-2 transform -rotate-45 origin-top-left whitespace-nowrap">
+                        {p.period}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-center gap-6 mt-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gradient-to-t from-blue-600 to-blue-400 rounded"></div>
+                  <span className="text-sm text-gray-700">매입액</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gradient-to-t from-green-600 to-green-400 rounded"></div>
+                  <span className="text-sm text-gray-700">매출액</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 섹션 5: 세일즈 히스토리 */}
+          {joinSalesHistoryMemos[id] && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">세일즈 히스토리</h2>
+                <button
+                  onClick={() => {
+                    setIsAddingMemo(true);
+                    setMemoContent('');
+                  }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  <PlusOutlined />
+                  메모 추가
+                </button>
+              </div>
+
+              {/* 메모 추가 폼 */}
+              {isAddingMemo && (
+                <div className="bg-blue-50 rounded-lg border border-blue-200 p-4 mb-4">
+                  <textarea
+                    value={memoContent}
+                    onChange={(e) => setMemoContent(e.target.value)}
+                    placeholder="영업 활동 내역을 입력하세요..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                  />
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={() => {
+                        if (memoContent.trim()) {
+                          message.success('메모가 추가되었습니다.');
+                          setIsAddingMemo(false);
+                          setMemoContent('');
+                        }
+                      }}
+                    >
+                      저장
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        setIsAddingMemo(false);
+                        setMemoContent('');
+                      }}
+                    >
+                      취소
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* 메모 타임라인 */}
+              <div className="space-y-4">
+                {joinSalesHistoryMemos[id].map((memo) => (
+                  <div key={memo.id} className="border-l-2 border-blue-400 pl-4 py-2">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{memo.author}</div>
+                        <div className="text-xs text-gray-500">{memo.date}</div>
+                      </div>
+                      {editingMemoId === memo.id ? (
+                        <div className="flex gap-2">
+                          <Button
+                            type="primary"
+                            size="small"
+                            onClick={() => {
+                              message.success('메모가 수정되었습니다.');
+                              setEditingMemoId(null);
+                            }}
+                          >
+                            저장
+                          </Button>
+                          <Button
+                            size="small"
+                            onClick={() => setEditingMemoId(null)}
+                          >
+                            취소
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingMemoId(memo.id)}
+                            className="text-xs text-blue-600 hover:text-blue-700"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() => {
+                              Modal.confirm({
+                                title: '메모 삭제',
+                                content: '이 메모를 삭제하시겠습니까?',
+                                onOk: () => {
+                                  message.success('메모가 삭제되었습니다.');
+                                },
+                              });
+                            }}
+                            className="text-xs text-red-600 hover:text-red-700"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {editingMemoId === memo.id ? (
+                      <textarea
+                        defaultValue={memo.content}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={3}
+                      />
+                    ) : (
+                      <div className="text-sm text-gray-700">{memo.content}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
