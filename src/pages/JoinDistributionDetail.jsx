@@ -707,10 +707,12 @@ function JoinDistributionDetail() {
               </div>
             </div>
           </div>
+        </div>
+      )}
 
-          {/* 섹션 5: 세일즈 히스토리 */}
-          {joinSalesHistoryMemos[id] && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      {/* 섹션 5: 세일즈 히스토리 */}
+      {joinSalesHistoryMemos[id] && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">세일즈 히스토리</h2>
                 <button

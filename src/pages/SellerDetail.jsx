@@ -145,15 +145,17 @@ function SellerDetail() {
     data: chartData,
     xField: 'period',
     yField: 'value',
+    color: '#9CA3AF',
     label: {
       position: 'top',
-      style: { fill: '#000', fontSize: 10 }
+      style: { fill: '#6B7280', fontSize: 10 }
     },
     xAxis: {
-      label: { autoRotate: false }
+      label: { autoRotate: false, style: { fill: '#6B7280' } }
     },
     yAxis: {
-      title: { text: '매입액 (억원)' }
+      title: { text: '매입액 (억원)', style: { fill: '#6B7280' } },
+      label: { style: { fill: '#6B7280' } }
     },
   };
 
