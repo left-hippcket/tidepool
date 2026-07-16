@@ -713,124 +713,122 @@ function JoinDistributionDetail() {
       {/* 섹션 5: 세일즈 히스토리 */}
       {joinSalesHistoryMemos[id] && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">세일즈 히스토리</h2>
-                <button
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">세일즈 히스토리</h2>
+            <button
+              onClick={() => {
+                setIsAddingMemo(true);
+                setMemoContent('');
+              }}
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <PlusOutlined />
+              메모 추가
+            </button>
+          </div>
+
+          {/* 메모 추가 폼 */}
+          {isAddingMemo && (
+            <div className="bg-blue-50 rounded-lg border border-blue-200 p-4 mb-4">
+              <textarea
+                value={memoContent}
+                onChange={(e) => setMemoContent(e.target.value)}
+                placeholder="영업 활동 내역을 입력하세요..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={4}
+              />
+              <div className="flex gap-2 mt-3">
+                <Button
+                  type="primary"
+                  size="small"
                   onClick={() => {
-                    setIsAddingMemo(true);
+                    if (memoContent.trim()) {
+                      message.success('메모가 추가되었습니다.');
+                      setIsAddingMemo(false);
+                      setMemoContent('');
+                    }
+                  }}
+                >
+                  저장
+                </Button>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setIsAddingMemo(false);
                     setMemoContent('');
                   }}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
                 >
-                  <PlusOutlined />
-                  메모 추가
-                </button>
-              </div>
-
-              {/* 메모 추가 폼 */}
-              {isAddingMemo && (
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-4 mb-4">
-                  <textarea
-                    value={memoContent}
-                    onChange={(e) => setMemoContent(e.target.value)}
-                    placeholder="영업 활동 내역을 입력하세요..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                  />
-                  <div className="flex gap-2 mt-3">
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() => {
-                        if (memoContent.trim()) {
-                          message.success('메모가 추가되었습니다.');
-                          setIsAddingMemo(false);
-                          setMemoContent('');
-                        }
-                      }}
-                    >
-                      저장
-                    </Button>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setIsAddingMemo(false);
-                        setMemoContent('');
-                      }}
-                    >
-                      취소
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* 메모 타임라인 */}
-              <div className="space-y-4">
-                {joinSalesHistoryMemos[id].map((memo) => (
-                  <div key={memo.id} className="border-l-2 border-blue-400 pl-4 py-2">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{memo.author}</div>
-                        <div className="text-xs text-gray-500">{memo.date}</div>
-                      </div>
-                      {editingMemoId === memo.id ? (
-                        <div className="flex gap-2">
-                          <Button
-                            type="primary"
-                            size="small"
-                            onClick={() => {
-                              message.success('메모가 수정되었습니다.');
-                              setEditingMemoId(null);
-                            }}
-                          >
-                            저장
-                          </Button>
-                          <Button
-                            size="small"
-                            onClick={() => setEditingMemoId(null)}
-                          >
-                            취소
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => setEditingMemoId(memo.id)}
-                            className="text-xs text-blue-600 hover:text-blue-700"
-                          >
-                            수정
-                          </button>
-                          <button
-                            onClick={() => {
-                              Modal.confirm({
-                                title: '메모 삭제',
-                                content: '이 메모를 삭제하시겠습니까?',
-                                onOk: () => {
-                                  message.success('메모가 삭제되었습니다.');
-                                },
-                              });
-                            }}
-                            className="text-xs text-red-600 hover:text-red-700"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    {editingMemoId === memo.id ? (
-                      <textarea
-                        defaultValue={memo.content}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={3}
-                      />
-                    ) : (
-                      <div className="text-sm text-gray-700">{memo.content}</div>
-                    )}
-                  </div>
-                ))}
+                  취소
+                </Button>
               </div>
             </div>
           )}
+
+          {/* 메모 타임라인 */}
+          <div className="space-y-4">
+            {joinSalesHistoryMemos[id].map((memo) => (
+              <div key={memo.id} className="border-l-2 border-blue-400 pl-4 py-2">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{memo.author}</div>
+                    <div className="text-xs text-gray-500">{memo.date}</div>
+                  </div>
+                  {editingMemoId === memo.id ? (
+                    <div className="flex gap-2">
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() => {
+                          message.success('메모가 수정되었습니다.');
+                          setEditingMemoId(null);
+                        }}
+                      >
+                        저장
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={() => setEditingMemoId(null)}
+                      >
+                        취소
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setEditingMemoId(memo.id)}
+                        className="text-xs text-blue-600 hover:text-blue-700"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => {
+                          Modal.confirm({
+                            title: '메모 삭제',
+                            content: '이 메모를 삭제하시겠습니까?',
+                            onOk: () => {
+                              message.success('메모가 삭제되었습니다.');
+                            },
+                          });
+                        }}
+                        className="text-xs text-red-600 hover:text-red-700"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {editingMemoId === memo.id ? (
+                  <textarea
+                    defaultValue={memo.content}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                  />
+                ) : (
+                  <div className="text-sm text-gray-700">{memo.content}</div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
