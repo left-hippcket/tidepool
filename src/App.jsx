@@ -92,7 +92,7 @@ function App() {
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🐟</div>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
-              피시파더 ERP
+              Fish Master
             </h2>
             <p style={{ color: '#888', marginTop: 8 }}>
               활어산지유통 관리시스템
@@ -215,7 +215,7 @@ function App() {
           fontWeight: 'bold',
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
         }}>
-          {collapsed ? '🐟' : '🐟 피시파더 ERP'}
+          {collapsed ? '🐟' : '🐟 Fish Master'}
         </div>
         <Menu
           theme="dark"

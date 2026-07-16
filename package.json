@@ -1,7 +1,7 @@
 {
-  "name": "fifa-admin-web",
+  "name": "fish-master",
   "version": "1.0.0",
-  "description": "활어산지유통 웹 어드민",
+  "description": "Fish Master - 활어산지유통 웹 어드민",
   "private": true,
   "scripts": {
     "dev": "vite",
