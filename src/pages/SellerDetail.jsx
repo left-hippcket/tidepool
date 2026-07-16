@@ -146,6 +146,9 @@ function SellerDetail() {
     xField: 'period',
     yField: 'value',
     color: '#9CA3AF',
+    columnStyle: {
+      fill: '#9CA3AF',
+    },
     label: {
       position: 'top',
       style: { fill: '#6B7280', fontSize: 10 }
