@@ -91,11 +91,6 @@ function DriverManagement() {
       ),
     },
     {
-      title: 'Ticker',
-      dataIndex: 'ticker',
-      key: 'ticker',
-    },
-    {
       title: () => (
         <span onClick={() => handleSort('vehicleType')} style={{ cursor: 'pointer', userSelect: 'none' }}>
           차종 {renderSortIcon('vehicleType')}
