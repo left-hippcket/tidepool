@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { sellerGroups, sellerDetails, managers, territories, productCategories } from '../data/mockData';
 import { Column } from '@ant-design/charts';
 
@@ -31,7 +31,16 @@ function SellerDetail() {
       territory: sellerGroup.territory,
       region: sellerGroup.region,
       commissionRate: sellerGroup.commissionRate,
-      status: sellerGroup.status
+      status: sellerGroup.status,
+      keymen: detail.keymen,
+      financial: detail.qualitativeRatings.financial,
+      quality: detail.qualitativeRatings.quality,
+      priceCompetitive: detail.qualitativeRatings.priceCompetitive,
+      claimCooperation: detail.qualitativeRatings.claimCooperation,
+      lossProvision: detail.qualitativeRatings.lossProvision,
+      farmArea: detail.additionalInfo.farmArea,
+      annualProduction: detail.additionalInfo.annualProduction,
+      mainDistributors: detail.additionalInfo.mainDistributors
     });
     setEditMode(true);
   };
@@ -282,96 +291,206 @@ function SellerDetail() {
                 </Select>
               </Form.Item>
             </div>
+
+            {/* 키맨 정보 편집 */}
+            <div className="mt-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
+              <Form.List name="keymen">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map((field) => (
+                      <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
+                        <div className="grid grid-cols-3 gap-4">
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'name']}
+                            label="이름"
+                            rules={[{ required: true, message: '이름을 입력해주세요' }]}
+                          >
+                            <Input placeholder="김철수" />
+                          </Form.Item>
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'position']}
+                            label="직책"
+                          >
+                            <Input placeholder="대표" />
+                          </Form.Item>
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'phone']}
+                            label="연락처"
+                            rules={[{ pattern: /^010-\d{4}-\d{4}$/, message: '010-XXXX-XXXX 형식' }]}
+                          >
+                            <Input placeholder="010-1234-5678" />
+                          </Form.Item>
+                        </div>
+                        {fields.length > 1 && (
+                          <Button onClick={() => remove(field.name)} icon={<MinusCircleOutlined />} size="small">
+                            삭제
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button onClick={() => add()} icon={<PlusOutlined />} block type="dashed">
+                      키맨 추가
+                    </Button>
+                  </>
+                )}
+              </Form.List>
+            </div>
+
+            {/* 정성적 평가 편집 */}
+            <div className="mt-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">정성적 평가</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Form.Item label="재무상황" name="financial">
+                  <Select>
+                    <Select.Option value="최상">최상</Select.Option>
+                    <Select.Option value="좋음">좋음</Select.Option>
+                    <Select.Option value="보통">보통</Select.Option>
+                    <Select.Option value="나쁨">나쁨</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="품질수준" name="quality">
+                  <Select>
+                    <Select.Option value="최상">최상</Select.Option>
+                    <Select.Option value="좋음">좋음</Select.Option>
+                    <Select.Option value="보통">보통</Select.Option>
+                    <Select.Option value="나쁨">나쁨</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="가격경쟁력" name="priceCompetitive">
+                  <Select>
+                    <Select.Option value="높음">높음</Select.Option>
+                    <Select.Option value="보통">보통</Select.Option>
+                    <Select.Option value="낮음">낮음</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="클레임협조도" name="claimCooperation">
+                  <Select>
+                    <Select.Option value="좋음">좋음</Select.Option>
+                    <Select.Option value="보통">보통</Select.Option>
+                    <Select.Option value="나쁨">나쁨</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="로스제공" name="lossProvision">
+                  <Select>
+                    <Select.Option value="넉넉함">넉넉함</Select.Option>
+                    <Select.Option value="적당함">적당함</Select.Option>
+                    <Select.Option value="부족함">부족함</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+
+            {/* 기타 정보 편집 */}
+            <div className="mt-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">기타 정보</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Form.Item label="양식장 수면적(평)" name="farmArea">
+                  <Input placeholder="15000" />
+                </Form.Item>
+                <Form.Item label="연간생산량(톤)" name="annualProduction">
+                  <Input placeholder="120" />
+                </Form.Item>
+                <Form.Item label="메인 유통사" name="mainDistributors">
+                  <Input placeholder="노량진수산, 가락시장" />
+                </Form.Item>
+              </div>
+            </div>
           </Form>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-sm text-gray-500 mb-1">셀러그룹명</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.name}</div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <div className="text-sm text-gray-500 mb-1">셀러그룹명</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.name}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">소싱담당자</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.manager}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">주요품목분류</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.mainCategory}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">사업권역</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.territory}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">상세지역</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.region}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">상차 수수료율</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.commissionRate}%</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">사업자 수</div>
+                <div className="text-base font-semibold text-gray-900">{sellerGroup.businessCount}개</div>
+              </div>
             </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">소싱담당자</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.manager}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">주요품목분류</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.mainCategory}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">사업권역</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.territory}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">상세지역</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.region}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">상차 수수료율</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.commissionRate}%</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">사업자 수</div>
-              <div className="text-base font-semibold text-gray-900">{sellerGroup.businessCount}개</div>
-            </div>
-          </div>
-        )}
 
-        {/* 키맨 정보 */}
-        <div className="mt-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
-          <div className="space-y-3">
-            {detail.keymen.map((keyman, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">이름</div>
-                    <div className="text-sm font-medium text-gray-900">{keyman.name}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">직책</div>
-                    <div className="text-sm font-medium text-gray-900">{keyman.position}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">연락처</div>
-                    <div className="text-sm font-medium text-gray-900">{keyman.phone}</div>
+            {/* 키맨 정보 */}
+          <div className="mt-8">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
+            <div className="space-y-3">
+              {detail.keymen.map((keyman, index) => (
+                <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">이름</div>
+                      <div className="text-sm font-medium text-gray-900">{keyman.name}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">직책</div>
+                      <div className="text-sm font-medium text-gray-900">{keyman.position}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500 mb-1">연락처</div>
+                      <div className="text-sm font-medium text-gray-900">{keyman.phone}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* 정성적 평가 */}
-        <div className="mt-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">정성적 평가</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {Object.entries(detail.qualitativeRatings).map(([key, value]) => (
-              <div key={key} className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
-                <div className="text-xs text-blue-600 mb-2">{qualitativeLabels[key]}</div>
-                <div className="text-base font-bold text-blue-700">{addEmoji(value)}</div>
-              </div>
-            ))}
+          {/* 정성적 평가 */}
+          <div className="mt-8">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">정성적 평가</h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {Object.entries(detail.qualitativeRatings).map(([key, value]) => (
+                <div key={key} className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
+                  <div className="text-xs text-blue-600 mb-2">{qualitativeLabels[key]}</div>
+                  <div className="text-base font-bold text-blue-700">{addEmoji(value)}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* 기타 정보 */}
-        <div className="mt-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">기타 정보</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-sm text-gray-500 mb-1">양식장 수면적</div>
-              <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.farmArea}평</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">연간생산량</div>
-              <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.annualProduction}톤</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">메인 유통사</div>
-              <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.mainDistributors}</div>
+          {/* 기타 정보 */}
+          <div className="mt-8">
+            <h3 className="text-base font-semibold text-gray-900 mb-4">기타 정보</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <div className="text-sm text-gray-500 mb-1">양식장 수면적</div>
+                <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.farmArea}평</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">연간생산량</div>
+                <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.annualProduction}톤</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 mb-1">메인 유통사</div>
+                <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.mainDistributors}</div>
+              </div>
             </div>
           </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* 섹션 2: 소속 사업자 정보 */}

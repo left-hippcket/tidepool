@@ -58,7 +58,8 @@ function BuyerDetail() {
       complaintIntensity: detail.complaintIntensity,
       mainSuppliers: detail.mainSuppliers,
       status: buyerGroup.status,
-      keymen: detail.keymen
+      keymen: detail.keymen,
+      priorityFactors: detail.priorityFactors
     });
     setEditMode(true);
   };
@@ -415,7 +416,73 @@ function BuyerDetail() {
               <Input />
             </Form.Item>
 
-            <Form.Item name="status" label="상태" rules={[{ required: true }]}>
+            {/* 중요 평가 요소 편집 */}
+            <div className="mt-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">중요 평가 요소 (우선순위)</h3>
+              <Form.List name="priorityFactors">
+                {(fields, { add, remove, move }) => (
+                  <>
+                    <div className="space-y-2">
+                      {fields.map((field, index) => (
+                        <div key={field.key} className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-700 w-16">{index + 1}순위</span>
+                          <Form.Item
+                            {...field}
+                            className="flex-1 mb-0"
+                            rules={[{ required: true, message: '평가 요소를 선택해주세요' }]}
+                          >
+                            <Select placeholder="평가 요소 선택">
+                              {priorityOptions.map(option => (
+                                <Select.Option key={option} value={option}>
+                                  {priorityEmojis[option]} {option}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                          <div className="flex gap-1">
+                            {index > 0 && (
+                              <Button
+                                size="small"
+                                icon={<span>↑</span>}
+                                onClick={() => move(index, index - 1)}
+                              />
+                            )}
+                            {index < fields.length - 1 && (
+                              <Button
+                                size="small"
+                                icon={<span>↓</span>}
+                                onClick={() => move(index, index + 1)}
+                              />
+                            )}
+                            {fields.length > 1 && (
+                              <Button
+                                size="small"
+                                danger
+                                icon={<MinusCircleOutlined />}
+                                onClick={() => remove(field.name)}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {fields.length < priorityOptions.length && (
+                      <Button
+                        onClick={() => add()}
+                        icon={<PlusOutlined />}
+                        block
+                        type="dashed"
+                        className="mt-3"
+                      >
+                        평가 요소 추가
+                      </Button>
+                    )}
+                  </>
+                )}
+              </Form.List>
+            </div>
+
+            <Form.Item name="status" label="상태" rules={[{ required: true }]} className="mt-4">
               <Select>
                 <Select.Option value="active">활성</Select.Option>
                 <Select.Option value="inactive">비활성</Select.Option>
