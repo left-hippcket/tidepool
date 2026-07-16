@@ -664,31 +664,31 @@ function SellerDetail() {
       </div>
 
       {/* 섹션 3: 거래 실적 (P2 샘플) */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">거래 실적 (P2 샘플)</h2>
+      <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 opacity-60">
+        <h2 className="text-lg font-semibold text-gray-500 mb-6">거래 실적 (P2 예정)</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
-            <div className="text-xs text-blue-600 mb-2">매입액 (누적)</div>
-            <div className="text-2xl font-bold text-blue-700">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">매입액 (누적)</div>
+            <div className="text-2xl font-bold text-gray-600">
               {(sellerGroup.totalPurchase / 100000000).toFixed(1)}억
             </div>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 text-center border border-green-100">
-            <div className="text-xs text-green-600 mb-2">매입액 (최근 3개월)</div>
-            <div className="text-2xl font-bold text-green-700">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">매입액 (최근 3개월)</div>
+            <div className="text-2xl font-bold text-gray-600">
               {(sellerGroup.purchase3M / 100000000).toFixed(1)}억
             </div>
           </div>
-          <div className="bg-yellow-50 rounded-lg p-4 text-center border border-yellow-100">
-            <div className="text-xs text-yellow-600 mb-2">매입액 (최근 1개월)</div>
-            <div className="text-2xl font-bold text-yellow-700">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">매입액 (최근 1개월)</div>
+            <div className="text-2xl font-bold text-gray-600">
               {(sellerGroup.purchase1M / 100000000).toFixed(1)}억
             </div>
           </div>
-          <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-            <div className="text-xs text-gray-600 mb-2">최근거래일</div>
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">최근거래일</div>
+            <div className="text-2xl font-bold text-gray-600">
               {sellerGroup.lastTradeDate}
             </div>
           </div>
@@ -712,8 +712,8 @@ function SellerDetail() {
               onClick={() => setPeriodFilter(key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 periodFilter === key
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  ? 'bg-gray-400 text-gray-700 shadow-sm'
+                  : 'bg-gray-200 text-gray-600 border border-gray-300'
               }`}
             >
               {label}
@@ -725,25 +725,25 @@ function SellerDetail() {
         <div className="mb-6 overflow-x-auto">
           <div className="hidden md:block">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-100 border-b border-gray-300">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">기간</th>
-                  <th className="px-4 py-3 text-right font-semibold text-gray-700">매입액</th>
-                  <th className="px-4 py-3 text-right font-semibold text-gray-700">조정손익액</th>
-                  <th className="px-4 py-3 text-right font-semibold text-gray-700">매입총중량(톤)</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">출하규격</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">출하바이어</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-500">기간</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-500">매입액</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-500">조정손익액</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-500">매입총중량(톤)</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-500">출하규격</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-500">출하바이어</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-300">
                 {currentData.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-900">{row.period}</td>
-                    <td className="px-4 py-3 text-right text-gray-900">{(row.purchase / 100000000).toFixed(1)}억</td>
-                    <td className="px-4 py-3 text-right text-gray-900">{(row.profit / 10000).toFixed(0)}만</td>
-                    <td className="px-4 py-3 text-right text-gray-900">{row.weight}</td>
-                    <td className="px-4 py-3 text-gray-600">{row.specs}</td>
-                    <td className="px-4 py-3 text-gray-600">{row.buyers}</td>
+                  <tr key={idx}>
+                    <td className="px-4 py-3 font-medium text-gray-600">{row.period}</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{(row.purchase / 100000000).toFixed(1)}억</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{(row.profit / 10000).toFixed(0)}만</td>
+                    <td className="px-4 py-3 text-right text-gray-600">{row.weight}</td>
+                    <td className="px-4 py-3 text-gray-500">{row.specs}</td>
+                    <td className="px-4 py-3 text-gray-500">{row.buyers}</td>
                   </tr>
                 ))}
               </tbody>
@@ -753,28 +753,28 @@ function SellerDetail() {
           {/* 모바일 카드 뷰 */}
           <div className="md:hidden space-y-3">
             {currentData.map((row, idx) => (
-              <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="font-semibold text-gray-900 mb-3">{row.period}</div>
+              <div key={idx} className="bg-gray-100 rounded-lg p-4 border border-gray-300">
+                <div className="font-semibold text-gray-600 mb-3">{row.period}</div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <div className="text-gray-500 text-xs mb-0.5">매입액</div>
-                    <div className="font-medium text-gray-900">{(row.purchase / 100000000).toFixed(1)}억</div>
+                    <div className="font-medium text-gray-600">{(row.purchase / 100000000).toFixed(1)}억</div>
                   </div>
                   <div>
                     <div className="text-gray-500 text-xs mb-0.5">조정손익액</div>
-                    <div className="font-medium text-gray-900">{(row.profit / 10000).toFixed(0)}만</div>
+                    <div className="font-medium text-gray-600">{(row.profit / 10000).toFixed(0)}만</div>
                   </div>
                   <div>
                     <div className="text-gray-500 text-xs mb-0.5">매입총중량</div>
-                    <div className="font-medium text-gray-900">{row.weight}톤</div>
+                    <div className="font-medium text-gray-600">{row.weight}톤</div>
                   </div>
                   <div>
                     <div className="text-gray-500 text-xs mb-0.5">출하규격</div>
-                    <div className="font-medium text-gray-900 text-xs">{row.specs}</div>
+                    <div className="font-medium text-gray-600 text-xs">{row.specs}</div>
                   </div>
                   <div className="col-span-2">
                     <div className="text-gray-500 text-xs mb-0.5">출하바이어</div>
-                    <div className="font-medium text-gray-900 text-xs">{row.buyers}</div>
+                    <div className="font-medium text-gray-600 text-xs">{row.buyers}</div>
                   </div>
                 </div>
               </div>
@@ -784,8 +784,8 @@ function SellerDetail() {
 
         {/* 매입액 막대차트 */}
         <div>
-          <h3 className="text-base font-semibold text-gray-900 mb-4">매입액 추이</h3>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <h3 className="text-base font-semibold text-gray-500 mb-4">매입액 추이</h3>
+          <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
             <Column {...chartConfig} />
           </div>
         </div>

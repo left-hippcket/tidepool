@@ -655,31 +655,31 @@ function BuyerDetail() {
       </div>
 
       {/* 섹션 3: 거래 실적 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">거래 실적</h2>
+      <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 opacity-60">
+        <h2 className="text-lg font-semibold text-gray-500 mb-6">거래 실적 (P2 예정)</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
-            <div className="text-xs text-blue-600 mb-2">매출액 (누적)</div>
-            <div className="text-2xl font-bold text-blue-700">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">매출액 (누적)</div>
+            <div className="text-2xl font-bold text-gray-600">
               {(buyerGroup.totalSales / 100000000).toFixed(1)}억
             </div>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 text-center border border-green-100">
-            <div className="text-xs text-green-600 mb-2">매출액 (최근 3개월)</div>
-            <div className="text-2xl font-bold text-green-700">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">매출액 (최근 3개월)</div>
+            <div className="text-2xl font-bold text-gray-600">
               {(buyerGroup.sales3M / 100000000).toFixed(1)}억
             </div>
           </div>
-          <div className="bg-yellow-50 rounded-lg p-4 text-center border border-yellow-100">
-            <div className="text-xs text-yellow-600 mb-2">매출액 (최근 1개월)</div>
-            <div className="text-2xl font-bold text-yellow-700">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">매출액 (최근 1개월)</div>
+            <div className="text-2xl font-bold text-gray-600">
               {(buyerGroup.sales1M / 100000000).toFixed(1)}억
             </div>
           </div>
-          <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-            <div className="text-xs text-gray-600 mb-2">최근거래일</div>
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
+            <div className="text-xs text-gray-500 mb-2">최근거래일</div>
+            <div className="text-2xl font-bold text-gray-600">
               {buyerGroup.lastTradeDate}
             </div>
           </div>
@@ -689,9 +689,9 @@ function BuyerDetail() {
 
       {/* P2 섹션: 등급 정보 & 판매 세부내역 */}
       {salesDetail && (
-        <>
+        <div className="opacity-60">
           {/* 기간 필터 */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-4 mb-6">
             <div className="flex flex-wrap gap-2">
               {['최근 1개월', '최근 3개월', '최근 6개월', '이번달', '이번분기', '올해', '누적'].map(period => (
                 <button
@@ -699,8 +699,8 @@ function BuyerDetail() {
                   onClick={() => setSelectedPeriod(period)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedPeriod === period
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-gray-400 text-gray-700'
+                      : 'bg-gray-200 text-gray-600 border border-gray-300'
                   }`}
                 >
                   {period}
@@ -712,36 +712,36 @@ function BuyerDetail() {
           {/* 통합 지표 & 등급 카드 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* 통합 지표 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">통합 지표 ({selectedPeriod})</h3>
+            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6">
+              <h3 className="text-lg font-semibold text-gray-500 mb-4">통합 지표 (P2 예정) ({selectedPeriod})</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">매출액</span>
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-sm text-gray-500">매출액</span>
+                  <span className="text-lg font-bold text-gray-600">
                     {(salesDetail.metrics.totalSales / 100000000).toFixed(1)}억원
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">조정손익액</span>
-                  <span className="text-lg font-bold text-green-700">
+                  <span className="text-sm text-gray-500">조정손익액</span>
+                  <span className="text-lg font-bold text-gray-600">
                     {(salesDetail.metrics.totalProfit / 10000000).toFixed(1)}백만원
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">조정손익률</span>
-                  <span className="text-lg font-bold text-green-700">
+                  <span className="text-sm text-gray-500">조정손익률</span>
+                  <span className="text-lg font-bold text-gray-600">
                     {salesDetail.metrics.profitRate.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">기말미수금</span>
-                  <span className="text-lg font-bold text-orange-600">
+                  <span className="text-sm text-gray-500">기말미수금</span>
+                  <span className="text-lg font-bold text-gray-600">
                     {(salesDetail.metrics.receivable / 10000000).toFixed(1)}백만원
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">자본회전율</span>
-                  <span className="text-lg font-bold text-blue-700">
+                  <span className="text-sm text-gray-500">자본회전율</span>
+                  <span className="text-lg font-bold text-gray-600">
                     {salesDetail.metrics.turnoverRate.toFixed(1)}회
                   </span>
                 </div>
@@ -749,24 +749,24 @@ function BuyerDetail() {
             </div>
 
             {/* 등급 정보 */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">바이어 등급</h3>
+            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6">
+              <h3 className="text-lg font-semibold text-gray-500 mb-4">바이어 등급 (P2 예정)</h3>
               <div className="space-y-4">
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                  <div className="text-sm text-blue-600 mb-1">매출액 순위</div>
-                  <div className="text-3xl font-bold text-blue-700">
+                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
+                  <div className="text-sm text-gray-500 mb-1">매출액 순위</div>
+                  <div className="text-3xl font-bold text-gray-600">
                     상위 {salesDetail.grade.salesRank}%
                   </div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <div className="text-sm text-green-600 mb-1">거래손익 순위</div>
-                  <div className="text-3xl font-bold text-green-700">
+                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
+                  <div className="text-sm text-gray-500 mb-1">거래손익 순위</div>
+                  <div className="text-3xl font-bold text-gray-600">
                     상위 {salesDetail.grade.profitRank}%
                   </div>
                 </div>
-                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                  <div className="text-sm text-purple-600 mb-1">자본회전율 등급</div>
-                  <div className="text-3xl font-bold text-purple-700">
+                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
+                  <div className="text-sm text-gray-500 mb-1">자본회전율 등급</div>
+                  <div className="text-3xl font-bold text-gray-600">
                     {salesDetail.grade.turnoverGrade}
                   </div>
                 </div>
@@ -775,35 +775,35 @@ function BuyerDetail() {
           </div>
 
           {/* 판매 세부내역 테이블 */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">판매 세부내역</h2>
+          <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-500 mb-4">판매 세부내역 (P2 예정)</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-100 border-b border-gray-300">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">기간</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-700">조정손익액</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-700">매출총중량</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">판매규격별 중량</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">판매 셀러</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">판매 품목</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-500">기간</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-500">매출액</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-500">조정손익액</th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-500">매출총중량</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-500">판매규격별 중량</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-500">판매 셀러</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-500">판매 품목</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-300">
                   {salesDetail.periods.map((p, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">{p.period}</td>
-                      <td className="px-4 py-3 text-right text-gray-900">
+                    <tr key={idx}>
+                      <td className="px-4 py-3 font-medium text-gray-600">{p.period}</td>
+                      <td className="px-4 py-3 text-right text-gray-600">
                         {(p.sales / 10000000).toFixed(1)}백만
                       </td>
-                      <td className="px-4 py-3 text-right text-green-700 font-medium">
+                      <td className="px-4 py-3 text-right text-gray-600 font-medium">
                         {(p.profit / 10000000).toFixed(1)}백만
                       </td>
-                      <td className="px-4 py-3 text-right text-gray-900">{p.weight}톤</td>
-                      <td className="px-4 py-3 text-gray-700 text-xs">{p.specs}</td>
-                      <td className="px-4 py-3 text-gray-700 text-xs">{p.sellers}</td>
-                      <td className="px-4 py-3 text-gray-700 text-xs">{p.products}</td>
+                      <td className="px-4 py-3 text-right text-gray-600">{p.weight}톤</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{p.specs}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{p.sellers}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">{p.products}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -812,7 +812,7 @@ function BuyerDetail() {
 
             {/* 매출액 차트 (세로 막대 시각화) */}
             <div className="mt-8">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">매출액 추이</h3>
+              <h3 className="text-base font-semibold text-gray-500 mb-4">매출액 추이</h3>
               <div className="relative">
                 {/* Y축 라벨 */}
                 <div className="absolute -left-8 top-0 bottom-16 flex items-center">
@@ -823,18 +823,18 @@ function BuyerDetail() {
 
                 {/* 차트 영역 */}
                 <div className="pl-4">
-                  <div className="flex items-end justify-between gap-2 h-64 border-l-2 border-b-2 border-gray-300 pl-2 pb-2 relative">
+                  <div className="flex items-end justify-between gap-2 h-64 border-l-2 border-b-2 border-gray-400 pl-2 pb-2 relative">
                     {salesDetail.periods.map((p, idx) => {
                       const maxSales = Math.max(...salesDetail.periods.map(period => period.sales));
                       const heightPercent = (p.sales / maxSales) * 100;
                       return (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full">
                           <div className="w-full flex flex-col items-center justify-end h-full">
-                            <div className="text-xs text-gray-700 font-medium mb-1">
+                            <div className="text-xs text-gray-500 font-medium mb-1">
                               {(p.sales / 10000000).toFixed(1)}
                             </div>
                             <div
-                              className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg hover:from-blue-700 hover:to-blue-500 transition-all cursor-pointer shadow-sm"
+                              className="w-full bg-gradient-to-t from-gray-500 to-gray-400 rounded-t-lg shadow-sm"
                               style={{ height: `${heightPercent}%`, minHeight: '4px' }}
                               title={`${p.period}: ${(p.sales / 10000000).toFixed(1)}백만원`}
                             />
@@ -848,7 +848,7 @@ function BuyerDetail() {
                   <div className="flex justify-between gap-2 mt-2 pl-2">
                     {salesDetail.periods.map((p, idx) => (
                       <div key={idx} className="flex-1 text-center">
-                        <span className="text-xs text-gray-600 inline-block transform -rotate-45 origin-center whitespace-nowrap">
+                        <span className="text-xs text-gray-500 inline-block transform -rotate-45 origin-center whitespace-nowrap">
                           {p.period}
                         </span>
                       </div>
@@ -861,7 +861,7 @@ function BuyerDetail() {
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* P2 섹션: 세일즈 히스토리 */}
