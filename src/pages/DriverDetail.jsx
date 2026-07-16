@@ -569,10 +569,13 @@ function DriverDetail() {
         )}
       </Card>
 
-      {/* 이슈 히스토리 */}
+      {/* 이슈 히스토리 (P2) */}
       <Card
-        title="이슈 히스토리"
+        title="이슈 히스토리 (P2 예정)"
         extra={<Button icon={<PlusOutlined />} onClick={handleClaimAdd}>이력 추가</Button>}
+        className="opacity-60"
+        style={{ backgroundColor: '#F9FAFB', borderColor: '#D1D5DB' }}
+        headStyle={{ color: '#6B7280' }}
       >
         {claims.length > 0 ? (
           <Timeline>

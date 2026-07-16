@@ -710,11 +710,11 @@ function JoinDistributionDetail() {
         </div>
       )}
 
-      {/* 섹션 5: 세일즈 히스토리 */}
+      {/* 섹션 5: 세일즈 히스토리 (P2) */}
       {joinSalesHistoryMemos[id] && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 opacity-60">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">세일즈 히스토리</h2>
+            <h2 className="text-lg font-semibold text-gray-500">세일즈 히스토리 (P2 예정)</h2>
             <button
               onClick={() => {
                 setIsAddingMemo(true);
