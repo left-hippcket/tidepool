@@ -261,10 +261,6 @@ function DriverDetail() {
                 <Input placeholder="예: 정훈" />
               </Form.Item>
 
-              <Form.Item label="Ticker">
-                <Input value={basicInfo.ticker} disabled />
-              </Form.Item>
-
               <Form.Item
                 name="phone"
                 label="전화번호"
@@ -333,10 +329,6 @@ function DriverDetail() {
               <p className="text-base text-gray-900 mt-1">{basicInfo.name}</p>
             </div>
             <div>
-              <span className="text-sm font-medium text-gray-500">Ticker</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.ticker}</p>
-            </div>
-            <div>
               <span className="text-sm font-medium text-gray-500">전화번호</span>
               <p className="text-base text-gray-900 mt-1">{basicInfo.phone || '-'}</p>
             </div>
@@ -392,6 +384,10 @@ function DriverDetail() {
                 ]}
               >
                 <Input placeholder="123-45-67890" />
+              </Form.Item>
+
+              <Form.Item label="ticker">
+                <Input value={basicInfo.ticker} disabled />
               </Form.Item>
 
               <Form.Item
@@ -492,6 +488,10 @@ function DriverDetail() {
             <div>
               <span className="text-sm font-medium text-gray-500">사업자등록번호</span>
               <p className="text-base text-gray-900 mt-1">{settlementInfo.businessNumber}</p>
+            </div>
+            <div>
+              <span className="text-sm font-medium text-gray-500">ticker</span>
+              <p className="text-base text-gray-900 mt-1">{basicInfo.ticker}</p>
             </div>
             <div>
               <span className="text-sm font-medium text-gray-500">사업자등록상호</span>
