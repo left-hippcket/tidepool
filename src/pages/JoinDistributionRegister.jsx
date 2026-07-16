@@ -278,7 +278,6 @@ function JoinDistributionRegister() {
               name="commissionRate"
               label="상차 수수료율(%)"
               rules={[
-                { required: true, message: '상차 수수료율을 입력해주세요' },
                 { type: 'number', min: 0, max: 100, message: '0-100% 범위 입력' }
               ]}
               initialValue={0}
@@ -326,7 +325,6 @@ function JoinDistributionRegister() {
               name="businessNumber"
               label="사업자등록번호"
               rules={[
-                { required: true, message: '사업자등록번호를 입력해주세요' },
                 { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
               ]}
             >
@@ -337,7 +335,6 @@ function JoinDistributionRegister() {
               name="businessName"
               label="사업자등록상호"
               rules={[
-                { required: true, message: '사업자등록상호를 입력해주세요' },
                 { max: 50, message: '최대 50자까지 입력 가능합니다' }
               ]}
             >
@@ -348,7 +345,6 @@ function JoinDistributionRegister() {
               name="representative"
               label="대표자"
               rules={[
-                { required: true, message: '대표자를 입력해주세요' },
                 { max: 10, message: '최대 10자까지 입력 가능합니다' }
               ]}
             >
@@ -369,7 +365,7 @@ function JoinDistributionRegister() {
               rules={[
                 { required: true, message: '조인유통명을 입력해주세요' },
                 { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
+                { pattern: /^[가-힣a-zA-Z0-9()]+$/, message: '한글, 영문, 숫자, 괄호()만 허용됩니다' }
               ]}
             >
               <Input placeholder="호경" />
@@ -391,7 +387,6 @@ function JoinDistributionRegister() {
               name="taxInvoiceEmail"
               label="세금계산서 발행 이메일주소"
               rules={[
-                { required: true, message: '이메일주소를 입력해주세요' },
                 { type: 'email', message: '올바른 이메일 형식이 아닙니다' }
               ]}
             >
