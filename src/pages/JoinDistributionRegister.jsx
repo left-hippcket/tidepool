@@ -164,7 +164,6 @@ function JoinDistributionRegister() {
                           {...field}
                           name={[field.name, 'name']}
                           label="이름"
-                          rules={[{ required: true, message: '이름 입력' }]}
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="김철수" maxLength={20} />
@@ -404,7 +403,6 @@ function JoinDistributionRegister() {
                           {...field}
                           name={[field.name, 'bank']}
                           label="은행명"
-                          rules={[{ required: true, message: '은행명 입력' }]}
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="하나은행" />
@@ -413,7 +411,6 @@ function JoinDistributionRegister() {
                           {...field}
                           name={[field.name, 'accountNumber']}
                           label="계좌번호"
-                          rules={[{ required: true, message: '계좌번호 입력' }]}
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="39484448392049" />
@@ -422,7 +419,6 @@ function JoinDistributionRegister() {
                           {...field}
                           name={[field.name, 'holder']}
                           label="예금주"
-                          rules={[{ required: true, message: '예금주 입력' }]}
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="김호경" />
