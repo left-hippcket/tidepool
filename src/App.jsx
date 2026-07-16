@@ -90,7 +90,11 @@ function App() {
           }}
         >
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🐟</div>
+            <img
+              src="/images/logo.png"
+              alt="Fish Master Logo"
+              style={{ width: 120, height: 120, marginBottom: 16, borderRadius: '50%' }}
+            />
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
               Fish Master
             </h2>
@@ -213,9 +217,25 @@ function App() {
           color: '#fff',
           fontSize: collapsed ? 16 : 20,
           fontWeight: 'bold',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          gap: '12px'
         }}>
-          {collapsed ? '🐟' : '🐟 Fish Master'}
+          {collapsed ? (
+            <img
+              src="/images/logo.png"
+              alt="Logo"
+              style={{ width: 32, height: 32, borderRadius: '50%' }}
+            />
+          ) : (
+            <>
+              <img
+                src="/images/logo.png"
+                alt="Logo"
+                style={{ width: 32, height: 32, borderRadius: '50%' }}
+              />
+              <span>Fish Master</span>
+            </>
+          )}
         </div>
         <Menu
           theme="dark"
