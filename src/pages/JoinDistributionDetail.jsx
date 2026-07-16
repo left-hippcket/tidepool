@@ -829,7 +829,7 @@ function JoinDistributionDetail() {
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
