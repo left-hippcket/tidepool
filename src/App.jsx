@@ -93,7 +93,7 @@ function App() {
             <img
               src="/images/logo.png"
               alt="Fish Master Logo"
-              style={{ width: 120, height: 120, marginBottom: 16, borderRadius: '50%' }}
+              style={{ width: 120, height: 120, marginBottom: 16, borderRadius: '50%', display: 'block', margin: '0 auto 16px' }}
             />
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>
               Fish Master
