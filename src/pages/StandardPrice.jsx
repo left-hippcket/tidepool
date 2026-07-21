@@ -3,7 +3,7 @@ import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconf
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
-import { productCategories, products } from '../data/mockData';
+import { productCategories, products, origins, specifications } from '../data/mockData';
 
 const { Option } = Select;
 
@@ -14,6 +14,7 @@ function StandardPrice() {
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -39,9 +40,11 @@ function StandardPrice() {
           applyDate: '2026-07-21',
           categoryId: 1,
           categoryName: '누운고기',
-          productId: 2,
-          productName: '넙치',
+          productId: 1,
+          productName: '광어',
+          originId: 1,
           originName: '완도',
+          specId: 1,
           spec: '1.2kg',
           price: 15000,
           source: '피시파더',
@@ -52,9 +55,11 @@ function StandardPrice() {
           applyDate: '2026-07-21',
           categoryId: 1,
           categoryName: '누운고기',
-          productId: 2,
-          productName: '넙치',
-          originName: '완도',
+          productId: 1,
+          productName: '광어',
+          originId: 2,
+          originName: '통영',
+          specId: 2,
           spec: '1.5kg',
           price: 18000,
           source: '피시파더',
@@ -67,10 +72,27 @@ function StandardPrice() {
           categoryName: '누운고기',
           productId: 2,
           productName: '넙치',
-          originName: '통영',
-          spec: '1.2kg',
-          price: 16000,
+          originId: 7,
+          originName: '완도',
+          specId: 7,
+          spec: '1.0kg',
+          price: 14500,
           source: '노량진시장',
+        },
+        {
+          key: '4',
+          id: '4',
+          applyDate: '2026-07-20',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 3,
+          productName: '우럭',
+          originId: 8,
+          originName: '통영',
+          specId: null,
+          spec: '-',
+          price: 12000,
+          source: '피시파더',
         },
       ];
       setDataSource(sampleData);
@@ -168,12 +190,13 @@ function StandardPrice() {
   const handleEdit = (record) => {
     setEditingRecord(record);
     setSelectedCategory(record.categoryId);
+    setSelectedProduct(record.productId);
     form.setFieldsValue({
       applyDate: dayjs(record.applyDate),
       categoryId: record.categoryId,
       productId: record.productId,
-      originName: record.originName,
-      spec: record.spec,
+      originId: record.originId,
+      specId: record.specId,
       price: record.price,
       source: record.source,
     });
@@ -190,6 +213,8 @@ function StandardPrice() {
     form.validateFields().then(values => {
       const category = productCategories.find(c => c.id === values.categoryId);
       const product = products.find(p => p.id === values.productId);
+      const origin = origins.find(o => o.id === values.originId);
+      const spec = specifications.find(s => s.id === values.specId);
 
       if (editingRecord) {
         // 수정
@@ -198,12 +223,10 @@ function StandardPrice() {
             return {
               ...item,
               applyDate: values.applyDate.format('YYYY-MM-DD'),
-              categoryId: values.categoryId,
-              categoryName: category?.name,
-              productId: values.productId,
-              productName: product?.name,
-              originName: values.originName,
-              spec: values.spec,
+              originId: values.originId,
+              originName: origin?.name,
+              specId: values.specId,
+              spec: spec?.name || values.spec,
               price: values.price,
               source: values.source,
             };
@@ -222,8 +245,10 @@ function StandardPrice() {
           categoryName: category?.name,
           productId: values.productId,
           productName: product?.name,
-          originName: values.originName,
-          spec: values.spec,
+          originId: values.originId,
+          originName: origin?.name,
+          specId: values.specId,
+          spec: spec?.name || values.spec,
           price: values.price,
           source: values.source,
         };
@@ -234,6 +259,7 @@ function StandardPrice() {
       setIsModalVisible(false);
       form.resetFields();
       setSelectedCategory(null);
+      setSelectedProduct(null);
     });
   };
 
@@ -241,12 +267,24 @@ function StandardPrice() {
     setIsModalVisible(false);
     form.resetFields();
     setSelectedCategory(null);
+    setSelectedProduct(null);
   };
 
   const onCategoryChange = (value) => {
     setSelectedCategory(value);
+    setSelectedProduct(null);
     form.setFieldsValue({
       productId: undefined,
+      originId: undefined,
+      specId: undefined,
+    });
+  };
+
+  const onProductChange = (value) => {
+    setSelectedProduct(value);
+    form.setFieldsValue({
+      originId: undefined,
+      specId: undefined,
     });
   };
 
@@ -345,6 +383,7 @@ function StandardPrice() {
           >
             <Select
               placeholder="품목 선택"
+              onChange={onProductChange}
               disabled={!selectedCategory || editingRecord !== null}
             >
               {selectedCategory && products
@@ -358,25 +397,41 @@ function StandardPrice() {
           </Form.Item>
 
           <Form.Item
-            name="originName"
+            name="originId"
             label="원산지"
-            rules={[
-              { required: true, message: '원산지를 입력해주세요' },
-              { max: 30, message: '원산지는 최대 30자까지 입력 가능합니다' }
-            ]}
+            rules={[{ required: true, message: '원산지를 선택해주세요' }]}
           >
-            <Input placeholder="원산지 입력 (예: 완도, 통영)" />
+            <Select
+              placeholder="원산지 선택"
+              disabled={!selectedProduct}
+            >
+              {selectedProduct && origins
+                .filter(o => o.productId === selectedProduct && o.status === 'active')
+                .map(origin => (
+                  <Option key={origin.id} value={origin.id}>
+                    {origin.name}
+                  </Option>
+                ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
-            name="spec"
+            name="specId"
             label="규격"
-            rules={[
-              { required: true, message: '규격을 입력해주세요' },
-              { max: 20, message: '규격은 최대 20자까지 입력 가능합니다' }
-            ]}
+            rules={[{ required: true, message: '규격을 선택해주세요' }]}
           >
-            <Input placeholder="규격 입력 (예: 1.2kg)" />
+            <Select
+              placeholder="규격 선택"
+              disabled={!selectedProduct}
+            >
+              {selectedProduct && specifications
+                .filter(s => s.productId === selectedProduct && s.status === 'active')
+                .map(spec => (
+                  <Option key={spec.id} value={spec.id}>
+                    {spec.name}
+                  </Option>
+                ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
