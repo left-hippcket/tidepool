@@ -23,13 +23,14 @@ function StandardPrice() {
   }, []);
 
   const loadInitialData = async () => {
-    // HTML 파일에서 추출한 실제 표준가격 데이터 로드
+    // CSV 파일에서 변환한 실제 표준가격 데이터 로드
     try {
       const response = await fetch('/data/standard-price-data.json');
       if (!response.ok) {
         throw new Error('데이터 로드 실패');
       }
       const data = await response.json();
+      console.log('표준가격 데이터 로드 성공:', data.length, '건');
       setDataSource(data);
     } catch (error) {
       console.error('표준가격 데이터 로드 실패:', error);
