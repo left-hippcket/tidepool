@@ -11,8 +11,6 @@ function BuyerManagement() {
   const [selectedTerritory, setSelectedTerritory] = useState('전체');
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [selectedStatus, setSelectedStatus] = useState('활성');
-  const [sortField, setSortField] = useState('totalSales');
-  const [sortOrder, setSortOrder] = useState('descend');
 
   // 이벤트 핸들러
   const handleViewDetail = (record) => {
@@ -36,42 +34,7 @@ function BuyerManagement() {
     return matchSalesPerson && matchCategory && matchTerritory && matchRegion && matchStatus;
   });
 
-  // 정렬 로직
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (!sortField || !sortOrder) return 0;
-
-    if (sortField === 'lastTradeDate') {
-      const comparison = a[sortField].localeCompare(b[sortField]);
-      return sortOrder === 'ascend' ? comparison : -comparison;
-    } else {
-      const comparison = a[sortField] - b[sortField];
-      return sortOrder === 'ascend' ? comparison : -comparison;
-    }
-  });
-
-  // 정렬 핸들러
-  const handleSort = (field) => {
-    if (sortField === field) {
-      // 같은 필드: ascend → descend → null → ascend
-      if (sortOrder === 'descend') {
-        setSortOrder('ascend');
-      } else if (sortOrder === 'ascend') {
-        setSortField(null);
-        setSortOrder(null);
-      }
-    } else {
-      // 다른 필드: descend부터 시작
-      setSortField(field);
-      setSortOrder('descend');
-    }
-  };
-
-  const getSortIcon = (field) => {
-    if (sortField !== field) return '⇅';
-    if (sortOrder === 'descend') return '▼';
-    if (sortOrder === 'ascend') return '▲';
-    return '⇅';
-  };
+  const sortedData = filteredData;
 
   return (
     <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
@@ -174,26 +137,10 @@ function BuyerManagement() {
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">주요품목분류</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">사업권역</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">상세지역</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">
-                  <button onClick={() => handleSort('totalSales')} className="hover:text-blue-600">
-                    매출액(누적) {getSortIcon('totalSales')}
-                  </button>
-                </th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">
-                  <button onClick={() => handleSort('sales3M')} className="hover:text-blue-600">
-                    매출액(최근 3개월) {getSortIcon('sales3M')}
-                  </button>
-                </th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">
-                  <button onClick={() => handleSort('sales1M')} className="hover:text-blue-600">
-                    매출액(최근 1개월) {getSortIcon('sales1M')}
-                  </button>
-                </th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">
-                  <button onClick={() => handleSort('lastTradeDate')} className="hover:text-blue-600">
-                    최근거래일 {getSortIcon('lastTradeDate')}
-                  </button>
-                </th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(누적)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(최근 3개월)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(최근 1개월)</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-700">최근거래일</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-700">사업자등록증</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-700">상세</th>
               </tr>
