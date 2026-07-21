@@ -25,6 +25,7 @@ import DriverRegister from './pages/DriverRegister';
 import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
 import StandardPrice from './pages/StandardPrice';
+import StandardPriceRegister from './pages/StandardPriceRegister';
 
 const { Header, Sider, Content } = Layout;
 
@@ -316,6 +317,7 @@ function App() {
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
             <Route path="/standard-price" element={<StandardPrice />} />
+            <Route path="/standard-price/register" element={<StandardPriceRegister />} />
           </Routes>
         </Content>
       </Layout>
