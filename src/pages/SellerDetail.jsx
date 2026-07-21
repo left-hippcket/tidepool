@@ -81,6 +81,7 @@ function SellerDetail() {
   // 사업자 편집 모드 진입
   const handleEditBusiness = (business) => {
     businessForm.setFieldsValue({
+      sellerName: business.sellerName,
       businessNumber: business.businessNumber,
       sellerId: business.sellerId,
       businessName: business.businessName,
@@ -582,6 +583,9 @@ function SellerDetail() {
                 <div className="p-4">
                   <Form form={businessForm} layout="vertical">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Form.Item label="셀러명" name="sellerName" className="md:col-span-2">
+                        <Input maxLength={20} />
+                      </Form.Item>
                       <Form.Item label="사업자등록번호" name="businessNumber">
                         <Input disabled className="bg-gray-100" />
                       </Form.Item>

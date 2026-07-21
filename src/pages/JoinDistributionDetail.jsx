@@ -418,6 +418,9 @@ function JoinDistributionDetail() {
                 <div className="p-4">
                   <Form form={businessForm} layout="vertical">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Form.Item label="조인유통명" name="joinName" className="md:col-span-2">
+                        <Input maxLength={20} />
+                      </Form.Item>
                       <Form.Item label="사업자등록번호" name="businessNumber">
                         <Input disabled className="bg-gray-100" />
                       </Form.Item>
@@ -432,9 +435,6 @@ function JoinDistributionDetail() {
                       </Form.Item>
                       <Form.Item label="사업자등록주소" name="businessAddress" className="md:col-span-2">
                         <Input maxLength={100} />
-                      </Form.Item>
-                      <Form.Item label="조인유통명" name="joinName">
-                        <Input maxLength={20} />
                       </Form.Item>
                       <Form.Item label="세금계산서 이메일" name="taxInvoiceEmail">
                         <Input type="email" />
