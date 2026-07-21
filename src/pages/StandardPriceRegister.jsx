@@ -185,21 +185,20 @@ function StandardPriceRegister() {
             <div style={{ marginBottom: 32 }}>
               <h3 style={{ marginBottom: 16, fontSize: 16, fontWeight: 600, color: '#333' }}>규격별 가격</h3>
               <div style={{ marginBottom: 12, color: '#666', fontSize: 13 }}>
-                선택한 품목-원산지의 최근 가격이 자동으로 입력됩니다. 가격을 수정하거나, 규격을 추가/삭제할 수 있습니다.
+                최근 가격이 자동 입력됩니다. 수정 가능하며, 빈 칸은 업데이트되지 않습니다.
               </div>
 
               <Form.List name="priceItems">
-                {(fields, { add, remove }) => (
+                {(fields) => (
                   <>
                     {fields.map(({ key, name, ...restField }) => (
                       <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
                         <Form.Item
                           {...restField}
                           name={[name, 'specName']}
-                          rules={[{ required: true, message: '규격 입력' }]}
                           style={{ marginBottom: 0, width: 150 }}
                         >
-                          <Input placeholder="예: 1.2kg" />
+                          <Input disabled style={{ backgroundColor: '#f5f5f5' }} />
                         </Form.Item>
                         <Form.Item
                           {...restField}
@@ -214,12 +213,8 @@ function StandardPriceRegister() {
                             addonAfter="원"
                           />
                         </Form.Item>
-                        <MinusCircleOutlined onClick={() => remove(name)} />
                       </Space>
                     ))}
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      규격 추가
-                    </Button>
                   </>
                 )}
               </Form.List>

@@ -84,7 +84,16 @@ export const specifications = [
   { id: 5, productId: 1, productName: '광어', name: '3.0kg', status: 'inactive', createdAt: '2024-02-05' },
   { id: 6, productId: 1, productName: '광어', name: '4~5kg', status: 'active', createdAt: '2024-02-06' },
   { id: 7, productId: 2, productName: '넙치', name: '1.0kg', status: 'active', createdAt: '2024-02-07' },
-  { id: 8, productId: 2, productName: '넙치', name: '1.5kg', status: 'active', createdAt: '2024-02-08' },
+  { id: 8, productId: 2, productName: '넙치', name: '1.1kg', status: 'active', createdAt: '2024-02-08' },
+  { id: 9, productId: 2, productName: '넙치', name: '1.2kg', status: 'active', createdAt: '2024-02-09' },
+  { id: 10, productId: 2, productName: '넙치', name: '1.3kg', status: 'active', createdAt: '2024-02-10' },
+  { id: 11, productId: 2, productName: '넙치', name: '1.4kg', status: 'active', createdAt: '2024-02-11' },
+  { id: 12, productId: 2, productName: '넙치', name: '1.5kg', status: 'active', createdAt: '2024-02-12' },
+  { id: 13, productId: 2, productName: '넙치', name: '1.6kg', status: 'active', createdAt: '2024-02-13' },
+  { id: 14, productId: 2, productName: '넙치', name: '1.7kg', status: 'active', createdAt: '2024-02-14' },
+  { id: 15, productId: 2, productName: '넙치', name: '1.8kg', status: 'active', createdAt: '2024-02-15' },
+  { id: 16, productId: 2, productName: '넙치', name: '1.9kg', status: 'active', createdAt: '2024-02-16' },
+  { id: 17, productId: 2, productName: '넙치', name: '2.0kg', status: 'active', createdAt: '2024-02-17' },
 ];
 
 // 셀러 그룹 데이터
