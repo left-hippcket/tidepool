@@ -3,6 +3,9 @@ import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconf
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
+import { productCategories, products } from '../data/mockData';
+
+const { Option } = Select;
 
 function StandardPrice() {
   const [activeTab, setActiveTab] = useState('1');
@@ -10,6 +13,7 @@ function StandardPrice() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -33,6 +37,9 @@ function StandardPrice() {
           key: '1',
           id: '1',
           applyDate: '2026-07-21',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 2,
           productName: '넙치',
           originName: '완도',
           spec: '1.2kg',
@@ -43,6 +50,9 @@ function StandardPrice() {
           key: '2',
           id: '2',
           applyDate: '2026-07-21',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 2,
           productName: '넙치',
           originName: '완도',
           spec: '1.5kg',
@@ -53,6 +63,9 @@ function StandardPrice() {
           key: '3',
           id: '3',
           applyDate: '2026-07-20',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 2,
           productName: '넙치',
           originName: '통영',
           spec: '1.2kg',
@@ -72,6 +85,17 @@ function StandardPrice() {
       width: 120,
       defaultSortOrder: 'descend',
       sorter: (a, b) => a.applyDate.localeCompare(b.applyDate),
+    },
+    {
+      title: '품목분류',
+      dataIndex: 'categoryName',
+      key: 'categoryName',
+      width: 100,
+      filters: [...new Set(dataSource.map(item => item.categoryName))].filter(Boolean).map(name => ({
+        text: name,
+        value: name,
+      })),
+      onFilter: (value, record) => record.categoryName === value,
     },
     {
       title: '품목',
@@ -143,9 +167,11 @@ function StandardPrice() {
 
   const handleEdit = (record) => {
     setEditingRecord(record);
+    setSelectedCategory(record.categoryId);
     form.setFieldsValue({
       applyDate: dayjs(record.applyDate),
-      productName: record.productName,
+      categoryId: record.categoryId,
+      productId: record.productId,
       originName: record.originName,
       spec: record.spec,
       price: record.price,
@@ -162,6 +188,9 @@ function StandardPrice() {
 
   const handleOk = () => {
     form.validateFields().then(values => {
+      const category = productCategories.find(c => c.id === values.categoryId);
+      const product = products.find(p => p.id === values.productId);
+
       if (editingRecord) {
         // 수정
         const newData = dataSource.map(item => {
@@ -169,7 +198,10 @@ function StandardPrice() {
             return {
               ...item,
               applyDate: values.applyDate.format('YYYY-MM-DD'),
-              productName: values.productName,
+              categoryId: values.categoryId,
+              categoryName: category?.name,
+              productId: values.productId,
+              productName: product?.name,
               originName: values.originName,
               spec: values.spec,
               price: values.price,
@@ -186,7 +218,10 @@ function StandardPrice() {
           key: String(dataSource.length + 1),
           id: String(dataSource.length + 1),
           applyDate: values.applyDate.format('YYYY-MM-DD'),
-          productName: values.productName,
+          categoryId: values.categoryId,
+          categoryName: category?.name,
+          productId: values.productId,
+          productName: product?.name,
           originName: values.originName,
           spec: values.spec,
           price: values.price,
@@ -198,12 +233,21 @@ function StandardPrice() {
 
       setIsModalVisible(false);
       form.resetFields();
+      setSelectedCategory(null);
     });
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setSelectedCategory(null);
+  };
+
+  const onCategoryChange = (value) => {
+    setSelectedCategory(value);
+    form.setFieldsValue({
+      productId: undefined,
+    });
   };
 
   return (
@@ -277,14 +321,40 @@ function StandardPrice() {
           </Form.Item>
 
           <Form.Item
-            name="productName"
-            label="품목"
-            rules={[
-              { required: true, message: '품목을 입력해주세요' },
-              { max: 30, message: '품목은 최대 30자까지 입력 가능합니다' }
-            ]}
+            name="categoryId"
+            label="품목분류"
+            rules={[{ required: true, message: '품목분류를 선택해주세요' }]}
           >
-            <Input placeholder="품목 입력 (예: 넙치, 우럭)" />
+            <Select
+              placeholder="품목분류 선택"
+              onChange={onCategoryChange}
+              disabled={editingRecord !== null}
+            >
+              {productCategories.map(category => (
+                <Option key={category.id} value={category.id}>
+                  {category.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="productId"
+            label="품목"
+            rules={[{ required: true, message: '품목을 선택해주세요' }]}
+          >
+            <Select
+              placeholder="품목 선택"
+              disabled={!selectedCategory || editingRecord !== null}
+            >
+              {selectedCategory && products
+                .filter(p => p.categoryId === selectedCategory)
+                .map(product => (
+                  <Option key={product.id} value={product.id}>
+                    {product.name}
+                  </Option>
+                ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
