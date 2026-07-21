@@ -7,57 +7,6 @@ import { productCategories, products, origins, specifications } from '../data/mo
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-// Mock 데이터
-const mockChartData = [
-  { date: '2026-04-21', origin: '완도', price: 14500 },
-  { date: '2026-04-28', origin: '완도', price: 15000 },
-  { date: '2026-05-05', origin: '완도', price: 15500 },
-  { date: '2026-05-12', origin: '완도', price: 15200 },
-  { date: '2026-05-19', origin: '완도', price: 15800 },
-  { date: '2026-05-26', origin: '완도', price: 16000 },
-  { date: '2026-06-02', origin: '완도', price: 15700 },
-  { date: '2026-06-09', origin: '완도', price: 15900 },
-  { date: '2026-06-16', origin: '완도', price: 16200 },
-  { date: '2026-06-23', origin: '완도', price: 16500 },
-  { date: '2026-06-30', origin: '완도', price: 16300 },
-  { date: '2026-07-07', origin: '완도', price: 16700 },
-  { date: '2026-07-14', origin: '완도', price: 17000 },
-  { date: '2026-07-21', origin: '완도', price: 17200 },
-
-  { date: '2026-04-21', origin: '통영', price: 15000 },
-  { date: '2026-04-28', origin: '통영', price: 15500 },
-  { date: '2026-05-05', origin: '통영', price: 16000 },
-  { date: '2026-05-12', origin: '통영', price: 15700 },
-  { date: '2026-05-19', origin: '통영', price: 16300 },
-  { date: '2026-05-26', origin: '통영', price: 16500 },
-  { date: '2026-06-02', origin: '통영', price: 16200 },
-  { date: '2026-06-09', origin: '통영', price: 16400 },
-  { date: '2026-06-16', origin: '통영', price: 16700 },
-  { date: '2026-06-23', origin: '통영', price: 17000 },
-  { date: '2026-06-30', origin: '통영', price: 16800 },
-  { date: '2026-07-07', origin: '통영', price: 17200 },
-  { date: '2026-07-14', origin: '통영', price: 17500 },
-  { date: '2026-07-21', origin: '통영', price: 17700 },
-
-  { date: '2026-04-21', origin: '고흥', price: 14000 },
-  { date: '2026-04-28', origin: '고흥', price: 14300 },
-  { date: '2026-05-05', origin: '고흥', price: 14800 },
-  { date: '2026-05-12', origin: '고흥', price: 14500 },
-  { date: '2026-05-19', origin: '고흥', price: 15000 },
-  { date: '2026-05-26', origin: '고흥', price: 15300 },
-  { date: '2026-06-02', origin: '고흥', price: 15000 },
-  { date: '2026-06-09', origin: '고흥', price: 15200 },
-  { date: '2026-06-16', origin: '고흥', price: 15500 },
-  { date: '2026-06-23', origin: '고흥', price: 15800 },
-  { date: '2026-06-30', origin: '고흥', price: 15600 },
-  { date: '2026-07-07', origin: '고흥', price: 16000 },
-  { date: '2026-07-14', origin: '고흥', price: 16300 },
-  { date: '2026-07-21', origin: '고흥', price: 16500 },
-];
-
-const mockOrigins = ['완도', '통영', '고흥', '여수'];
-const mockSpecs = ['1.2kg', '1.3kg', '1.4kg', '1.5kg', '2.0kg'];
-
 function StandardPriceComparison() {
   const [dateRange, setDateRange] = useState([dayjs().subtract(3, 'month'), dayjs()]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -67,6 +16,26 @@ function StandardPriceComparison() {
   const [chartData, setChartData] = useState([]);
   const [availableOrigins, setAvailableOrigins] = useState([]);
   const [availableSpecs, setAvailableSpecs] = useState([]);
+  const [allPriceData, setAllPriceData] = useState([]);
+
+  // 실제 데이터 로드
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetch('/data/standard-price-data.json');
+        if (!response.ok) {
+          throw new Error('데이터 로드 실패');
+        }
+        const data = await response.json();
+        console.log('가격 비교 데이터 로드 성공:', data.length, '건');
+        setAllPriceData(data);
+      } catch (error) {
+        console.error('가격 비교 데이터 로드 실패:', error);
+        setAllPriceData([]);
+      }
+    };
+    loadData();
+  }, []);
 
   const onCategoryChange = (value) => {
     setSelectedCategory(value);
@@ -162,21 +131,29 @@ function StandardPriceComparison() {
       return;
     }
 
-    // 선택된 원산지에 따라 데이터 필터링
-    const filteredData = mockChartData.filter(item =>
-      selectedOrigins.includes(item.origin) &&
-      dayjs(item.date).isAfter(dateRange[0].subtract(1, 'day')) &&
-      dayjs(item.date).isBefore(dateRange[1].add(1, 'day'))
-    );
+    // 실제 데이터에서 필터링
+    const filteredData = allPriceData
+      .filter(item =>
+        item.productId === selectedProduct &&
+        item.spec === selectedSpec &&
+        selectedOrigins.includes(item.originName) &&
+        dayjs(item.applyDate).isAfter(dateRange[0].subtract(1, 'day')) &&
+        dayjs(item.applyDate).isBefore(dateRange[1].add(1, 'day'))
+      )
+      .map(item => ({
+        date: item.applyDate,
+        origin: item.originName,
+        price: item.price,
+      }));
 
     if (filteredData.length === 0) {
-      message.warning('조회된 데이터가 없습니다.');
+      message.warning('조회된 데이터가 없습니다. 다른 기간이나 원산지를 선택해주세요.');
       setChartData([]);
       return;
     }
 
     setChartData(filteredData);
-    message.success('차트가 생성되었습니다.');
+    message.success(`차트가 생성되었습니다. (${filteredData.length}건)`);
   };
 
   const config = {
