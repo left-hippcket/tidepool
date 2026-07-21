@@ -368,7 +368,9 @@ function DriverDetail() {
               <Button type="primary" onClick={handleSettlementSave}>저장</Button>
             </Space>
           ) : (
-            <Button icon={<EditOutlined />} onClick={handleSettlementEdit}>수정</Button>
+            <Button icon={<EditOutlined />} onClick={handleSettlementEdit}>
+              {settlementInfo ? '수정' : '등록'}
+            </Button>
           )
         }
         className="mb-4"
@@ -382,8 +384,13 @@ function DriverDetail() {
                 rules={[
                   { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
                 ]}
+                help={settlementInfo ? "사업자등록번호는 수정할 수 없습니다" : undefined}
               >
-                <Input placeholder="123-45-67890" />
+                <Input
+                  placeholder="123-45-67890"
+                  disabled={!!settlementInfo}
+                  className={settlementInfo ? "bg-gray-100" : ""}
+                />
               </Form.Item>
 
               <Form.Item label="ticker">
@@ -604,15 +611,16 @@ function DriverDetail() {
 
       {/* P2: 거래 실적 */}
       {transactionData && (
-        <>
+        <div className="opacity-60">
           {/* 기간 필터 */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+          <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-4 mb-4">
             <Space wrap>
               {['최근 1개월', '최근 3개월', '최근 6개월', '이번달', '이번분기', '올해', '누적'].map((period) => (
                 <Button
                   key={period}
                   type={periodFilter === period ? 'primary' : 'default'}
                   onClick={() => setPeriodFilter(period)}
+                  className={periodFilter === period ? '' : 'bg-gray-200 text-gray-600 border-gray-300'}
                 >
                   {period}
                 </Button>
@@ -622,97 +630,111 @@ function DriverDetail() {
 
           {/* 통합 지표 카드 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <Card>
+            <Card className="bg-gray-100 border-gray-300">
               <Statistic
-                title="운임 (총액)"
+                title={<span className="text-gray-500">운임 (총액)</span>}
                 value={metrics.totalFreight}
                 suffix="원"
-                valueStyle={{ color: '#1890ff' }}
+                valueStyle={{ color: '#9CA3AF' }}
               />
             </Card>
-            <Card>
+            <Card className="bg-gray-100 border-gray-300">
               <Statistic
-                title="운송횟수"
+                title={<span className="text-gray-500">운송횟수</span>}
                 value={metrics.totalTripCount}
                 suffix="회"
-                valueStyle={{ color: '#52c41a' }}
+                valueStyle={{ color: '#9CA3AF' }}
               />
             </Card>
-            <Card>
+            <Card className="bg-gray-100 border-gray-300">
               <Statistic
-                title="평균 운임"
+                title={<span className="text-gray-500">평균 운임</span>}
                 value={metrics.averageFreight}
                 suffix="원"
-                valueStyle={{ color: '#faad14' }}
+                valueStyle={{ color: '#9CA3AF' }}
               />
             </Card>
           </div>
 
           {/* 거래 상세 테이블 */}
-          <Card title="거래 상세 내역" className="mb-4">
+          <Card
+            title={<span className="text-gray-500">거래 상세 내역 (P2 예정)</span>}
+            className="mb-4 bg-gray-50 border-gray-300"
+          >
             <Table
               dataSource={filteredPeriods}
               rowKey="period"
               pagination={false}
               scroll={{ x: 800 }}
+              className="text-gray-500"
               columns={[
                 {
                   title: '기간',
                   dataIndex: 'period',
                   key: 'period',
                   fixed: 'left',
-                  width: 100
+                  width: 100,
+                  render: (text) => <span className="text-gray-500">{text}</span>
                 },
                 {
                   title: '운임',
                   dataIndex: 'freight',
                   key: 'freight',
-                  render: (val) => `${val.toLocaleString()}원`,
+                  render: (val) => <span className="text-gray-500">{val.toLocaleString()}원</span>,
                   width: 120
                 },
                 {
                   title: '운송횟수',
                   dataIndex: 'tripCount',
                   key: 'tripCount',
-                  render: (val) => `${val}회`,
+                  render: (val) => <span className="text-gray-500">{val}회</span>,
                   width: 100
                 },
                 {
                   title: '운송 셀러',
                   dataIndex: 'sellers',
                   key: 'sellers',
-                  width: 200
+                  width: 200,
+                  render: (text) => <span className="text-gray-500">{text}</span>
                 },
                 {
                   title: '운송 바이어',
                   dataIndex: 'buyers',
                   key: 'buyers',
-                  width: 200
+                  width: 200,
+                  render: (text) => <span className="text-gray-500">{text}</span>
                 },
                 {
                   title: '운송 품목',
                   dataIndex: 'products',
                   key: 'products',
-                  width: 150
+                  width: 150,
+                  render: (text) => <span className="text-gray-500">{text}</span>
                 }
               ]}
             />
           </Card>
 
           {/* 운임 차트 */}
-          <Card title="운임 추이">
+          <Card
+            title={<span className="text-gray-500">운임 추이 (P2 예정)</span>}
+            className="bg-gray-50 border-gray-300"
+          >
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={filteredPeriods}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="period" />
-                <YAxis />
-                <Tooltip formatter={(value) => `${value.toLocaleString()}원`} />
-                <Legend />
-                <Bar dataKey="freight" name="운임" fill="#1890ff" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#D1D5DB" />
+                <XAxis dataKey="period" tick={{ fill: '#6B7280' }} />
+                <YAxis tick={{ fill: '#6B7280' }} />
+                <Tooltip
+                  formatter={(value) => `${value.toLocaleString()}원`}
+                  contentStyle={{ backgroundColor: '#F3F4F6', border: '1px solid #D1D5DB' }}
+                />
+                <Legend wrapperStyle={{ color: '#6B7280' }} />
+                <Bar dataKey="freight" name="운임" fill="#9CA3AF" />
               </BarChart>
             </ResponsiveContainer>
           </Card>
-        </>
+        </div>
       )}
 
       {/* 이슈 히스토리 추가/수정 모달 */}
