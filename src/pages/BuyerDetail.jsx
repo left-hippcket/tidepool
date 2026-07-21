@@ -607,8 +607,8 @@ function BuyerDetail() {
                 ) : (
                   <Form form={businessForm} layout="vertical">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Form.Item name="businessNumber" label="사업자등록번호">
-                        <Input disabled className="bg-gray-100" />
+                      <Form.Item name="buyerName" label="바이어명" rules={[{ required: true }]}>
+                        <Input />
                       </Form.Item>
                       <Form.Item
                         name="buyerId"
@@ -618,6 +618,9 @@ function BuyerDetail() {
                       >
                         <Input disabled className="bg-gray-100" />
                       </Form.Item>
+                      <Form.Item name="businessNumber" label="사업자등록번호">
+                        <Input disabled className="bg-gray-100" />
+                      </Form.Item>
                       <Form.Item name="businessName" label="사업자등록상호">
                         <Input />
                       </Form.Item>
@@ -625,9 +628,6 @@ function BuyerDetail() {
                         <Input />
                       </Form.Item>
                       <Form.Item name="businessAddress" label="사업장등록주소" className="md:col-span-2">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item name="buyerName" label="바이어명" rules={[{ required: true }]}>
                         <Input />
                       </Form.Item>
                       <Form.Item name="unloadingAddress" label="하차지 주소">
