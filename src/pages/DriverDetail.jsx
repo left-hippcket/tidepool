@@ -443,7 +443,6 @@ function DriverDetail() {
                             {...field}
                             name={[field.name, 'bank']}
                             label="은행명"
-                            rules={[{ required: true, message: '은행명 입력' }]}
                             style={{ marginBottom: 0 }}
                           >
                             <Input placeholder="하나은행" />
@@ -452,7 +451,6 @@ function DriverDetail() {
                             {...field}
                             name={[field.name, 'accountNumber']}
                             label="계좌번호"
-                            rules={[{ required: true, message: '계좌번호 입력' }]}
                             style={{ marginBottom: 0 }}
                           >
                             <Input placeholder="123-456789-01234" />
@@ -461,7 +459,6 @@ function DriverDetail() {
                             {...field}
                             name={[field.name, 'holder']}
                             label="예금주"
-                            rules={[{ required: true, message: '예금주 입력' }]}
                             style={{ marginBottom: 0 }}
                           >
                             <Input placeholder="김만진" />

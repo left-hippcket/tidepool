@@ -607,7 +607,7 @@ function BuyerDetail() {
                 ) : (
                   <Form form={businessForm} layout="vertical">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Form.Item name="businessNumber" label="사업자등록번호" rules={[{ required: true }]}>
+                      <Form.Item name="businessNumber" label="사업자등록번호">
                         <Input disabled className="bg-gray-100" />
                       </Form.Item>
                       <Form.Item
@@ -618,10 +618,10 @@ function BuyerDetail() {
                       >
                         <Input disabled className="bg-gray-100" />
                       </Form.Item>
-                      <Form.Item name="businessName" label="사업자등록상호" rules={[{ required: true }]}>
+                      <Form.Item name="businessName" label="사업자등록상호">
                         <Input />
                       </Form.Item>
-                      <Form.Item name="representative" label="대표자" rules={[{ required: true }]}>
+                      <Form.Item name="representative" label="대표자">
                         <Input />
                       </Form.Item>
                       <Form.Item name="businessAddress" label="사업장등록주소" className="md:col-span-2">
@@ -633,10 +633,10 @@ function BuyerDetail() {
                       <Form.Item name="unloadingAddress" label="하차지 주소">
                         <Input />
                       </Form.Item>
-                      <Form.Item name="taxInvoiceEmail" label="세금계산서 발행 이메일" rules={[{ required: true }]} className="md:col-span-2">
+                      <Form.Item name="taxInvoiceEmail" label="세금계산서 발행 이메일" className="md:col-span-2">
                         <Input />
                       </Form.Item>
-                      <Form.Item name="status" label="상태" rules={[{ required: true }]}>
+                      <Form.Item name="status" label="상태">
                         <Select>
                           <Select.Option value="active">활성</Select.Option>
                           <Select.Option value="inactive">비활성</Select.Option>
