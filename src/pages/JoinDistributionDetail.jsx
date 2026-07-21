@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, InputNumber, message, Modal, Image } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Select, InputNumber, message, Modal, Image, Upload, Space } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { joinGroups, joinDetails, managers, territories, joinSalesDetails, joinSalesHistoryMemos } from '../data/mockData';
 
 function JoinDistributionDetail() {
@@ -116,7 +116,9 @@ function JoinDistributionDetail() {
       businessAddress: business.businessAddress,
       joinName: business.joinName,
       taxInvoiceEmail: business.taxInvoiceEmail,
-      status: business.status
+      status: business.status,
+      bankAccounts: business.bankAccounts || [{ bank: '', accountNumber: '', holder: '', isPrimary: false }],
+      certificate: business.hasCertificate ? [{ uid: '-1', name: '사업자등록증.pdf', status: 'done' }] : []
     });
     setEditingBusinessId(business.id);
   };
@@ -442,6 +444,80 @@ function JoinDistributionDetail() {
                           <Select.Option value="active">활성</Select.Option>
                           <Select.Option value="inactive">비활성</Select.Option>
                         </Select>
+                      </Form.Item>
+                    </div>
+
+                    {/* 은행계좌정보 */}
+                    <div className="mt-6">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-4">은행계좌정보</h4>
+                      <Form.List name="bankAccounts">
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map((field, index) => (
+                              <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
+                                <Space align="start" style={{ width: '100%', display: 'flex', flexWrap: 'wrap' }}>
+                                  <Form.Item
+                                    {...field}
+                                    name={[field.name, 'bank']}
+                                    label="은행명"
+                                    style={{ marginBottom: 0, minWidth: 120 }}
+                                  >
+                                    <Input placeholder="하나은행" />
+                                  </Form.Item>
+                                  <Form.Item
+                                    {...field}
+                                    name={[field.name, 'accountNumber']}
+                                    label="계좌번호"
+                                    style={{ marginBottom: 0, minWidth: 180 }}
+                                  >
+                                    <Input placeholder="123-456789-01234" />
+                                  </Form.Item>
+                                  <Form.Item
+                                    {...field}
+                                    name={[field.name, 'holder']}
+                                    label="예금주"
+                                    style={{ marginBottom: 0, minWidth: 120 }}
+                                  >
+                                    <Input placeholder="김호경" />
+                                  </Form.Item>
+                                  <Form.Item
+                                    {...field}
+                                    name={[field.name, 'isPrimary']}
+                                    valuePropName="checked"
+                                    style={{ marginBottom: 0, marginTop: 24 }}
+                                  >
+                                    <Button type={index === 0 ? "primary" : "default"} size="small">
+                                      {index === 0 ? "주사용" : "일반"}
+                                    </Button>
+                                  </Form.Item>
+                                  {fields.length > 1 && (
+                                    <MinusCircleOutlined
+                                      onClick={() => remove(field.name)}
+                                      style={{ marginTop: 30, color: '#ff4d4f', fontSize: 20 }}
+                                    />
+                                  )}
+                                </Space>
+                              </div>
+                            ))}
+                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                              계좌 추가하기
+                            </Button>
+                          </>
+                        )}
+                      </Form.List>
+                    </div>
+
+                    {/* 사업자등록증 */}
+                    <div className="mt-6">
+                      <Form.Item
+                        name="certificate"
+                        label="사업자등록증"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => e?.fileList}
+                      >
+                        <Upload beforeUpload={() => false} maxCount={1} accept="image/*,.pdf">
+                          <Button icon={<UploadOutlined />}>사업자등록증 업데이트 (최대 10MB)</Button>
+                        </Upload>
                       </Form.Item>
                     </div>
                   </Form>
