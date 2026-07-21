@@ -4,96 +4,29 @@ import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
 
-const { Option } = Select;
-
-// Mock 데이터 - 상품마스터DB 참조
-const mockProductCategories = [
-  { id: 1, name: '누운고기' },
-  { id: 2, name: '뜬고기' },
-  { id: 3, name: '갑각류' },
-];
-
-const mockProducts = {
-  1: [
-    { id: 1, name: '광어', specs: ['1.2kg', '1.3kg', '1.4kg', '2.0kg'] },
-    { id: 2, name: '강도다리', specs: ['1.0kg', '1.5kg'] },
-  ],
-  2: [
-    { id: 3, name: '우럭', specs: ['800g', '1.0kg'] },
-  ],
-  3: [
-    { id: 4, name: '대하', specs: ['500g', '1kg'] },
-  ],
-};
-
-const mockOrigins = {
-  1: ['완도', '통영', '고흥', '여수'],
-  2: ['완도', '통영'],
-  3: ['남해', '완도'],
-  4: ['서해', '남해'],
-};
-
 function StandardPrice() {
   const [activeTab, setActiveTab] = useState('1');
   const [dataSource, setDataSource] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // 초기 데이터 로드
   useEffect(() => {
     loadInitialData();
   }, []);
 
-  const loadInitialData = () => {
-    // Mock 초기 데이터
-    const initialData = [
-      {
-        key: '1',
-        id: '1',
-        applyDate: '2026-07-21',
-        categoryId: 1,
-        categoryName: '누운고기',
-        productId: 1,
-        productName: '광어',
-        originId: 1,
-        originName: '완도',
-        spec: '1.2kg',
-        price: 15000,
-        source: '피시파더',
-      },
-      {
-        key: '2',
-        id: '2',
-        applyDate: '2026-07-20',
-        categoryId: 1,
-        categoryName: '누운고기',
-        productId: 1,
-        productName: '광어',
-        originId: 2,
-        originName: '통영',
-        spec: '1.2kg',
-        price: 16000,
-        source: '노량진시장',
-      },
-      {
-        key: '3',
-        id: '3',
-        applyDate: '2026-07-21',
-        categoryId: 1,
-        categoryName: '누운고기',
-        productId: 1,
-        productName: '광어',
-        originId: 1,
-        originName: '완도',
-        spec: '1.5kg',
-        price: 18000,
-        source: '피시파더',
-      },
-    ];
-    setDataSource(initialData);
+  const loadInitialData = async () => {
+    // HTML 파일에서 추출한 실제 표준가격 데이터 로드
+    try {
+      const response = await fetch('/data/standard-price-data.json');
+      const data = await response.json();
+      setDataSource(data);
+    } catch (error) {
+      console.error('표준가격 데이터 로드 실패:', error);
+      // 로드 실패 시 빈 배열
+      setDataSource([]);
+    }
   };
 
   const columns = [
@@ -102,24 +35,30 @@ function StandardPrice() {
       dataIndex: 'applyDate',
       key: 'applyDate',
       width: 120,
-    },
-    {
-      title: '품목분류',
-      dataIndex: 'categoryName',
-      key: 'categoryName',
-      width: 100,
+      sorter: (a, b) => a.applyDate.localeCompare(b.applyDate),
+      defaultSortOrder: 'descend',
     },
     {
       title: '품목',
       dataIndex: 'productName',
       key: 'productName',
       width: 100,
+      filters: [...new Set(dataSource.map(item => item.productName))].map(name => ({
+        text: name,
+        value: name,
+      })),
+      onFilter: (value, record) => record.productName === value,
     },
     {
       title: '원산지',
       dataIndex: 'originName',
       key: 'originName',
       width: 100,
+      filters: [...new Set(dataSource.map(item => item.originName))].map(name => ({
+        text: name,
+        value: name,
+      })),
+      onFilter: (value, record) => record.originName === value,
     },
     {
       title: '규격',
@@ -133,6 +72,7 @@ function StandardPrice() {
       key: 'price',
       width: 120,
       render: (price) => `${price.toLocaleString()}원`,
+      sorter: (a, b) => a.price - b.price,
     },
     {
       title: '가격출처',
@@ -169,13 +109,10 @@ function StandardPrice() {
 
   const handleEdit = (record) => {
     setEditingRecord(record);
-    setSelectedCategory(record.categoryId);
-    setSelectedProduct(record.productId);
     form.setFieldsValue({
       applyDate: dayjs(record.applyDate),
-      categoryId: record.categoryId,
-      productId: record.productId,
-      originId: record.originId,
+      productName: record.productName,
+      originName: record.originName,
       spec: record.spec,
       price: record.price,
       source: record.source,
@@ -191,10 +128,6 @@ function StandardPrice() {
 
   const handleOk = () => {
     form.validateFields().then(values => {
-      const categoryName = mockProductCategories.find(c => c.id === values.categoryId)?.name;
-      const productName = mockProducts[values.categoryId]?.find(p => p.id === values.productId)?.name;
-      const originName = mockOrigins[values.productId]?.[values.originId - 1];
-
       if (editingRecord) {
         // 수정
         const newData = dataSource.map(item => {
@@ -202,8 +135,8 @@ function StandardPrice() {
             return {
               ...item,
               applyDate: values.applyDate.format('YYYY-MM-DD'),
-              originId: values.originId,
-              originName,
+              productName: values.productName,
+              originName: values.originName,
               spec: values.spec,
               price: values.price,
               source: values.source,
@@ -219,12 +152,8 @@ function StandardPrice() {
           key: String(dataSource.length + 1),
           id: String(dataSource.length + 1),
           applyDate: values.applyDate.format('YYYY-MM-DD'),
-          categoryId: values.categoryId,
-          categoryName,
-          productId: values.productId,
-          productName,
-          originId: values.originId,
-          originName,
+          productName: values.productName,
+          originName: values.originName,
           spec: values.spec,
           price: values.price,
           source: values.source,
@@ -235,39 +164,12 @@ function StandardPrice() {
 
       setIsModalVisible(false);
       form.resetFields();
-      setSelectedCategory(null);
-      setSelectedProduct(null);
     });
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
-    setSelectedCategory(null);
-    setSelectedProduct(null);
-  };
-
-  const onCategoryChange = (value) => {
-    setSelectedCategory(value);
-    setSelectedProduct(null);
-    form.setFieldsValue({
-      productId: undefined,
-      originId: undefined,
-      spec: undefined,
-    });
-  };
-
-  const onProductChange = (value) => {
-    setSelectedProduct(value);
-    const product = mockProducts[selectedCategory]?.find(p => p.id === value);
-    if (product && product.specs.length > 0) {
-      form.setFieldsValue({
-        spec: product.specs[0],
-      });
-    }
-    form.setFieldsValue({
-      originId: undefined,
-    });
   };
 
   return (
@@ -341,55 +243,25 @@ function StandardPrice() {
           </Form.Item>
 
           <Form.Item
-            name="categoryId"
-            label="품목분류"
-            rules={[{ required: true, message: '품목분류를 선택해주세요' }]}
-          >
-            <Select
-              placeholder="품목분류 선택"
-              onChange={onCategoryChange}
-              disabled={editingRecord !== null}
-              style={editingRecord ? { backgroundColor: '#f5f5f5' } : {}}
-            >
-              {mockProductCategories.map(category => (
-                <Option key={category.id} value={category.id}>
-                  {category.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="productId"
+            name="productName"
             label="품목"
-            rules={[{ required: true, message: '품목을 선택해주세요' }]}
+            rules={[
+              { required: true, message: '품목을 입력해주세요' },
+              { max: 30, message: '품목은 최대 30자까지 입력 가능합니다' }
+            ]}
           >
-            <Select
-              placeholder="품목 선택"
-              onChange={onProductChange}
-              disabled={!selectedCategory || editingRecord !== null}
-              style={editingRecord ? { backgroundColor: '#f5f5f5' } : {}}
-            >
-              {selectedCategory && mockProducts[selectedCategory]?.map(product => (
-                <Option key={product.id} value={product.id}>
-                  {product.name}
-                </Option>
-              ))}
-            </Select>
+            <Input placeholder="품목 입력 (예: 넙치, 우럭)" />
           </Form.Item>
 
           <Form.Item
-            name="originId"
+            name="originName"
             label="원산지"
-            rules={[{ required: true, message: '원산지를 선택해주세요' }]}
+            rules={[
+              { required: true, message: '원산지를 입력해주세요' },
+              { max: 30, message: '원산지는 최대 30자까지 입력 가능합니다' }
+            ]}
           >
-            <Select placeholder="원산지 선택" disabled={!selectedProduct}>
-              {selectedProduct && mockOrigins[selectedProduct]?.map((origin, index) => (
-                <Option key={index + 1} value={index + 1}>
-                  {origin}
-                </Option>
-              ))}
-            </Select>
+            <Input placeholder="원산지 입력 (예: 완도, 통영)" />
           </Form.Item>
 
           <Form.Item
