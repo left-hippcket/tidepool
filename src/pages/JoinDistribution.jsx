@@ -117,10 +117,10 @@ function JoinDistribution() {
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">조인유통그룹명</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">사업자수</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">담당영업사원</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매입액(누적)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(누적)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매입액(최근 3개월)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(최근 3개월)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매입액(누적)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매출액(누적)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매입액(최근 3개월)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매출액(최근 3개월)</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">최근거래일</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-700">사업자등록증</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-700">상세</th>
@@ -139,10 +139,10 @@ function JoinDistribution() {
                   </td>
                   <td className="px-4 py-3 text-gray-900">{join.businessCount}개</td>
                   <td className="px-4 py-3 text-gray-900">{join.salesPerson}</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(join.totalPurchase / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(join.totalSales / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(join.purchase3M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(join.sales3M / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(join.totalPurchase / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(join.totalSales / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(join.purchase3M / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(join.sales3M / 100000000).toFixed(1)}억</td>
                   <td className="px-4 py-3 text-gray-900">{join.lastTradeDate}</td>
                   <td className="px-4 py-3 text-center">
                     <input
@@ -196,20 +196,20 @@ function JoinDistribution() {
                 <div className="font-medium text-gray-900">{join.salesPerson}</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">매입액(누적)</div>
-                <div className="font-medium text-gray-900">{(join.totalPurchase / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">매입액(누적)</div>
+                <div className="font-medium text-gray-400">{(join.totalPurchase / 100000000).toFixed(1)}억</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">매출액(누적)</div>
-                <div className="font-medium text-gray-900">{(join.totalSales / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">매출액(누적)</div>
+                <div className="font-medium text-gray-400">{(join.totalSales / 100000000).toFixed(1)}억</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">최근 3개월 매입</div>
-                <div className="font-medium text-gray-900">{(join.purchase3M / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">최근 3개월 매입</div>
+                <div className="font-medium text-gray-400">{(join.purchase3M / 100000000).toFixed(1)}억</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">최근 3개월 매출</div>
-                <div className="font-medium text-gray-900">{(join.sales3M / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">최근 3개월 매출</div>
+                <div className="font-medium text-gray-400">{(join.sales3M / 100000000).toFixed(1)}억</div>
               </div>
               <div className="col-span-2">
                 <div className="text-gray-500 text-xs mb-0.5">최근거래일</div>

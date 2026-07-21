@@ -137,9 +137,9 @@ function BuyerManagement() {
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">주요품목분류</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">사업권역</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">상세지역</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(누적)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(최근 3개월)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-700">매출액(최근 1개월)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매출액(누적)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매출액(최근 3개월)</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-400">매출액(최근 1개월)</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-700">최근거래일</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-700">사업자등록증</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-700">상세</th>
@@ -161,9 +161,9 @@ function BuyerManagement() {
                   <td className="px-4 py-3 text-gray-900">{buyer.mainCategory}</td>
                   <td className="px-4 py-3 text-gray-900">{buyer.territory}</td>
                   <td className="px-4 py-3 text-gray-900">{buyer.region}</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(buyer.totalSales / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(buyer.sales3M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-900">{(buyer.sales1M / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(buyer.totalSales / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(buyer.sales3M / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-gray-400">{(buyer.sales1M / 100000000).toFixed(1)}억</td>
                   <td className="px-4 py-3 text-gray-900">{buyer.lastTradeDate}</td>
                   <td className="px-4 py-3 text-center">
                     <input
@@ -229,16 +229,16 @@ function BuyerManagement() {
                 <div className="font-medium text-gray-900">{buyer.region}</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">매출액(누적)</div>
-                <div className="font-medium text-gray-900">{(buyer.totalSales / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">매출액(누적)</div>
+                <div className="font-medium text-gray-400">{(buyer.totalSales / 100000000).toFixed(1)}억</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">최근 3개월</div>
-                <div className="font-medium text-gray-900">{(buyer.sales3M / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">최근 3개월</div>
+                <div className="font-medium text-gray-400">{(buyer.sales3M / 100000000).toFixed(1)}억</div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs mb-0.5">최근 1개월</div>
-                <div className="font-medium text-gray-900">{(buyer.sales1M / 100000000).toFixed(1)}억</div>
+                <div className="text-gray-400 text-xs mb-0.5">최근 1개월</div>
+                <div className="font-medium text-gray-400">{(buyer.sales1M / 100000000).toFixed(1)}억</div>
               </div>
               <div className="col-span-2">
                 <div className="text-gray-500 text-xs mb-0.5">최근거래일</div>
