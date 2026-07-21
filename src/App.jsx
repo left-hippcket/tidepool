@@ -35,10 +35,7 @@ const AUTH_KEY = 'fifa_admin_auth';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [collapsed, setCollapsed] = useState(() => {
-    // 초기값: 모바일(768px 이하)이면 접힌 상태, 웹이면 펼친 상태
-    return window.innerWidth <= 768;
-  });
+  const [collapsed, setCollapsed] = useState(false); // 초기 상태: 항상 펼쳐진 상태
   const navigate = useNavigate();
   const location = useLocation();
 
