@@ -232,7 +232,6 @@ function JoinDistributionRegister() {
             <Form.Item
               name="territory"
               label="사업권역"
-              rules={[{ required: true, message: '사업권역을 선택해주세요' }]}
             >
               <Select placeholder="사업권역 선택">
                 {territories.filter(t => t.status === 'active').map(t => (
@@ -244,7 +243,6 @@ function JoinDistributionRegister() {
             <Form.Item
               name="region"
               label="상세지역"
-              rules={[{ required: true, message: '상세지역을 선택해주세요' }]}
             >
               <Select placeholder="상세지역 선택">
                 <Select.Option value="서울">서울</Select.Option>
@@ -344,6 +342,31 @@ function JoinDistributionRegister() {
         {(registrationType === 'new' || selectedGroup) && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
+
+            <Form.Item
+              name="joinName"
+              label="조인유통명"
+              rules={[
+                { required: true, message: '조인유통명을 입력해주세요' },
+                { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                { pattern: /^[가-힣a-zA-Z0-9()]+$/, message: '한글, 영문, 숫자, 괄호()만 허용됩니다' }
+              ]}
+            >
+              <Input placeholder="호경" />
+            </Form.Item>
+
+            <Form.Item
+              name="ticker"
+              label="ticker"
+              rules={[
+                { required: true, message: 'ticker를 입력해주세요' },
+                { max: 10, message: '최대 10자' },
+                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+              ]}
+            >
+              <Input placeholder="HK01" />
+            </Form.Item>
+
             <Form.Item
               name="businessNumber"
               label="사업자등록번호"
@@ -381,30 +404,6 @@ function JoinDistributionRegister() {
               rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
             >
               <Input placeholder="서울시 강남구 테헤란로 123" />
-            </Form.Item>
-
-            <Form.Item
-              name="joinName"
-              label="조인유통명"
-              rules={[
-                { required: true, message: '조인유통명을 입력해주세요' },
-                { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                { pattern: /^[가-힣a-zA-Z0-9()]+$/, message: '한글, 영문, 숫자, 괄호()만 허용됩니다' }
-              ]}
-            >
-              <Input placeholder="호경" />
-            </Form.Item>
-
-            <Form.Item
-              name="ticker"
-              label="ticker"
-              rules={[
-                { required: true, message: 'ticker를 입력해주세요' },
-                { max: 10, message: '최대 10자' },
-                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
-              ]}
-            >
-              <Input placeholder="HK01" />
             </Form.Item>
 
             <Form.Item
