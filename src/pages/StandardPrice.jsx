@@ -458,7 +458,7 @@ function StandardPrice() {
           <Table
             columns={columns}
             dataSource={dataSource}
-            pagination={{ pageSize: 10 }}
+            pagination={{ pageSize: 20 }}
             scroll={{ x: 1000 }}
           />
         </Tabs.TabPane>
