@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, message, Modal, Image } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, MinusCircleOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Select, message, Modal, Image, Upload, Space } from 'antd';
+import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, MinusCircleOutlined, FileImageOutlined, UploadOutlined } from '@ant-design/icons';
 import { buyerGroups, buyerDetails, managers, territories, regions, productCategories, products, buyerSalesDetails, salesHistoryMemos } from '../data/mockData';
 
 function BuyerDetail() {
@@ -119,7 +119,8 @@ function BuyerDetail() {
       buyerName: business.buyerName,
       unloadingAddress: business.unloadingAddress,
       taxInvoiceEmail: business.taxInvoiceEmail,
-      status: business.status
+      status: business.status,
+      certificate: business.hasCertificate ? [{ uid: '-1', name: '사업자등록증.pdf', status: 'done' }] : []
     });
     setEditingBusinessId(business.id);
   };
@@ -605,36 +606,57 @@ function BuyerDetail() {
                   </div>
                 ) : (
                   <Form form={businessForm} layout="vertical">
-                    <Form.Item name="businessNumber" label="사업자등록번호" rules={[{ required: true }]}>
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="buyerId" label="ticker" rules={[{ required: true }]}>
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="businessName" label="사업자등록상호" rules={[{ required: true }]}>
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="representative" label="대표자" rules={[{ required: true }]}>
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="businessAddress" label="사업장등록주소">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="buyerName" label="바이어명" rules={[{ required: true }]}>
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="unloadingAddress" label="하차지 주소">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="taxInvoiceEmail" label="세금계산서 발행 이메일" rules={[{ required: true }]}>
-                      <Input />
-                    </Form.Item>
-                    <Form.Item name="status" label="상태" rules={[{ required: true }]}>
-                      <Select>
-                        <Select.Option value="active">활성</Select.Option>
-                        <Select.Option value="inactive">비활성</Select.Option>
-                      </Select>
-                    </Form.Item>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Form.Item name="businessNumber" label="사업자등록번호" rules={[{ required: true }]}>
+                        <Input disabled className="bg-gray-100" />
+                      </Form.Item>
+                      <Form.Item
+                        name="buyerId"
+                        label="ticker"
+                        rules={[{ required: true }]}
+                        help="티커는 수정할 수 없습니다"
+                      >
+                        <Input disabled className="bg-gray-100" />
+                      </Form.Item>
+                      <Form.Item name="businessName" label="사업자등록상호" rules={[{ required: true }]}>
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="representative" label="대표자" rules={[{ required: true }]}>
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="businessAddress" label="사업장등록주소" className="md:col-span-2">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="buyerName" label="바이어명" rules={[{ required: true }]}>
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="unloadingAddress" label="하차지 주소">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="taxInvoiceEmail" label="세금계산서 발행 이메일" rules={[{ required: true }]} className="md:col-span-2">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="status" label="상태" rules={[{ required: true }]}>
+                        <Select>
+                          <Select.Option value="active">활성</Select.Option>
+                          <Select.Option value="inactive">비활성</Select.Option>
+                        </Select>
+                      </Form.Item>
+                    </div>
+
+                    {/* 사업자등록증 */}
+                    <div className="mt-6">
+                      <Form.Item
+                        name="certificate"
+                        label="사업자등록증"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => e?.fileList}
+                      >
+                        <Upload beforeUpload={() => false} maxCount={1} accept="image/*,.pdf">
+                          <Button icon={<UploadOutlined />}>사업자등록증 업데이트 (최대 10MB)</Button>
+                        </Upload>
+                      </Form.Item>
+                    </div>
                   </Form>
                 )}
               </div>
