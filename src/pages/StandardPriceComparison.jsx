@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, DatePicker, Checkbox, Select, Space, Row, Col, message } from 'antd';
 import { Line } from '@ant-design/charts';
 import dayjs from 'dayjs';
+import { productCategories, products, origins, specifications } from '../data/mockData';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -59,15 +60,48 @@ const mockSpecs = ['1.2kg', '1.3kg', '1.4kg', '1.5kg', '2.0kg'];
 
 function StandardPriceComparison() {
   const [dateRange, setDateRange] = useState([dayjs().subtract(3, 'month'), dayjs()]);
-  const [selectedOrigins, setSelectedOrigins] = useState(['완도', '통영', '고흥']);
-  const [selectedSpec, setSelectedSpec] = useState('1.2kg');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedOrigins, setSelectedOrigins] = useState([]);
+  const [selectedSpec, setSelectedSpec] = useState(null);
   const [chartData, setChartData] = useState([]);
-  const [availableOrigins, setAvailableOrigins] = useState(mockOrigins);
+  const [availableOrigins, setAvailableOrigins] = useState([]);
+  const [availableSpecs, setAvailableSpecs] = useState([]);
 
-  useEffect(() => {
-    // 초기 로드
-    handleQuery();
-  }, []);
+  const onCategoryChange = (value) => {
+    setSelectedCategory(value);
+    setSelectedProduct(null);
+    setSelectedSpec(null);
+    setSelectedOrigins([]);
+    setAvailableOrigins([]);
+    setAvailableSpecs([]);
+  };
+
+  const onProductChange = (value) => {
+    setSelectedProduct(value);
+
+    // 해당 품목의 규격 필터링
+    const productSpecs = specifications.filter(s =>
+      s.productId === value && s.status === 'active'
+    );
+    setAvailableSpecs(productSpecs);
+
+    // 해당 품목의 원산지 필터링
+    const productOrigins = origins.filter(o =>
+      o.productId === value && o.status === 'active'
+    );
+    setAvailableOrigins(productOrigins);
+
+    // 자동으로 첫 번째 규격 선택
+    if (productSpecs.length > 0) {
+      setSelectedSpec(productSpecs[0].name);
+    } else {
+      setSelectedSpec(null);
+    }
+
+    // 자동으로 모든 원산지 선택
+    setSelectedOrigins(productOrigins.map(o => o.name));
+  };
 
   const handlePeriodClick = (period) => {
     let startDate;
@@ -98,13 +132,23 @@ function StandardPriceComparison() {
   };
 
   const handleQuery = () => {
-    if (selectedOrigins.length === 0) {
-      message.error('원산지를 선택해주세요.');
+    if (!selectedCategory) {
+      message.error('품목분류를 선택해주세요.');
+      return;
+    }
+
+    if (!selectedProduct) {
+      message.error('품목을 선택해주세요.');
       return;
     }
 
     if (!selectedSpec) {
       message.error('규격을 선택해주세요.');
+      return;
+    }
+
+    if (selectedOrigins.length === 0) {
+      message.error('원산지를 선택해주세요.');
       return;
     }
 
@@ -193,32 +237,74 @@ function StandardPriceComparison() {
           </Space>
         </Card>
 
+        {/* 품목 선택 */}
+        <Card title="품목 선택" size="small">
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <div>
+              <div style={{ marginBottom: 8, fontWeight: 500 }}>품목분류</div>
+              <Select
+                value={selectedCategory}
+                onChange={onCategoryChange}
+                style={{ width: '100%' }}
+                placeholder="품목분류 선택"
+              >
+                {productCategories.map(category => (
+                  <Option key={category.id} value={category.id}>
+                    {category.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+
+            <div>
+              <div style={{ marginBottom: 8, fontWeight: 500 }}>품목</div>
+              <Select
+                value={selectedProduct}
+                onChange={onProductChange}
+                style={{ width: '100%' }}
+                placeholder="품목 선택"
+                disabled={!selectedCategory}
+              >
+                {selectedCategory && products
+                  .filter(p => p.categoryId === selectedCategory)
+                  .map(product => (
+                    <Option key={product.id} value={product.id}>
+                      {product.name}
+                    </Option>
+                  ))}
+              </Select>
+            </div>
+
+            <div>
+              <div style={{ marginBottom: 8, fontWeight: 500 }}>규격</div>
+              <Select
+                value={selectedSpec}
+                onChange={setSelectedSpec}
+                style={{ width: '100%' }}
+                placeholder="규격 선택"
+                disabled={!selectedProduct}
+              >
+                {availableSpecs.map(spec => (
+                  <Option key={spec.id} value={spec.name}>
+                    {spec.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </Space>
+        </Card>
+
         {/* 원산지 설정 */}
         <Card title="원산지 설정" size="small">
           <Checkbox.Group
-            options={availableOrigins}
+            options={availableOrigins.map(o => ({ label: o.name, value: o.name }))}
             value={selectedOrigins}
             onChange={handleOriginChange}
+            disabled={!selectedProduct}
           />
           <div style={{ marginTop: 8, color: '#999', fontSize: 12 }}>
-            * 최소 1개 이상 선택 필수
+            * 최소 1개 이상 선택 필수 (품목 선택 시 자동으로 모두 선택됨)
           </div>
-        </Card>
-
-        {/* 규격 설정 */}
-        <Card title="규격 설정" size="small">
-          <Select
-            value={selectedSpec}
-            onChange={setSelectedSpec}
-            style={{ width: '100%' }}
-            placeholder="규격 선택"
-          >
-            {mockSpecs.map(spec => (
-              <Option key={spec} value={spec}>
-                {spec}
-              </Option>
-            ))}
-          </Select>
         </Card>
 
         {/* 조회 버튼 */}
@@ -228,7 +314,10 @@ function StandardPriceComparison() {
 
         {/* 차트 영역 */}
         {chartData.length > 0 && (
-          <Card title="원산지별 가격 추이" size="small">
+          <Card
+            title={`${products.find(p => p.id === selectedProduct)?.name || ''} ${selectedSpec} - 원산지별 가격 추이`}
+            size="small"
+          >
             <Line {...config} height={400} />
           </Card>
         )}
