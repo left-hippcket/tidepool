@@ -15,6 +15,7 @@ function StandardPrice() {
   const [form] = Form.useForm();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedOrigin, setSelectedOrigin] = useState(null);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -284,6 +285,7 @@ function StandardPrice() {
     form.resetFields();
     setSelectedCategory(null);
     setSelectedProduct(null);
+    setSelectedOrigin(null);
     form.setFieldsValue({
       applyDate: dayjs(),
       source: '피시파더',
@@ -296,6 +298,7 @@ function StandardPrice() {
     setEditingRecord(record);
     setSelectedCategory(record.categoryId);
     setSelectedProduct(record.productId);
+    setSelectedOrigin(record.originId);
     form.setFieldsValue({
       applyDate: dayjs(record.applyDate),
       categoryId: record.categoryId,
@@ -377,6 +380,7 @@ function StandardPrice() {
       form.resetFields();
       setSelectedCategory(null);
       setSelectedProduct(null);
+      setSelectedOrigin(null);
     });
   };
 
@@ -385,20 +389,23 @@ function StandardPrice() {
     form.resetFields();
     setSelectedCategory(null);
     setSelectedProduct(null);
+    setSelectedOrigin(null);
   };
 
   const onCategoryChange = (value) => {
     setSelectedCategory(value);
     setSelectedProduct(null);
+    setSelectedOrigin(null);
     form.setFieldsValue({
       productId: undefined,
       originId: undefined,
-      specId: undefined,
+      priceItems: [],
     });
   };
 
   const onProductChange = (value) => {
     setSelectedProduct(value);
+    setSelectedOrigin(null);
     form.setFieldsValue({
       originId: undefined,
       priceItems: [],
@@ -406,7 +413,8 @@ function StandardPrice() {
   };
 
   const onOriginChange = (originId) => {
-    const selectedOrigin = origins.find(o => o.id === originId);
+    setSelectedOrigin(originId);
+    const origin = origins.find(o => o.id === originId);
 
     // 해당 품목의 기존 규격 자동 로드
     const productSpecs = specifications.filter(s => s.productId === selectedProduct && s.status === 'active');
@@ -417,7 +425,7 @@ function StandardPrice() {
       const recentRecord = dataSource
         .filter(item =>
           item.productId === selectedProduct &&
-          item.originName === selectedOrigin?.name &&
+          item.originName === origin?.name &&
           item.spec === specName
         )
         .sort((a, b) => b.applyDate.localeCompare(a.applyDate))[0];
@@ -605,7 +613,7 @@ function StandardPrice() {
             </>
           ) : (
             // 등록 모드: 여러 규격 동시 입력
-            form.getFieldValue('originId') && (
+            selectedOrigin && (
               <Form.Item label="규격별 가격">
                 <div style={{ marginBottom: 8, color: '#666', fontSize: 12 }}>
                   선택한 품목-원산지의 최근 가격이 자동으로 입력됩니다. 가격을 수정하거나, 규격을 추가/삭제할 수 있습니다.
