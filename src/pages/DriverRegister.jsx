@@ -108,18 +108,6 @@ function DriverRegister() {
             </Form.Item>
 
             <Form.Item
-              name="ticker"
-              label="Ticker"
-              rules={[
-                { required: true, message: 'Ticker를 입력해주세요' },
-                { max: 10, message: '최대 10자' },
-                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
-              ]}
-            >
-              <Input placeholder="예: JH01" />
-            </Form.Item>
-
-            <Form.Item
               name="phone"
               label="전화번호"
               rules={[
@@ -182,6 +170,18 @@ function DriverRegister() {
               extra="등록된 사업자번호 입력 시 상호, 대표자, 주소, 과세유형이 자동으로 입력됩니다"
             >
               <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
+            </Form.Item>
+
+            <Form.Item
+              name="ticker"
+              label="Ticker"
+              rules={[
+                { required: true, message: 'Ticker를 입력해주세요' },
+                { max: 10, message: '최대 10자' },
+                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+              ]}
+            >
+              <Input placeholder="예: JH01" />
             </Form.Item>
 
             <Form.Item
