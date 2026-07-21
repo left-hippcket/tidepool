@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs, Space, InputNumber } from 'antd';
-import { PlusOutlined, EditOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs, Space, InputNumber, Alert } from 'antd';
+import { PlusOutlined, EditOutlined, MinusCircleOutlined, SaveOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
 import { productCategories, products, origins, specifications } from '../data/mockData';
@@ -8,14 +9,12 @@ import { productCategories, products, origins, specifications } from '../data/mo
 const { Option } = Select;
 
 function StandardPrice() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('1');
   const [dataSource, setDataSource] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingRecord, setEditingRecord] = useState(null);
-  const [form] = Form.useForm();
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editingDataSource, setEditingDataSource] = useState([]);
+  const [originalDataSource, setOriginalDataSource] = useState([]);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -212,14 +211,35 @@ function StandardPrice() {
     return origins.map(name => ({ text: name, value: name }));
   }, [dataSource]);
 
+  const handleFieldChange = (index, field, value) => {
+    const newData = [...editingDataSource];
+    newData[index] = {
+      ...newData[index],
+      [field]: value
+    };
+    setEditingDataSource(newData);
+  };
+
   const columns = [
     {
       title: '적용일자',
       dataIndex: 'applyDate',
       key: 'applyDate',
-      width: 120,
+      width: 140,
       defaultSortOrder: 'descend',
       sorter: (a, b) => a.applyDate.localeCompare(b.applyDate),
+      render: (text, record, index) => {
+        if (editMode) {
+          return (
+            <DatePicker
+              value={dayjs(text)}
+              onChange={(date) => handleFieldChange(index, 'applyDate', date ? date.format('YYYY-MM-DD') : text)}
+              style={{ width: '100%' }}
+            />
+          );
+        }
+        return text;
+      },
     },
     {
       title: '품목분류',
@@ -249,230 +269,175 @@ function StandardPrice() {
       title: '규격',
       dataIndex: 'spec',
       key: 'spec',
-      width: 100,
+      width: 140,
+      render: (text, record, index) => {
+        if (editMode) {
+          return (
+            <Select
+              value={text}
+              onChange={(value) => handleFieldChange(index, 'spec', value)}
+              style={{ width: '100%' }}
+            >
+              {specifications
+                .filter(s => s.productId === record.productId && s.status === 'active')
+                .map(s => (
+                  <Option key={s.id} value={s.name}>{s.name}</Option>
+                ))
+              }
+            </Select>
+          );
+        }
+        return text;
+      },
     },
     {
       title: '표준가격',
       dataIndex: 'price',
       key: 'price',
-      width: 120,
-      render: (price) => `${price.toLocaleString()}원`,
+      width: 160,
+      render: (text, record, index) => {
+        if (editMode) {
+          return (
+            <InputNumber
+              value={text}
+              onChange={(value) => handleFieldChange(index, 'price', value)}
+              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              addonAfter="원"
+              style={{ width: '100%' }}
+            />
+          );
+        }
+        return `${text.toLocaleString()}원`;
+      },
     },
     {
       title: '가격출처',
       dataIndex: 'source',
       key: 'source',
-      width: 120,
-    },
-    {
-      title: '수정',
-      key: 'action',
-      width: 80,
-      fixed: 'right',
-      render: (_, record) => (
-        <Button
-          type="link"
-          icon={<EditOutlined />}
-          onClick={() => handleEdit(record)}
-        >
-          수정
-        </Button>
-      ),
+      width: 140,
+      render: (text, record, index) => {
+        if (editMode) {
+          return (
+            <Input
+              value={text}
+              onChange={(e) => handleFieldChange(index, 'source', e.target.value)}
+              style={{ width: '100%' }}
+            />
+          );
+        }
+        return text;
+      },
     },
   ];
 
-  const handleAdd = () => {
-    setEditingRecord(null);
-    form.resetFields();
-    setSelectedCategory(null);
-    setSelectedProduct(null);
-    setSelectedOrigin(null);
-    form.setFieldsValue({
-      applyDate: dayjs(),
-      source: '피시파더',
-      priceItems: [],
-    });
-    setIsModalVisible(true);
+  const handleRegister = () => {
+    navigate('/standard-price/register');
   };
 
-  const handleEdit = (record) => {
-    setEditingRecord(record);
-    setSelectedCategory(record.categoryId);
-    setSelectedProduct(record.productId);
-    setSelectedOrigin(record.originId);
-    form.setFieldsValue({
-      applyDate: dayjs(record.applyDate),
-      categoryId: record.categoryId,
-      productId: record.productId,
-      originId: record.originId,
-      specId: record.specId,
-      price: record.price,
-      source: record.source,
-    });
-    setIsModalVisible(true);
+  const handleEnterEditMode = () => {
+    setOriginalDataSource([...dataSource]);
+    setEditingDataSource([...dataSource]);
+    setEditMode(true);
+    message.info('수정 모드입니다. 여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요.');
   };
 
-  const handleDelete = (record) => {
-    const newData = dataSource.filter(item => item.key !== record.key);
-    setDataSource(newData);
-    message.success('표준가격이 삭제되었습니다.');
+  const handleSaveAll = () => {
+    setDataSource(editingDataSource);
+    setEditMode(false);
+    setEditingDataSource([]);
+    setOriginalDataSource([]);
+    message.success('모든 변경사항이 저장되었습니다.');
   };
 
-  const handleOk = () => {
-    form.validateFields().then(values => {
-      const category = productCategories.find(c => c.id === values.categoryId);
-      const product = products.find(p => p.id === values.productId);
-      const origin = origins.find(o => o.id === values.originId);
-
-      if (editingRecord) {
-        // 수정 모드 (단일 레코드)
-        const spec = specifications.find(s => s.id === values.specId);
-        const newData = dataSource.map(item => {
-          if (item.key === editingRecord.key) {
-            return {
-              ...item,
-              applyDate: values.applyDate.format('YYYY-MM-DD'),
-              originId: values.originId,
-              originName: origin?.name,
-              specId: values.specId,
-              spec: spec?.name || values.spec,
-              price: values.price,
-              source: values.source,
-            };
-          }
-          return item;
-        });
-        setDataSource(newData);
-        message.success('표준가격 정보가 수정되었습니다.');
-      } else {
-        // 등록 모드 (여러 규격 한번에)
-        const priceItems = values.priceItems || [];
-        const validItems = priceItems.filter(item => item.price !== undefined && item.price !== null);
-
-        if (validItems.length === 0) {
-          message.warning('최소 1개 이상의 규격에 가격을 입력해주세요.');
-          return;
-        }
-
-        const newRecords = validItems.map((item, index) => {
-          const spec = specifications.find(s => s.id === item.specId);
-          return {
-            key: String(dataSource.length + index + 1),
-            id: String(dataSource.length + index + 1),
-            applyDate: values.applyDate.format('YYYY-MM-DD'),
-            categoryId: values.categoryId,
-            categoryName: category?.name,
-            productId: values.productId,
-            productName: product?.name,
-            originId: values.originId,
-            originName: origin?.name,
-            specId: item.specId,
-            spec: spec?.name || item.specName,
-            price: item.price,
-            source: values.source,
-          };
-        });
-
-        setDataSource([...newRecords, ...dataSource]);
-        message.success(`${validItems.length}개의 표준가격이 등록되었습니다.`);
-      }
-
-      setIsModalVisible(false);
-      form.resetFields();
-      setSelectedCategory(null);
-      setSelectedProduct(null);
-      setSelectedOrigin(null);
-    });
+  const handleCancelEdit = () => {
+    const hasChanges = JSON.stringify(editingDataSource) !== JSON.stringify(originalDataSource);
+    if (hasChanges) {
+      Modal.confirm({
+        title: '변경사항을 취소하시겠습니까?',
+        content: '저장하지 않은 변경사항은 모두 사라집니다.',
+        onOk() {
+          setEditMode(false);
+          setEditingDataSource([]);
+          setOriginalDataSource([]);
+          message.info('변경사항이 취소되었습니다.');
+        },
+      });
+    } else {
+      setEditMode(false);
+      setEditingDataSource([]);
+      setOriginalDataSource([]);
+    }
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
-    setSelectedCategory(null);
-    setSelectedProduct(null);
-    setSelectedOrigin(null);
-  };
-
-  const onCategoryChange = (value) => {
-    setSelectedCategory(value);
-    setSelectedProduct(null);
-    setSelectedOrigin(null);
-    form.setFieldsValue({
-      productId: undefined,
-      originId: undefined,
-      priceItems: [],
-    });
-  };
-
-  const onProductChange = (value) => {
-    setSelectedProduct(value);
-    setSelectedOrigin(null);
-    form.setFieldsValue({
-      originId: undefined,
-      priceItems: [],
-    });
-  };
-
-  const onOriginChange = (originId) => {
-    setSelectedOrigin(originId);
-    const origin = origins.find(o => o.id === originId);
-
-    // 해당 품목의 기존 규격 자동 로드
-    const productSpecs = specifications.filter(s => s.productId === selectedProduct && s.status === 'active');
-
-    // 최근 가격 가져오기 (같은 품목 + 원산지 조합)
-    const getRecentPrice = (specName) => {
-      // 같은 품목, 원산지, 규격의 가장 최근 데이터 찾기
-      const recentRecord = dataSource
-        .filter(item =>
-          item.productId === selectedProduct &&
-          item.originName === origin?.name &&
-          item.spec === specName
-        )
-        .sort((a, b) => b.applyDate.localeCompare(a.applyDate))[0];
-
-      return recentRecord?.price;
-    };
-
-    const priceItems = productSpecs.map(spec => ({
-      specId: spec.id,
-      specName: spec.name,
-      price: getRecentPrice(spec.name), // 최근 가격 자동 입력
-    }));
-
-    form.setFieldsValue({
-      priceItems: priceItems,
-    });
-  };
 
   return (
     <div>
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 className="text-2xl font-bold text-gray-900" style={{ margin: 0 }}>표준가격 관리</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-          표준가격 등록
-        </Button>
+        <Space>
+          {editMode ? (
+            <>
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                onClick={handleSaveAll}
+              >
+                저장
+              </Button>
+              <Button
+                onClick={handleCancelEdit}
+              >
+                취소
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                icon={<EditOutlined />}
+                onClick={handleEnterEditMode}
+              >
+                수정 모드
+              </Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleRegister}
+              >
+                표준가격 등록
+              </Button>
+            </>
+          )}
+        </Space>
       </div>
 
       <Tabs activeKey={activeTab} onChange={setActiveTab}>
         <Tabs.TabPane tab="표준가격 관리" key="1">
+          {editMode && (
+            <Alert
+              message="수정 모드"
+              description="여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다."
+              type="info"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
           <Table
             columns={columns}
-            dataSource={dataSource}
+            dataSource={editMode ? editingDataSource : dataSource}
             pagination={{ pageSize: 20 }}
             scroll={{ x: 1000 }}
+            style={editMode ? { backgroundColor: '#f9fafb' } : {}}
           />
         </Tabs.TabPane>
         <Tabs.TabPane tab="원산지별 가격 비교" key="2">
           <StandardPriceComparison />
         </Tabs.TabPane>
       </Tabs>
+    </div>
+  );
+}
 
-      <Modal
-        title={editingRecord ? '표준가격 수정' : '표준가격 등록'}
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+export default StandardPrice;
         width={600}
         footer={
           editingRecord ? [

@@ -162,6 +162,9 @@ function StandardPriceComparison() {
     yField: 'price',
     seriesField: 'origin',
     smooth: true,
+    lineStyle: {
+      lineWidth: 3,
+    },
     colorField: 'origin',
     scale: {
       color: {
