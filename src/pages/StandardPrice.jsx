@@ -194,6 +194,22 @@ function StandardPrice() {
     }
   };
 
+  // 필터 옵션 계산 (useMemo로 최적화)
+  const categoryFilters = React.useMemo(() => {
+    const categories = [...new Set(dataSource.map(item => item.categoryName))].filter(Boolean);
+    return categories.map(name => ({ text: name, value: name }));
+  }, [dataSource]);
+
+  const productFilters = React.useMemo(() => {
+    const products = [...new Set(dataSource.map(item => item.productName))];
+    return products.map(name => ({ text: name, value: name }));
+  }, [dataSource]);
+
+  const originFilters = React.useMemo(() => {
+    const origins = [...new Set(dataSource.map(item => item.originName))];
+    return origins.map(name => ({ text: name, value: name }));
+  }, [dataSource]);
+
   const columns = [
     {
       title: '적용일자',
@@ -208,10 +224,7 @@ function StandardPrice() {
       dataIndex: 'categoryName',
       key: 'categoryName',
       width: 100,
-      filters: [...new Set(dataSource.map(item => item.categoryName))].filter(Boolean).map(name => ({
-        text: name,
-        value: name,
-      })),
+      filters: categoryFilters,
       onFilter: (value, record) => record.categoryName === value,
     },
     {
@@ -219,10 +232,7 @@ function StandardPrice() {
       dataIndex: 'productName',
       key: 'productName',
       width: 100,
-      filters: [...new Set(dataSource.map(item => item.productName))].map(name => ({
-        text: name,
-        value: name,
-      })),
+      filters: productFilters,
       onFilter: (value, record) => record.productName === value,
     },
     {
@@ -230,10 +240,7 @@ function StandardPrice() {
       dataIndex: 'originName',
       key: 'originName',
       width: 100,
-      filters: [...new Set(dataSource.map(item => item.originName))].map(name => ({
-        text: name,
-        value: name,
-      })),
+      filters: originFilters,
       onFilter: (value, record) => record.originName === value,
     },
     {
@@ -392,17 +399,39 @@ function StandardPrice() {
 
   const onProductChange = (value) => {
     setSelectedProduct(value);
+    form.setFieldsValue({
+      originId: undefined,
+      priceItems: [],
+    });
+  };
+
+  const onOriginChange = (originId) => {
+    const selectedOrigin = origins.find(o => o.id === originId);
 
     // 해당 품목의 기존 규격 자동 로드
-    const productSpecs = specifications.filter(s => s.productId === value && s.status === 'active');
+    const productSpecs = specifications.filter(s => s.productId === selectedProduct && s.status === 'active');
+
+    // 최근 가격 가져오기 (같은 품목 + 원산지 조합)
+    const getRecentPrice = (specName) => {
+      // 같은 품목, 원산지, 규격의 가장 최근 데이터 찾기
+      const recentRecord = dataSource
+        .filter(item =>
+          item.productId === selectedProduct &&
+          item.originName === selectedOrigin?.name &&
+          item.spec === specName
+        )
+        .sort((a, b) => b.applyDate.localeCompare(a.applyDate))[0];
+
+      return recentRecord?.price;
+    };
+
     const priceItems = productSpecs.map(spec => ({
       specId: spec.id,
       specName: spec.name,
-      price: undefined,
+      price: getRecentPrice(spec.name), // 최근 가격 자동 입력
     }));
 
     form.setFieldsValue({
-      originId: undefined,
       priceItems: priceItems,
     });
   };
@@ -522,6 +551,7 @@ function StandardPrice() {
           >
             <Select
               placeholder="원산지 선택"
+              onChange={editingRecord ? undefined : onOriginChange}
               disabled={!selectedProduct}
             >
               {selectedProduct && origins
@@ -575,10 +605,11 @@ function StandardPrice() {
             </>
           ) : (
             // 등록 모드: 여러 규격 동시 입력
-            <Form.Item label="규격별 가격">
-              <div style={{ marginBottom: 8, color: '#666', fontSize: 12 }}>
-                선택한 품목의 규격이 자동으로 불러와집니다. 가격을 입력하거나, 규격을 수정/추가/삭제할 수 있습니다.
-              </div>
+            form.getFieldValue('originId') && (
+              <Form.Item label="규격별 가격">
+                <div style={{ marginBottom: 8, color: '#666', fontSize: 12 }}>
+                  선택한 품목-원산지의 최근 가격이 자동으로 입력됩니다. 가격을 수정하거나, 규격을 추가/삭제할 수 있습니다.
+                </div>
               <Form.List name="priceItems">
                 {(fields, { add, remove }) => (
                   <>
@@ -608,13 +639,14 @@ function StandardPrice() {
                         <MinusCircleOutlined onClick={() => remove(name)} style={{ color: '#ff4d4f' }} />
                       </Space>
                     ))}
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />} disabled={!selectedProduct}>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                       규격 추가
                     </Button>
                   </>
                 )}
               </Form.List>
-            </Form.Item>
+              </Form.Item>
+            )
           )}
 
           <Form.Item
