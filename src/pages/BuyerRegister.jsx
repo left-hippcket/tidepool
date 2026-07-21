@@ -246,7 +246,7 @@ function BuyerRegister() {
                           {...field}
                           name={[field.name, 'name']}
                           label="이름"
-                          rules={[{ required: true, message: '이름 입력' }, { max: 20, message: '최대 20자' }]}
+                          rules={[{ max: 20, message: '최대 20자' }]}
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="김철수" />
@@ -292,7 +292,6 @@ function BuyerRegister() {
             <Form.Item
               name="territory"
               label="사업권역"
-              rules={[{ required: true, message: '사업권역을 선택해주세요' }]}
             >
               <Select
                 placeholder="사업권역 선택"
@@ -307,7 +306,6 @@ function BuyerRegister() {
             <Form.Item
               name="region"
               label="상세지역"
-              rules={[{ required: true, message: '상세지역을 선택해주세요' }]}
             >
               <Select
                 placeholder="상세지역 선택"
@@ -444,6 +442,30 @@ function BuyerRegister() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
 
             <Form.Item
+              name="buyerName"
+              label="바이어명"
+              rules={[
+                { required: true, message: '바이어명을 입력해주세요' },
+                { max: 20, message: '최대 20자' },
+                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용' }
+              ]}
+            >
+              <Input placeholder="대박집" />
+            </Form.Item>
+
+            <Form.Item
+              name="buyerId"
+              label="ticker (ticker)"
+              rules={[
+                { required: true, message: 'ticker를 입력해주세요' },
+                { max: 10, message: '최대 10자' },
+                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+              ]}
+            >
+              <Input placeholder="DBBK01" />
+            </Form.Item>
+
+            <Form.Item
               name="businessNumber"
               label="사업자등록번호"
               rules={[
@@ -480,30 +502,6 @@ function BuyerRegister() {
               rules={[{ max: 100, message: '최대 100자' }]}
             >
               <Input placeholder="서울시 강남구 테헤란로 123" />
-            </Form.Item>
-
-            <Form.Item
-              name="buyerName"
-              label="바이어명"
-              rules={[
-                { required: true, message: '바이어명을 입력해주세요' },
-                { max: 20, message: '최대 20자' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용' }
-              ]}
-            >
-              <Input placeholder="대박집" />
-            </Form.Item>
-
-            <Form.Item
-              name="buyerId"
-              label="ticker (ticker)"
-              rules={[
-                { required: true, message: 'ticker를 입력해주세요' },
-                { max: 10, message: '최대 10자' },
-                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
-              ]}
-            >
-              <Input placeholder="DBBK01" />
             </Form.Item>
 
             <Form.Item
