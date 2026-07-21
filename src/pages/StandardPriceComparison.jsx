@@ -162,6 +162,13 @@ function StandardPriceComparison() {
     yField: 'price',
     seriesField: 'origin',
     smooth: true,
+    colorField: 'origin',
+    scale: {
+      color: {
+        domain: ['완도', '제주', '통영'],
+        range: ['#1890ff', '#52c41a', '#faad14'],
+      },
+    },
     animation: {
       appear: {
         animation: 'path-in',
@@ -178,23 +185,20 @@ function StandardPriceComparison() {
       },
     },
     tooltip: {
-      formatter: (datum) => {
-        return {
-          name: datum.origin,
-          value: `${Number(datum.price).toLocaleString()}원`,
-        };
-      },
+      items: [
+        {
+          field: 'origin',
+          name: '원산지',
+        },
+        {
+          field: 'price',
+          name: '가격',
+          valueFormatter: (value) => `${Number(value).toLocaleString()}원`,
+        },
+      ],
     },
     legend: {
       position: 'top',
-    },
-    color: (datum) => {
-      const colorMap = {
-        '완도': '#1890ff',
-        '제주': '#52c41a',
-        '통영': '#faad14',
-      };
-      return colorMap[datum.origin] || '#f5222d';
     },
   };
 
