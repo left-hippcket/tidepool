@@ -178,11 +178,23 @@ function StandardPriceComparison() {
       },
     },
     tooltip: {
-      formatter: (datum) => {
-        return {
-          name: datum.origin,
-          value: `${datum.price.toLocaleString()}원`,
-        };
+      customContent: (title, items) => {
+        if (!items || items.length === 0) return '';
+
+        const itemsHtml = items.map(item => `
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: ${item.color}; display: inline-block;"></span>
+            <span style="color: #333;">${item.name}:</span>
+            <span style="font-weight: 600; color: #1890ff;">${Number(item.value).toLocaleString()}원</span>
+          </div>
+        `).join('');
+
+        return `
+          <div style="padding: 12px; background: rgba(255, 255, 255, 0.96); border: 1px solid #e8e8e8; border-radius: 4px;">
+            <div style="margin-bottom: 8px; font-weight: 600; color: #666;">${title}</div>
+            ${itemsHtml}
+          </div>
+        `;
       },
     },
     legend: {
