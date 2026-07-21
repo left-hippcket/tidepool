@@ -7,7 +7,7 @@ import {
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
-import { joinGroups, managers, territories } from '../data/mockData';
+import { joinGroups, managers, territories, businessRegistry } from '../data/mockData';
 
 function JoinDistributionRegister() {
   const navigate = useNavigate();
@@ -45,6 +45,32 @@ function JoinDistributionRegister() {
   const handleGroupSearch = (value) => {
     const group = joinGroups.find(g => g.name === value);
     setSelectedGroup(group);
+  };
+
+  // 사업자등록번호 입력 시 자동 채우기
+  const handleBusinessNumberChange = (e) => {
+    const value = e.target.value;
+
+    if (/^\d{3}-\d{2}-\d{5}$/.test(value)) {
+      const businessInfo = businessRegistry[value];
+
+      if (businessInfo) {
+        form.setFieldsValue({
+          businessName: businessInfo.businessName,
+          representative: businessInfo.representative,
+          businessAddress: businessInfo.businessAddress,
+          taxType: businessInfo.taxType,
+        });
+        message.success('등록된 사업자 정보를 불러왔습니다.');
+      } else {
+        form.setFieldsValue({
+          businessName: undefined,
+          representative: undefined,
+          businessAddress: undefined,
+          taxType: undefined,
+        });
+      }
+    }
   };
 
   // 저장
@@ -326,8 +352,9 @@ function JoinDistributionRegister() {
               rules={[
                 { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
               ]}
+              extra="등록된 사업자번호 입력 시 상호, 대표자, 주소, 과세유형이 자동으로 입력됩니다"
             >
-              <Input placeholder="123-45-67890" />
+              <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
             </Form.Item>
 
             <Form.Item
@@ -356,6 +383,17 @@ function JoinDistributionRegister() {
               rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
             >
               <Input placeholder="서울시 강남구 테헤란로 123" />
+            </Form.Item>
+
+            <Form.Item
+              name="taxType"
+              label="과세유형"
+            >
+              <Select placeholder="과세유형 선택">
+                <Select.Option value="일반과세">일반과세</Select.Option>
+                <Select.Option value="간이과세">간이과세</Select.Option>
+                <Select.Option value="면세">면세</Select.Option>
+              </Select>
             </Form.Item>
 
             <Form.Item

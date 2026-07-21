@@ -1637,3 +1637,64 @@ export const driverTransactionDetails = {
     }
   }
 };
+
+// 사업자 정보 데이터베이스
+// 사업자등록번호를 키로 하여 사업자 정보를 저장
+export const businessRegistry = {
+  '123-45-67890': {
+    businessNumber: '123-45-67890',
+    businessName: '영어조합법인 성호수산',
+    representative: '박성호',
+    businessAddress: '경기도 수지구 동천동 230-3',
+    taxType: '일반과세',
+  },
+  '234-56-78901': {
+    businessNumber: '234-56-78901',
+    businessName: '주식회사 해양수산',
+    representative: '김철수',
+    businessAddress: '부산광역시 수영구 광안동 123-45',
+    taxType: '일반과세',
+  },
+  '345-67-89012': {
+    businessNumber: '345-67-89012',
+    businessName: '완도수산',
+    representative: '이영희',
+    businessAddress: '전라남도 완도군 완도읍 해변로 100',
+    taxType: '간이과세',
+  },
+  '456-78-90123': {
+    businessNumber: '456-78-90123',
+    businessName: '제주활어유통',
+    representative: '최민수',
+    businessAddress: '제주특별자치도 제주시 해안로 456',
+    taxType: '일반과세',
+  },
+  '567-89-01234': {
+    businessNumber: '567-89-01234',
+    businessName: '통영수협',
+    representative: '정수진',
+    businessAddress: '경상남도 통영시 중앙로 789',
+    taxType: '일반과세',
+  },
+  '678-90-12345': {
+    businessNumber: '678-90-12345',
+    businessName: '인천종합수산',
+    representative: '강동훈',
+    businessAddress: '인천광역시 연수구 송도동 101-202',
+    taxType: '일반과세',
+  },
+  '789-01-23456': {
+    businessNumber: '789-01-23456',
+    businessName: '노량진수산',
+    representative: '윤지영',
+    businessAddress: '서울특별시 동작구 노량진로 321',
+    taxType: '간이과세',
+  },
+  '890-12-34567': {
+    businessNumber: '890-12-34567',
+    businessName: '거제활어센터',
+    representative: '임태호',
+    businessAddress: '경상남도 거제시 고현동 567-8',
+    taxType: '일반과세',
+  },
+};
