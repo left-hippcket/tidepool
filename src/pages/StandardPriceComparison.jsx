@@ -178,29 +178,24 @@ function StandardPriceComparison() {
       },
     },
     tooltip: {
-      customContent: (title, items) => {
-        if (!items || items.length === 0) return '';
-
-        const itemsHtml = items.map(item => `
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: ${item.color}; display: inline-block;"></span>
-            <span style="color: #333;">${item.name}:</span>
-            <span style="font-weight: 600; color: #1890ff;">${Number(item.value).toLocaleString()}원</span>
-          </div>
-        `).join('');
-
-        return `
-          <div style="padding: 12px; background: rgba(255, 255, 255, 0.96); border: 1px solid #e8e8e8; border-radius: 4px;">
-            <div style="margin-bottom: 8px; font-weight: 600; color: #666;">${title}</div>
-            ${itemsHtml}
-          </div>
-        `;
+      formatter: (datum) => {
+        return {
+          name: datum.origin,
+          value: `${Number(datum.price).toLocaleString()}원`,
+        };
       },
     },
     legend: {
       position: 'top',
     },
-    color: ['#1890ff', '#52c41a', '#faad14', '#f5222d'],
+    color: (datum) => {
+      const colorMap = {
+        '완도': '#1890ff',
+        '제주': '#52c41a',
+        '통영': '#faad14',
+      };
+      return colorMap[datum.origin] || '#f5222d';
+    },
   };
 
   return (
