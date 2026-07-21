@@ -254,7 +254,6 @@ function SellerRegister() {
             <Form.Item
               name="territory"
               label="사업권역"
-              rules={[{ required: true, message: '사업권역을 선택해주세요' }]}
             >
               <Select placeholder="사업권역 선택">
                 {territories.filter(t => t.status === 'active').map(t => (
@@ -266,7 +265,6 @@ function SellerRegister() {
             <Form.Item
               name="region"
               label="상세지역"
-              rules={[{ required: true, message: '상세지역을 선택해주세요' }]}
             >
               <Select placeholder="상세지역 선택">
                 <Select.Option value="인천">인천</Select.Option>
@@ -402,6 +400,18 @@ function SellerRegister() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
 
             <Form.Item
+              name="sellerName"
+              label="셀러명"
+              rules={[
+                { required: true, message: '셀러명을 입력해주세요' },
+                { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
+              ]}
+            >
+              <Input placeholder="성호1호" />
+            </Form.Item>
+
+            <Form.Item
               name="ticker"
               label="Ticker"
               rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
@@ -446,18 +456,6 @@ function SellerRegister() {
               rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
             >
               <Input placeholder="경기도 수지구 동천동 230-3" />
-            </Form.Item>
-
-            <Form.Item
-              name="sellerName"
-              label="셀러명"
-              rules={[
-                { required: true, message: '셀러명을 입력해주세요' },
-                { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
-              ]}
-            >
-              <Input placeholder="성호1호" />
             </Form.Item>
 
             <Form.Item
