@@ -3,7 +3,6 @@ import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconf
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
-import standardPriceData from '../data/standard-price-data.json';
 
 function StandardPrice() {
   const [activeTab, setActiveTab] = useState('1');
@@ -14,9 +13,56 @@ function StandardPrice() {
 
   // 초기 데이터 로드
   useEffect(() => {
-    // Static import로 직접 로드된 데이터 사용
-    setDataSource(standardPriceData);
+    loadInitialData();
   }, []);
+
+  const loadInitialData = async () => {
+    // HTML 파일에서 추출한 실제 표준가격 데이터 로드
+    try {
+      const response = await fetch('/data/standard-price-data.json');
+      if (!response.ok) {
+        throw new Error('데이터 로드 실패');
+      }
+      const data = await response.json();
+      setDataSource(data);
+    } catch (error) {
+      console.error('표준가격 데이터 로드 실패:', error);
+      // 로드 실패 시 샘플 데이터 사용
+      const sampleData = [
+        {
+          key: '1',
+          id: '1',
+          applyDate: '2026-07-21',
+          productName: '넙치',
+          originName: '완도',
+          spec: '1.2kg',
+          price: 15000,
+          source: '피시파더',
+        },
+        {
+          key: '2',
+          id: '2',
+          applyDate: '2026-07-21',
+          productName: '넙치',
+          originName: '완도',
+          spec: '1.5kg',
+          price: 18000,
+          source: '피시파더',
+        },
+        {
+          key: '3',
+          id: '3',
+          applyDate: '2026-07-20',
+          productName: '넙치',
+          originName: '통영',
+          spec: '1.2kg',
+          price: 16000,
+          source: '노량진시장',
+        },
+      ];
+      setDataSource(sampleData);
+    }
+  };
 
   const columns = [
     {
