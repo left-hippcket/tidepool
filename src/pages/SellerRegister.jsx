@@ -198,14 +198,6 @@ function SellerRegister() {
               <Input placeholder="예: 성호수산" />
             </Form.Item>
 
-            <Form.Item
-              name="ticker"
-              label="Ticker"
-              rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
-            >
-              <Input placeholder="예: SH" maxLength={10} />
-            </Form.Item>
-
             <Divider orientation="left">키맨 정보</Divider>
             <Form.List name="keymen" initialValue={[{}]}>
               {(fields, { add, remove }) => (
@@ -408,6 +400,15 @@ function SellerRegister() {
         {(registrationType === 'new' || selectedGroup) && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
+
+            <Form.Item
+              name="ticker"
+              label="Ticker"
+              rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
+            >
+              <Input placeholder="예: SH" maxLength={10} />
+            </Form.Item>
+
             <Form.Item
               name="businessNumber"
               label="사업자등록번호"
