@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs, Space, InputNumber } from 'antd';
+import { PlusOutlined, EditOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
 import { productCategories, products, origins, specifications } from '../data/mockData';
@@ -34,17 +34,18 @@ function StandardPrice() {
       console.error('표준가격 데이터 로드 실패:', error);
       // 로드 실패 시 샘플 데이터 사용
       const sampleData = [
+        // 누운고기 - 넙치
         {
           key: '1',
           id: '1',
           applyDate: '2026-07-21',
           categoryId: 1,
           categoryName: '누운고기',
-          productId: 1,
-          productName: '광어',
-          originId: 1,
+          productId: 2,
+          productName: '넙치',
+          originId: 7,
           originName: '완도',
-          specId: 1,
+          specId: 7,
           spec: '1.2kg',
           price: 15000,
           source: '피시파더',
@@ -55,34 +56,35 @@ function StandardPrice() {
           applyDate: '2026-07-21',
           categoryId: 1,
           categoryName: '누운고기',
-          productId: 1,
-          productName: '광어',
-          originId: 2,
-          originName: '통영',
-          specId: 2,
-          spec: '1.5kg',
-          price: 18000,
-          source: '피시파더',
-        },
-        {
-          key: '3',
-          id: '3',
-          applyDate: '2026-07-20',
-          categoryId: 1,
-          categoryName: '누운고기',
           productId: 2,
           productName: '넙치',
           originId: 7,
           originName: '완도',
-          specId: 7,
-          spec: '1.0kg',
-          price: 14500,
-          source: '노량진시장',
+          specId: 8,
+          spec: '1.5kg',
+          price: 18000,
+          source: '피시파더',
+        },
+        // 누운고기 - 우럭
+        {
+          key: '3',
+          id: '3',
+          applyDate: '2026-07-21',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 3,
+          productName: '우럭',
+          originId: 8,
+          originName: '완도',
+          specId: null,
+          spec: '800g',
+          price: 12000,
+          source: '피시파더',
         },
         {
           key: '4',
           id: '4',
-          applyDate: '2026-07-20',
+          applyDate: '2026-07-21',
           categoryId: 1,
           categoryName: '누운고기',
           productId: 3,
@@ -90,9 +92,102 @@ function StandardPrice() {
           originId: 8,
           originName: '통영',
           specId: null,
-          spec: '-',
-          price: 12000,
+          spec: '800g',
+          price: 12500,
           source: '피시파더',
+        },
+        // 갑각류 - 대하
+        {
+          key: '5',
+          id: '5',
+          applyDate: '2026-07-21',
+          categoryId: 3,
+          categoryName: '갑각류',
+          productId: 9,
+          productName: '대하',
+          originId: null,
+          originName: '서해',
+          specId: null,
+          spec: '500g',
+          price: 25000,
+          source: '피시파더',
+        },
+        {
+          key: '6',
+          id: '6',
+          applyDate: '2026-07-21',
+          categoryId: 3,
+          categoryName: '갑각류',
+          productId: 9,
+          productName: '대하',
+          originId: null,
+          originName: '남해',
+          specId: null,
+          spec: '500g',
+          price: 24000,
+          source: '피시파더',
+        },
+        // 이전 날짜 데이터
+        {
+          key: '7',
+          id: '7',
+          applyDate: '2026-07-20',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 2,
+          productName: '넙치',
+          originId: 7,
+          originName: '통영',
+          specId: 7,
+          spec: '1.2kg',
+          price: 16000,
+          source: '노량진시장',
+        },
+        {
+          key: '8',
+          id: '8',
+          applyDate: '2026-07-20',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 4,
+          productName: '강도다리',
+          originId: null,
+          originName: '완도',
+          specId: null,
+          spec: '1.0kg',
+          price: 14000,
+          source: '노량진시장',
+        },
+        // 다른 날짜
+        {
+          key: '9',
+          id: '9',
+          applyDate: '2026-07-19',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 2,
+          productName: '넙치',
+          originId: 7,
+          originName: '여수',
+          specId: 7,
+          spec: '1.2kg',
+          price: 15500,
+          source: '피시파더',
+        },
+        {
+          key: '10',
+          id: '10',
+          applyDate: '2026-07-19',
+          categoryId: 1,
+          categoryName: '누운고기',
+          productId: 2,
+          productName: '넙치',
+          originId: 7,
+          originName: '고흥',
+          specId: 8,
+          spec: '1.5kg',
+          price: 17500,
+          source: '노량진시장',
         },
       ];
       setDataSource(sampleData);
@@ -180,9 +275,12 @@ function StandardPrice() {
   const handleAdd = () => {
     setEditingRecord(null);
     form.resetFields();
+    setSelectedCategory(null);
+    setSelectedProduct(null);
     form.setFieldsValue({
       applyDate: dayjs(),
       source: '피시파더',
+      priceItems: [],
     });
     setIsModalVisible(true);
   };
@@ -214,10 +312,10 @@ function StandardPrice() {
       const category = productCategories.find(c => c.id === values.categoryId);
       const product = products.find(p => p.id === values.productId);
       const origin = origins.find(o => o.id === values.originId);
-      const spec = specifications.find(s => s.id === values.specId);
 
       if (editingRecord) {
-        // 수정
+        // 수정 모드 (단일 레코드)
+        const spec = specifications.find(s => s.id === values.specId);
         const newData = dataSource.map(item => {
           if (item.key === editingRecord.key) {
             return {
@@ -236,24 +334,36 @@ function StandardPrice() {
         setDataSource(newData);
         message.success('표준가격 정보가 수정되었습니다.');
       } else {
-        // 등록
-        const newRecord = {
-          key: String(dataSource.length + 1),
-          id: String(dataSource.length + 1),
-          applyDate: values.applyDate.format('YYYY-MM-DD'),
-          categoryId: values.categoryId,
-          categoryName: category?.name,
-          productId: values.productId,
-          productName: product?.name,
-          originId: values.originId,
-          originName: origin?.name,
-          specId: values.specId,
-          spec: spec?.name || values.spec,
-          price: values.price,
-          source: values.source,
-        };
-        setDataSource([newRecord, ...dataSource]);
-        message.success('표준가격이 등록되었습니다.');
+        // 등록 모드 (여러 규격 한번에)
+        const priceItems = values.priceItems || [];
+        const validItems = priceItems.filter(item => item.price !== undefined && item.price !== null);
+
+        if (validItems.length === 0) {
+          message.warning('최소 1개 이상의 규격에 가격을 입력해주세요.');
+          return;
+        }
+
+        const newRecords = validItems.map((item, index) => {
+          const spec = specifications.find(s => s.id === item.specId);
+          return {
+            key: String(dataSource.length + index + 1),
+            id: String(dataSource.length + index + 1),
+            applyDate: values.applyDate.format('YYYY-MM-DD'),
+            categoryId: values.categoryId,
+            categoryName: category?.name,
+            productId: values.productId,
+            productName: product?.name,
+            originId: values.originId,
+            originName: origin?.name,
+            specId: item.specId,
+            spec: spec?.name || item.specName,
+            price: item.price,
+            source: values.source,
+          };
+        });
+
+        setDataSource([...newRecords, ...dataSource]);
+        message.success(`${validItems.length}개의 표준가격이 등록되었습니다.`);
       }
 
       setIsModalVisible(false);
@@ -282,9 +392,18 @@ function StandardPrice() {
 
   const onProductChange = (value) => {
     setSelectedProduct(value);
+
+    // 해당 품목의 기존 규격 자동 로드
+    const productSpecs = specifications.filter(s => s.productId === value && s.status === 'active');
+    const priceItems = productSpecs.map(spec => ({
+      specId: spec.id,
+      specName: spec.name,
+      price: undefined,
+    }));
+
     form.setFieldsValue({
       originId: undefined,
-      specId: undefined,
+      priceItems: priceItems,
     });
   };
 
@@ -415,35 +534,88 @@ function StandardPrice() {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="specId"
-            label="규격"
-            rules={[{ required: true, message: '규격을 선택해주세요' }]}
-          >
-            <Select
-              placeholder="규격 선택"
-              disabled={!selectedProduct}
-            >
-              {selectedProduct && specifications
-                .filter(s => s.productId === selectedProduct && s.status === 'active')
-                .map(spec => (
-                  <Option key={spec.id} value={spec.id}>
-                    {spec.name}
-                  </Option>
-                ))}
-            </Select>
-          </Form.Item>
+          {editingRecord ? (
+            // 수정 모드: 단일 규격
+            <>
+              <Form.Item
+                name="specId"
+                label="규격"
+                rules={[{ required: true, message: '규격을 선택해주세요' }]}
+              >
+                <Select
+                  placeholder="규격 선택"
+                  disabled={!selectedProduct}
+                >
+                  {selectedProduct && specifications
+                    .filter(s => s.productId === selectedProduct && s.status === 'active')
+                    .map(spec => (
+                      <Option key={spec.id} value={spec.id}>
+                        {spec.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
 
-          <Form.Item
-            name="price"
-            label="표준가격"
-            rules={[
-              { required: true, message: '표준가격을 입력해주세요' },
-              { type: 'number', min: 0, message: '0 이상의 숫자를 입력해주세요' }
-            ]}
-          >
-            <Input type="number" placeholder="표준가격 입력" suffix="원" />
-          </Form.Item>
+              <Form.Item
+                name="price"
+                label="표준가격"
+                rules={[
+                  { required: true, message: '표준가격을 입력해주세요' },
+                  { type: 'number', min: 0, message: '0 이상의 숫자를 입력해주세요' }
+                ]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="표준가격 입력"
+                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/,/g, '')}
+                  addonAfter="원"
+                />
+              </Form.Item>
+            </>
+          ) : (
+            // 등록 모드: 여러 규격 동시 입력
+            <Form.Item label="규격별 가격">
+              <div style={{ marginBottom: 8, color: '#666', fontSize: 12 }}>
+                선택한 품목의 규격이 자동으로 불러와집니다. 가격을 입력하거나, 규격을 수정/추가/삭제할 수 있습니다.
+              </div>
+              <Form.List name="priceItems">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'specName']}
+                          rules={[{ required: true, message: '규격 입력' }]}
+                          style={{ marginBottom: 0, width: 120 }}
+                        >
+                          <Input placeholder="예: 1.2kg" />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'price']}
+                          style={{ marginBottom: 0, width: 180 }}
+                        >
+                          <InputNumber
+                            style={{ width: '100%' }}
+                            placeholder="가격 입력 (선택)"
+                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            parser={value => value.replace(/,/g, '')}
+                            addonAfter="원"
+                          />
+                        </Form.Item>
+                        <MinusCircleOutlined onClick={() => remove(name)} style={{ color: '#ff4d4f' }} />
+                      </Space>
+                    ))}
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />} disabled={!selectedProduct}>
+                      규격 추가
+                    </Button>
+                  </>
+                )}
+              </Form.List>
+            </Form.Item>
+          )}
 
           <Form.Item
             name="source"
