@@ -36,6 +36,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false); // 초기 상태: 항상 펼쳐진 상태
+  const [openKeys, setOpenKeys] = useState(['partners', 'product', 'data']); // 모든 서브메뉴 펼침
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -241,7 +242,8 @@ function App() {
           theme="dark"
           mode="inline"
           selectedKeys={getSelectedKeys()}
-          defaultOpenKeys={getOpenKeys()}
+          openKeys={openKeys}
+          onOpenChange={setOpenKeys}
           items={menuItems}
           onClick={handleMenuClick}
         />
