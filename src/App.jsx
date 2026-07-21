@@ -24,6 +24,7 @@ import DriverDetail from './pages/DriverDetail';
 import DriverRegister from './pages/DriverRegister';
 import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
+import StandardPrice from './pages/StandardPrice';
 
 const { Header, Sider, Content } = Layout;
 
@@ -168,6 +169,7 @@ function App() {
       label: '기타 데이터',
       children: [
         { key: '/territory', label: '사업권역' },
+        { key: '/standard-price', label: '표준가격' },
       ],
     },
   ];
@@ -184,7 +186,7 @@ function App() {
     if (location.pathname === '/seller' || location.pathname === '/buyer' || location.pathname === '/join-distribution' || location.pathname === '/driver') {
       return ['partners'];
     }
-    if (location.pathname === '/territory') {
+    if (location.pathname === '/territory' || location.pathname === '/standard-price') {
       return ['data'];
     }
     if (location.pathname === '/product' || location.pathname === '/product-list') {
@@ -313,6 +315,7 @@ function App() {
             <Route path="/driver/:id" element={<DriverDetail />} />
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
+            <Route path="/standard-price" element={<StandardPrice />} />
           </Routes>
         </Content>
       </Layout>
