@@ -219,24 +219,6 @@ function StandardPriceComparison() {
       <h2 style={{ marginBottom: 24 }}>원산지별 표준가격 비교</h2>
 
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* 기간 설정 */}
-        <Card title="기간 설정" size="small">
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Space wrap>
-              <Button onClick={() => handlePeriodClick('1month')}>최근 1개월</Button>
-              <Button onClick={() => handlePeriodClick('3months')}>최근 3개월</Button>
-              <Button onClick={() => handlePeriodClick('6months')}>최근 6개월</Button>
-              <Button onClick={() => handlePeriodClick('1year')}>최근 1년</Button>
-            </Space>
-            <RangePicker
-              value={dateRange}
-              onChange={setDateRange}
-              format="YYYY-MM-DD"
-              style={{ width: '100%' }}
-            />
-          </Space>
-        </Card>
-
         {/* 품목 선택 */}
         <Card title="품목 선택" size="small">
           <Space direction="vertical" style={{ width: '100%' }} size="middle">
@@ -291,6 +273,24 @@ function StandardPriceComparison() {
                 ))}
               </Select>
             </div>
+          </Space>
+        </Card>
+
+        {/* 기간 설정 */}
+        <Card title="기간 설정" size="small">
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Space wrap>
+              <Button onClick={() => handlePeriodClick('1month')}>최근 1개월</Button>
+              <Button onClick={() => handlePeriodClick('3months')}>최근 3개월</Button>
+              <Button onClick={() => handlePeriodClick('6months')}>최근 6개월</Button>
+              <Button onClick={() => handlePeriodClick('1year')}>최근 1년</Button>
+            </Space>
+            <RangePicker
+              value={dateRange}
+              onChange={setDateRange}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Space>
         </Card>
 
