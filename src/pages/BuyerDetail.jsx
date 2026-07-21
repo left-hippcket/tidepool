@@ -607,7 +607,7 @@ function BuyerDetail() {
                 ) : (
                   <Form form={businessForm} layout="vertical">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Form.Item name="buyerName" label="바이어명" rules={[{ required: true }]}>
+                      <Form.Item name="buyerName" label="바이어명" rules={[{ required: true }]} className="md:col-span-2">
                         <Input />
                       </Form.Item>
                       <Form.Item
