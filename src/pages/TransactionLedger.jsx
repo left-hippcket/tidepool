@@ -592,7 +592,7 @@ function TransactionLedger() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+    <div>
       {/* 헤더 */}
       <div className="flex justify-between items-center mb-6">
         <Title level={2}>장부 조회</Title>
