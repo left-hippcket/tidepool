@@ -31,7 +31,7 @@ function TransactionLedger() {
   // 전체 보기 탭 기본 선택 칼럼 (거래식별 정보 제외)
   const defaultColumns = [
     '주문일', '납품일', '품목', '원산지', '규격',
-    '주문수량', '주문단위', '주문중량', '상차단가', '상차수수료율',
+    '주문수량', '주문중량', '상차단가', '상차수수료율',
     '통당운임단가', '운송비포함여부', '도착단가', '알파수익단가',
     '셀러명', '셀러그룹명', '바이어명', '바이어그룹명', '바이어사업권역', '드라이버명',
     '클레임/조정 유형', '클레임/조정 내용', '바이어정산조정금액', '셀러정산조정물량',
@@ -146,10 +146,10 @@ function TransactionLedger() {
   // 아코디언 상세 패널
   const renderExpandedRow = (record) => {
     return (
-      <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa' }}>
+      <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '12px', backgroundColor: '#fafafa' }}>
         {/* 1. 기본정보 */}
-        <Title level={5}><FileTextOutlined /> 기본정보</Title>
-        <Descriptions column={3} bordered size="small">
+        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><FileTextOutlined /> 기본정보</Title>
+        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="거래코드">{record.거래코드}</Descriptions.Item>
           <Descriptions.Item label="주문일">{record.주문일}</Descriptions.Item>
           <Descriptions.Item label="납품일">{record.납품일}</Descriptions.Item>
@@ -157,13 +157,12 @@ function TransactionLedger() {
           <Descriptions.Item label="원산지">{record.원산지}</Descriptions.Item>
           <Descriptions.Item label="규격">{record.규격}</Descriptions.Item>
         </Descriptions>
-        <Divider />
+        <Divider style={{ margin: '12px 0' }} />
 
         {/* 2. 수량·단가 */}
-        <Title level={5}><ShoppingCartOutlined /> 수량·단가</Title>
-        <Descriptions column={3} bordered size="small">
+        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><ShoppingCartOutlined /> 수량·단가</Title>
+        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="주문수량">{record.주문수량} {record.주문단위}</Descriptions.Item>
-          <Descriptions.Item label="주문단위">{record.주문단위}</Descriptions.Item>
           <Descriptions.Item label="주문중량">{record.주문중량}kg</Descriptions.Item>
           <Descriptions.Item label="상차단가">{formatCurrency(record.상차단가)}</Descriptions.Item>
           <Descriptions.Item label="상차수수료율">{record.상차수수료율}%</Descriptions.Item>
@@ -174,34 +173,34 @@ function TransactionLedger() {
             </Text>
           </Descriptions.Item>
         </Descriptions>
-        <Divider />
+        <Divider style={{ margin: '12px 0' }} />
 
         {/* 3. 운송 */}
-        <Title level={5}><CarOutlined /> 운송</Title>
-        <Descriptions column={3} bordered size="small">
+        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><CarOutlined /> 운송</Title>
+        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="통당운임단가">{formatCurrency(record.통당운임단가)}</Descriptions.Item>
           <Descriptions.Item label="운송비포함여부">{record.운송비포함여부}</Descriptions.Item>
           <Descriptions.Item label="운송비(비용)">{formatCurrency(record['운송비(비용)'])}</Descriptions.Item>
           <Descriptions.Item label="드라이버명">{record.드라이버명}</Descriptions.Item>
         </Descriptions>
-        <Divider />
+        <Divider style={{ margin: '12px 0' }} />
 
         {/* 4. 파트너 */}
-        <Title level={5}><TeamOutlined /> 파트너</Title>
-        <Descriptions column={3} bordered size="small">
+        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><TeamOutlined /> 파트너</Title>
+        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="셀러명">{record.셀러명}</Descriptions.Item>
           <Descriptions.Item label="셀러그룹명">{record.셀러그룹명}</Descriptions.Item>
           <Descriptions.Item label="바이어명">{record.바이어명}</Descriptions.Item>
           <Descriptions.Item label="바이어그룹명">{record.바이어그룹명}</Descriptions.Item>
-          <Descriptions.Item label="바이어사업권역">{record.바이어사업권역}</Descriptions.Item>
+          <Descriptions.Item label="바이어사업권역" span={2}>{record.바이어사업권역}</Descriptions.Item>
         </Descriptions>
-        <Divider />
+        <Divider style={{ margin: '12px 0' }} />
 
         {/* 5. 조정·클레임 */}
-        <Title level={5}><WarningOutlined /> 조정·클레임</Title>
-        <Descriptions column={3} bordered size="small">
-          <Descriptions.Item label="유형" span={3}>{record['클레임/조정 유형'] || '-'}</Descriptions.Item>
-          <Descriptions.Item label="내용" span={3}>{record['클레임/조정 내용'] || '-'}</Descriptions.Item>
+        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><WarningOutlined /> 조정·클레임</Title>
+        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+          <Descriptions.Item label="유형" span={2}>{record['클레임/조정 유형'] || '-'}</Descriptions.Item>
+          <Descriptions.Item label="내용" span={2}>{record['클레임/조정 내용'] || '-'}</Descriptions.Item>
           <Descriptions.Item label="바이어조정액">
             <Text style={{ color: getProfitColor(record.바이어정산조정금액) }}>
               {formatCurrency(record.바이어정산조정금액)}
@@ -218,18 +217,18 @@ function TransactionLedger() {
               {formatCurrency(record.드라이버정산조정금액)}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label="회계처리조정액">
+          <Descriptions.Item label="회계처리조정액" span={2}>
             <Text style={{ color: getProfitColor(record.회계처리용조정금액) }}>
               {formatCurrency(record.회계처리용조정금액)}
             </Text>
           </Descriptions.Item>
         </Descriptions>
-        <Divider />
+        <Divider style={{ margin: '12px 0' }} />
 
         {/* 6. 손익 */}
         <div id="profit-section">
-          <Title level={5}><DollarOutlined /> 손익</Title>
-          <Descriptions column={3} bordered size="small">
+          <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><DollarOutlined /> 손익</Title>
+          <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
             <Descriptions.Item label="매출액">{formatCurrency(record.매출액)}</Descriptions.Item>
             <Descriptions.Item label="매입액">{formatCurrency(record.매입액)}</Descriptions.Item>
             <Descriptions.Item label="운송비(비용)">{formatCurrency(record['운송비(비용)'])}</Descriptions.Item>
@@ -249,7 +248,7 @@ function TransactionLedger() {
                 {formatCurrency(record.바이어조정손익)}
               </Text>
             </Descriptions.Item>
-            <Descriptions.Item label="거래메모" span={3}>
+            <Descriptions.Item label="거래메모" span={4}>
               <Text style={{ color: '#1890ff' }}>{record.거래메모 || '-'}</Text>
             </Descriptions.Item>
           </Descriptions>
@@ -512,7 +511,6 @@ function TransactionLedger() {
       '원산지': { width: 100 },
       '규격': { width: 100 },
       '주문수량': { width: 100, render: (text, record) => `${text} ${record.주문단위}` },
-      '주문단위': { width: 80 },
       '주문중량': { width: 100, render: (text) => `${text}kg` },
       '상차단가': { width: 120, render: formatCurrency, align: 'right' },
       '상차수수료율': { width: 120, render: (text) => `${text}%`, align: 'right' },
@@ -747,7 +745,6 @@ function TransactionLedger() {
                       <Collapse.Panel header="수량/가격 정보" key="4">
                         <Space wrap>
                           <Checkbox checked={selectedColumns.includes('주문수량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문수량'] : selectedColumns.filter(c => c !== '주문수량'))}>주문수량</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('주문단위')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문단위'] : selectedColumns.filter(c => c !== '주문단위'))}>주문단위</Checkbox>
                           <Checkbox checked={selectedColumns.includes('주문중량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문중량'] : selectedColumns.filter(c => c !== '주문중량'))}>주문중량</Checkbox>
                           <Checkbox checked={selectedColumns.includes('상차단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차단가'] : selectedColumns.filter(c => c !== '상차단가'))}>상차단가</Checkbox>
                           <Checkbox checked={selectedColumns.includes('상차수수료율')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료율'] : selectedColumns.filter(c => c !== '상차수수료율'))}>상차수수료율</Checkbox>
