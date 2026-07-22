@@ -145,11 +145,14 @@ function TransactionLedger() {
 
   // 아코디언 상세 패널
   const renderExpandedRow = (record) => {
+    // 조정·클레임 섹션 표시 여부 확인
+    const hasAdjustment = record['클레임/조정 유형'] && record['클레임/조정 유형'].trim() !== '';
+
     return (
       <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '12px', backgroundColor: '#fafafa' }}>
         {/* 1. 기본정보 */}
         <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><FileTextOutlined /> 기본정보</Title>
-        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="거래코드">{record.거래코드}</Descriptions.Item>
           <Descriptions.Item label="주문일">{record.주문일}</Descriptions.Item>
           <Descriptions.Item label="납품일">{record.납품일}</Descriptions.Item>
@@ -161,7 +164,7 @@ function TransactionLedger() {
 
         {/* 2. 수량·단가 */}
         <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><ShoppingCartOutlined /> 수량·단가</Title>
-        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="주문수량">{record.주문수량} {record.주문단위}</Descriptions.Item>
           <Descriptions.Item label="주문중량">{record.주문중량}kg</Descriptions.Item>
           <Descriptions.Item label="상차단가">{formatCurrency(record.상차단가)}</Descriptions.Item>
@@ -177,17 +180,17 @@ function TransactionLedger() {
 
         {/* 3. 운송 */}
         <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><CarOutlined /> 운송</Title>
-        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="통당운임단가">{formatCurrency(record.통당운임단가)}</Descriptions.Item>
           <Descriptions.Item label="운송비포함여부">{record.운송비포함여부}</Descriptions.Item>
           <Descriptions.Item label="운송비(비용)">{formatCurrency(record['운송비(비용)'])}</Descriptions.Item>
-          <Descriptions.Item label="드라이버명">{record.드라이버명}</Descriptions.Item>
+          <Descriptions.Item label="드라이버명" span={3}>{record.드라이버명}</Descriptions.Item>
         </Descriptions>
         <Divider style={{ margin: '12px 0' }} />
 
         {/* 4. 파트너 */}
         <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><TeamOutlined /> 파트너</Title>
-        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
           <Descriptions.Item label="셀러명">{record.셀러명}</Descriptions.Item>
           <Descriptions.Item label="셀러그룹명">{record.셀러그룹명}</Descriptions.Item>
           <Descriptions.Item label="바이어명">{record.바이어명}</Descriptions.Item>
@@ -196,39 +199,43 @@ function TransactionLedger() {
         </Descriptions>
         <Divider style={{ margin: '12px 0' }} />
 
-        {/* 5. 조정·클레임 */}
-        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><WarningOutlined /> 조정·클레임</Title>
-        <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-          <Descriptions.Item label="유형" span={2}>{record['클레임/조정 유형'] || '-'}</Descriptions.Item>
-          <Descriptions.Item label="내용" span={2}>{record['클레임/조정 내용'] || '-'}</Descriptions.Item>
-          <Descriptions.Item label="바이어조정액">
-            <Text style={{ color: getProfitColor(record.바이어정산조정금액) }}>
-              {formatCurrency(record.바이어정산조정금액)}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="셀러조정물량">{record.셀러정산조정물량 || '-'}</Descriptions.Item>
-          <Descriptions.Item label="셀러조정액">
-            <Text style={{ color: getProfitColor(record.셀러정산조정금액) }}>
-              {formatCurrency(record.셀러정산조정금액)}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="기사조정액">
-            <Text style={{ color: getProfitColor(record.드라이버정산조정금액) }}>
-              {formatCurrency(record.드라이버정산조정금액)}
-            </Text>
-          </Descriptions.Item>
-          <Descriptions.Item label="회계처리조정액" span={2}>
-            <Text style={{ color: getProfitColor(record.회계처리용조정금액) }}>
-              {formatCurrency(record.회계처리용조정금액)}
-            </Text>
-          </Descriptions.Item>
-        </Descriptions>
-        <Divider style={{ margin: '12px 0' }} />
+        {/* 5. 조정·클레임 (조건부 표시) */}
+        {hasAdjustment && (
+          <>
+            <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><WarningOutlined /> 조정·클레임</Title>
+            <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+              <Descriptions.Item label="유형" span={3}>{record['클레임/조정 유형']}</Descriptions.Item>
+              <Descriptions.Item label="내용" span={3}>{record['클레임/조정 내용']}</Descriptions.Item>
+              <Descriptions.Item label="바이어조정액">
+                <Text style={{ color: getProfitColor(record.바이어정산조정금액) }}>
+                  {formatCurrency(record.바이어정산조정금액)}
+                </Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="셀러조정물량">{record.셀러정산조정물량 || '-'}</Descriptions.Item>
+              <Descriptions.Item label="셀러조정액">
+                <Text style={{ color: getProfitColor(record.셀러정산조정금액) }}>
+                  {formatCurrency(record.셀러정산조정금액)}
+                </Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="기사조정액">
+                <Text style={{ color: getProfitColor(record.드라이버정산조정금액) }}>
+                  {formatCurrency(record.드라이버정산조정금액)}
+                </Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="회계처리조정액" span={2}>
+                <Text style={{ color: getProfitColor(record.회계처리용조정금액) }}>
+                  {formatCurrency(record.회계처리용조정금액)}
+                </Text>
+              </Descriptions.Item>
+            </Descriptions>
+            <Divider style={{ margin: '12px 0' }} />
+          </>
+        )}
 
         {/* 6. 손익 */}
         <div id="profit-section">
           <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><DollarOutlined /> 손익</Title>
-          <Descriptions column={4} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
+          <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
             <Descriptions.Item label="매출액">{formatCurrency(record.매출액)}</Descriptions.Item>
             <Descriptions.Item label="매입액">{formatCurrency(record.매입액)}</Descriptions.Item>
             <Descriptions.Item label="운송비(비용)">{formatCurrency(record['운송비(비용)'])}</Descriptions.Item>
@@ -248,7 +255,7 @@ function TransactionLedger() {
                 {formatCurrency(record.바이어조정손익)}
               </Text>
             </Descriptions.Item>
-            <Descriptions.Item label="거래메모" span={4}>
+            <Descriptions.Item label="거래메모" span={3}>
               <Text style={{ color: '#1890ff' }}>{record.거래메모 || '-'}</Text>
             </Descriptions.Item>
           </Descriptions>
