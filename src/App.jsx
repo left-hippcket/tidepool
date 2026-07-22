@@ -7,6 +7,7 @@ import {
   AppstoreOutlined,
   SettingOutlined,
   LockOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import TerritoryManagement from './pages/TerritoryManagement';
@@ -26,6 +27,7 @@ import ProductManagement from './pages/ProductManagement';
 import ProductList from './pages/ProductList';
 import StandardPrice from './pages/StandardPrice';
 import StandardPriceRegister from './pages/StandardPriceRegister';
+import TransactionLedger from './pages/TransactionLedger';
 
 const { Header, Sider, Content } = Layout;
 
@@ -36,7 +38,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false); // 초기 상태: 항상 펼쳐진 상태
-  const [openKeys, setOpenKeys] = useState(['partners', 'product', 'data']); // 모든 서브메뉴 펼침
+  const [openKeys, setOpenKeys] = useState(['partners', 'product', 'ledger', 'data']); // 모든 서브메뉴 펼침
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -163,6 +165,14 @@ function App() {
       ],
     },
     {
+      key: 'ledger',
+      icon: <BookOutlined />,
+      label: '거래장부',
+      children: [
+        { key: '/transaction-ledger', label: '장부 조회' },
+      ],
+    },
+    {
       key: 'data',
       icon: <SettingOutlined />,
       label: '기타 데이터',
@@ -190,6 +200,9 @@ function App() {
     }
     if (location.pathname === '/product' || location.pathname === '/product-list') {
       return ['product'];
+    }
+    if (location.pathname === '/transaction-ledger') {
+      return ['ledger'];
     }
     return [];
   };
@@ -315,6 +328,7 @@ function App() {
             <Route path="/driver/:id" element={<DriverDetail />} />
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
+            <Route path="/transaction-ledger" element={<TransactionLedger />} />
             <Route path="/standard-price" element={<StandardPrice />} />
             <Route path="/standard-price/register" element={<StandardPriceRegister />} />
           </Routes>
