@@ -600,18 +600,7 @@ function TransactionLedger() {
     <div>
       {/* 헤더 */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Title level={2} style={{ margin: 0 }}>장부 조회</Title>
-          <Dropdown.Button
-            type="primary"
-            icon={<DownOutlined />}
-            loading={downloading}
-            onClick={() => handleCSVDownload('period')}
-            menu={{ items: downloadMenuItems }}
-          >
-            <DownloadOutlined /> CSV 다운로드
-          </Dropdown.Button>
-        </div>
+        <Title level={2} style={{ margin: 0 }}>장부 조회</Title>
       </div>
 
       {/* 기간 설정 */}
@@ -637,6 +626,17 @@ function TransactionLedger() {
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
+          tabBarExtraContent={
+            <Dropdown.Button
+              type="primary"
+              icon={<DownOutlined />}
+              loading={downloading}
+              onClick={() => handleCSVDownload('period')}
+              menu={{ items: downloadMenuItems }}
+            >
+              <DownloadOutlined /> CSV 다운로드
+            </Dropdown.Button>
+          }
           items={[
             {
               key: 'summary',
@@ -725,94 +725,74 @@ function TransactionLedger() {
                   }>
                     <Collapse defaultActiveKey={['1', '2', '3', '4', '5', '6', '7', '8']}>
                       <Collapse.Panel header="거래식별 정보" key="1">
-                        <Checkbox.Group
-                          value={selectedColumns}
-                          onChange={handleColumnChange}
-                          style={{ width: '100%' }}
-                        >
-                          <Space wrap>
-                            <Checkbox value="주문코드">주문코드</Checkbox>
-                            <Checkbox value="거래코드">거래코드</Checkbox>
-                            <Checkbox value="운송코드">운송코드</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('주문코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문코드'] : selectedColumns.filter(c => c !== '주문코드'))}>주문코드</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('거래코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래코드'] : selectedColumns.filter(c => c !== '거래코드'))}>거래코드</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('운송코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송코드'] : selectedColumns.filter(c => c !== '운송코드'))}>운송코드</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="날짜 정보" key="2">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="주문일">주문일</Checkbox>
-                            <Checkbox value="납품일">납품일</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('주문일')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문일'] : selectedColumns.filter(c => c !== '주문일'))}>주문일</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('납품일')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '납품일'] : selectedColumns.filter(c => c !== '납품일'))}>납품일</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="품목 정보" key="3">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="품목">품목</Checkbox>
-                            <Checkbox value="원산지">원산지</Checkbox>
-                            <Checkbox value="규격">규격</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('품목')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '품목'] : selectedColumns.filter(c => c !== '품목'))}>품목</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('원산지')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '원산지'] : selectedColumns.filter(c => c !== '원산지'))}>원산지</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('규격')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '규격'] : selectedColumns.filter(c => c !== '규격'))}>규격</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="수량/가격 정보" key="4">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="주문수량">주문수량</Checkbox>
-                            <Checkbox value="주문단위">주문단위</Checkbox>
-                            <Checkbox value="주문중량">주문중량</Checkbox>
-                            <Checkbox value="상차단가">상차단가</Checkbox>
-                            <Checkbox value="상차수수료율">상차수수료율</Checkbox>
-                            <Checkbox value="통당운임단가">통당운임단가</Checkbox>
-                            <Checkbox value="운송비포함여부">운송비포함여부</Checkbox>
-                            <Checkbox value="도착단가">도착단가</Checkbox>
-                            <Checkbox value="알파수익단가">알파수익단가</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('주문수량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문수량'] : selectedColumns.filter(c => c !== '주문수량'))}>주문수량</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('주문단위')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문단위'] : selectedColumns.filter(c => c !== '주문단위'))}>주문단위</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('주문중량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문중량'] : selectedColumns.filter(c => c !== '주문중량'))}>주문중량</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('상차단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차단가'] : selectedColumns.filter(c => c !== '상차단가'))}>상차단가</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('상차수수료율')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료율'] : selectedColumns.filter(c => c !== '상차수수료율'))}>상차수수료율</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('통당운임단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '통당운임단가'] : selectedColumns.filter(c => c !== '통당운임단가'))}>통당운임단가</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('운송비포함여부')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송비포함여부'] : selectedColumns.filter(c => c !== '운송비포함여부'))}>운송비포함여부</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('도착단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '도착단가'] : selectedColumns.filter(c => c !== '도착단가'))}>도착단가</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('알파수익단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '알파수익단가'] : selectedColumns.filter(c => c !== '알파수익단가'))}>알파수익단가</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="파트너 정보" key="5">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="셀러명">셀러명</Checkbox>
-                            <Checkbox value="셀러그룹명">셀러그룹명</Checkbox>
-                            <Checkbox value="바이어명">바이어명</Checkbox>
-                            <Checkbox value="바이어그룹명">바이어그룹명</Checkbox>
-                            <Checkbox value="바이어사업권역">바이어사업권역</Checkbox>
-                            <Checkbox value="드라이버명">드라이버명</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('셀러명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러명'] : selectedColumns.filter(c => c !== '셀러명'))}>셀러명</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('셀러그룹명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러그룹명'] : selectedColumns.filter(c => c !== '셀러그룹명'))}>셀러그룹명</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('바이어명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어명'] : selectedColumns.filter(c => c !== '바이어명'))}>바이어명</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('바이어그룹명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어그룹명'] : selectedColumns.filter(c => c !== '바이어그룹명'))}>바이어그룹명</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('바이어사업권역')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어사업권역'] : selectedColumns.filter(c => c !== '바이어사업권역'))}>바이어사업권역</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('드라이버명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '드라이버명'] : selectedColumns.filter(c => c !== '드라이버명'))}>드라이버명</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="클레임/조정 정보" key="6">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="클레임/조정 유형">클레임/조정 유형</Checkbox>
-                            <Checkbox value="클레임/조정 내용">클레임/조정 내용</Checkbox>
-                            <Checkbox value="바이어정산조정금액">바이어정산조정금액</Checkbox>
-                            <Checkbox value="셀러정산조정물량">셀러정산조정물량</Checkbox>
-                            <Checkbox value="셀러정산조정금액">셀러정산조정금액</Checkbox>
-                            <Checkbox value="드라이버정산조정금액">드라이버정산조정금액</Checkbox>
-                            <Checkbox value="회계처리용조정금액">회계처리용조정금액</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('클레임/조정 유형')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '클레임/조정 유형'] : selectedColumns.filter(c => c !== '클레임/조정 유형'))}>클레임/조정 유형</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('클레임/조정 내용')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '클레임/조정 내용'] : selectedColumns.filter(c => c !== '클레임/조정 내용'))}>클레임/조정 내용</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('바이어정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어정산조정금액'] : selectedColumns.filter(c => c !== '바이어정산조정금액'))}>바이어정산조정금액</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('셀러정산조정물량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러정산조정물량'] : selectedColumns.filter(c => c !== '셀러정산조정물량'))}>셀러정산조정물량</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('셀러정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러정산조정금액'] : selectedColumns.filter(c => c !== '셀러정산조정금액'))}>셀러정산조정금액</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('드라이버정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '드라이버정산조정금액'] : selectedColumns.filter(c => c !== '드라이버정산조정금액'))}>드라이버정산조정금액</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('회계처리용조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '회계처리용조정금액'] : selectedColumns.filter(c => c !== '회계처리용조정금액'))}>회계처리용조정금액</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="손익 정보" key="7">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="매출액">매출액</Checkbox>
-                            <Checkbox value="매입액">매입액</Checkbox>
-                            <Checkbox value="운송비(비용)">운송비(비용)</Checkbox>
-                            <Checkbox value="거래손익">거래손익</Checkbox>
-                            <Checkbox value="상차수수료수익">상차수수료수익</Checkbox>
-                            <Checkbox value="셀러조정손익">셀러조정손익</Checkbox>
-                            <Checkbox value="바이어조정손익">바이어조정손익</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('매출액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '매출액'] : selectedColumns.filter(c => c !== '매출액'))}>매출액</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('매입액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '매입액'] : selectedColumns.filter(c => c !== '매입액'))}>매입액</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('운송비(비용)')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송비(비용)'] : selectedColumns.filter(c => c !== '운송비(비용)'))}>운송비(비용)</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('거래손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래손익'] : selectedColumns.filter(c => c !== '거래손익'))}>거래손익</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('상차수수료수익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료수익'] : selectedColumns.filter(c => c !== '상차수수료수익'))}>상차수수료수익</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('셀러조정손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러조정손익'] : selectedColumns.filter(c => c !== '셀러조정손익'))}>셀러조정손익</Checkbox>
+                          <Checkbox checked={selectedColumns.includes('바이어조정손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어조정손익'] : selectedColumns.filter(c => c !== '바이어조정손익'))}>바이어조정손익</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                       <Collapse.Panel header="기타 정보" key="8">
-                        <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <Space wrap>
-                            <Checkbox value="거래메모">거래메모</Checkbox>
-                          </Space>
-                        </Checkbox.Group>
+                        <Space wrap>
+                          <Checkbox checked={selectedColumns.includes('거래메모')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래메모'] : selectedColumns.filter(c => c !== '거래메모'))}>거래메모</Checkbox>
+                        </Space>
                       </Collapse.Panel>
                     </Collapse>
                   </Card>
