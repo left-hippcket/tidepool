@@ -97,6 +97,12 @@ function TransactionLedger() {
     return undefined;
   };
 
+  // 유니크 값 추출 헬퍼 함수 (필터용)
+  const getUniqueValues = (data, field) => {
+    const unique = [...new Set(data.map(item => item[field]))].filter(Boolean);
+    return unique.sort().map(value => ({ text: value, value }));
+  };
+
   // CSV 다운로드
   const handleCSVDownload = async (type = 'period') => {
     setDownloading(true);
@@ -147,119 +153,176 @@ function TransactionLedger() {
   const renderExpandedRow = (record) => {
     // 조정·클레임 섹션 표시 여부 확인
     const hasAdjustment = record['클레임/조정 유형'] && record['클레임/조정 유형'].trim() !== '';
+    const hasMemo = record.거래메모 && record.거래메모.trim() !== '';
+
+    // 필드 헬퍼 컴포넌트
+    const Field = ({ label, value, span = 1, isAmount = false }) => (
+      <div style={{ gridColumn: `span ${span}` }}>
+        <div style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '4px' }}>
+          {label}
+        </div>
+        <div style={{
+          fontSize: isAmount ? '14px' : '13px',
+          fontWeight: isAmount ? 600 : 500,
+          color: typeof value === 'number' && value < 0 ? '#ff4d4f' : 'inherit'
+        }}>
+          {value}
+        </div>
+      </div>
+    );
 
     return (
-      <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '12px', backgroundColor: '#fafafa' }}>
-        {/* 1. 기본정보 */}
-        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><FileTextOutlined /> 기본정보</Title>
-        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-          <Descriptions.Item label="거래코드">{record.거래코드}</Descriptions.Item>
-          <Descriptions.Item label="주문일">{record.주문일}</Descriptions.Item>
-          <Descriptions.Item label="납품일">{record.납품일}</Descriptions.Item>
-          <Descriptions.Item label="품목">{record.품목}</Descriptions.Item>
-          <Descriptions.Item label="원산지">{record.원산지}</Descriptions.Item>
-          <Descriptions.Item label="규격">{record.규격}</Descriptions.Item>
-        </Descriptions>
-        <Divider style={{ margin: '12px 0' }} />
+      <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '16px', backgroundColor: '#fff' }}>
+        {/* 메인 그리드 */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(8, 1fr)',
+          gap: '12px 12px',
+          marginBottom: hasAdjustment || hasMemo ? '16px' : '0'
+        }}>
+          {/* 1행 */}
+          <Field label="거래코드" value={record.거래코드} />
+          <Field label="주문일" value={record.주문일} />
+          <Field label="납품일" value={record.납품일} />
+          <Field label="품목" value={record.품목} />
+          <Field label="원산지" value={record.원산지} />
+          <Field label="규격" value={record.규격} />
+          <Field label="셀러그룹명" value={record.셀러그룹명} />
+          <Field label="바이어그룹명" value={record.바이어그룹명} />
 
-        {/* 2. 수량·단가 */}
-        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><ShoppingCartOutlined /> 수량·단가</Title>
-        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-          <Descriptions.Item label="주문수량">{record.주문수량} {record.주문단위}</Descriptions.Item>
-          <Descriptions.Item label="주문중량">{record.주문중량}kg</Descriptions.Item>
-          <Descriptions.Item label="상차단가">{formatCurrency(record.상차단가)}</Descriptions.Item>
-          <Descriptions.Item label="상차수수료율">{record.상차수수료율}%</Descriptions.Item>
-          <Descriptions.Item label="도착단가">{formatCurrency(record.도착단가)}</Descriptions.Item>
-          <Descriptions.Item label="알파수익단가">
-            <Text style={{ color: getProfitColor(record.알파수익단가) }}>
-              {formatCurrency(record.알파수익단가)}
-            </Text>
-          </Descriptions.Item>
-        </Descriptions>
-        <Divider style={{ margin: '12px 0' }} />
+          {/* 2행 */}
+          <Field label="셀러명" value={record.셀러명} />
+          <Field label="바이어명" value={record.바이어명} />
+          <Field label="바이어사업권역" value={record.바이어사업권역} />
+          <Field label="드라이버명" value={record.드라이버명} />
+          <Field label="주문수량" value={`${record.주문수량}통`} />
+          <Field label="주문중량" value={`${record.주문중량}kg`} />
+          <Field label="상차단가" value={formatCurrency(record.상차단가)} isAmount />
+          <Field label="상차수수료율" value={`${record.상차수수료율}%`} />
 
-        {/* 3. 운송 */}
-        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><CarOutlined /> 운송</Title>
-        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-          <Descriptions.Item label="통당운임단가">{formatCurrency(record.통당운임단가)}</Descriptions.Item>
-          <Descriptions.Item label="운송비포함여부">{record.운송비포함여부}</Descriptions.Item>
-          <Descriptions.Item label="운송비(비용)">{formatCurrency(record['운송비(비용)'])}</Descriptions.Item>
-          <Descriptions.Item label="드라이버명" span={3}>{record.드라이버명}</Descriptions.Item>
-        </Descriptions>
-        <Divider style={{ margin: '12px 0' }} />
+          {/* 3행 */}
+          <Field label="통당운임단가" value={formatCurrency(record.통당운임단가)} isAmount />
+          <Field label="운송비포함여부" value={record.운송비포함여부} />
+          <Field label="도착단가" value={formatCurrency(record.도착단가)} isAmount />
+          <Field
+            label="알파수익단가"
+            value={
+              <span style={{ color: getProfitColor(record.알파수익단가) }}>
+                {formatCurrency(record.알파수익단가)}
+              </span>
+            }
+            isAmount
+          />
+          <Field label="매출액" value={formatCurrency(record.매출액)} isAmount />
+          <Field label="매입액" value={formatCurrency(record.매입액)} isAmount />
+          <Field label="운송비(비용)" value={formatCurrency(record['운송비(비용)'])} isAmount />
+          <Field
+            label="거래손익"
+            value={
+              <span style={{ color: getProfitColor(record.거래손익) }}>
+                {formatCurrency(record.거래손익)}
+              </span>
+            }
+            isAmount
+          />
 
-        {/* 4. 파트너 */}
-        <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><TeamOutlined /> 파트너</Title>
-        <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-          <Descriptions.Item label="셀러명">{record.셀러명}</Descriptions.Item>
-          <Descriptions.Item label="셀러그룹명">{record.셀러그룹명}</Descriptions.Item>
-          <Descriptions.Item label="바이어명">{record.바이어명}</Descriptions.Item>
-          <Descriptions.Item label="바이어그룹명">{record.바이어그룹명}</Descriptions.Item>
-          <Descriptions.Item label="바이어사업권역" span={2}>{record.바이어사업권역}</Descriptions.Item>
-        </Descriptions>
-        <Divider style={{ margin: '12px 0' }} />
+          {/* 4행 */}
+          <Field label="상차수수료수익" value={formatCurrency(record.상차수수료수익)} isAmount />
+          <Field
+            label="셀러조정손익"
+            value={
+              <span style={{ color: getProfitColor(record.셀러조정손익) }}>
+                {formatCurrency(record.셀러조정손익)}
+              </span>
+            }
+            isAmount
+          />
+          <Field
+            label="바이어조정손익"
+            value={
+              <span style={{ color: getProfitColor(record.바이어조정손익) }}>
+                {formatCurrency(record.바이어조정손익)}
+              </span>
+            }
+            isAmount
+          />
+        </div>
 
-        {/* 5. 조정·클레임 (조건부 표시) */}
+        {/* 조정·클레임 섹션 (조건부) */}
         {hasAdjustment && (
-          <>
-            <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><WarningOutlined /> 조정·클레임</Title>
-            <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-              <Descriptions.Item label="유형" span={3}>{record['클레임/조정 유형']}</Descriptions.Item>
-              <Descriptions.Item label="내용" span={3}>{record['클레임/조정 내용']}</Descriptions.Item>
-              <Descriptions.Item label="바이어조정액">
-                <Text style={{ color: getProfitColor(record.바이어정산조정금액) }}>
-                  {formatCurrency(record.바이어정산조정금액)}
-                </Text>
-              </Descriptions.Item>
-              <Descriptions.Item label="셀러조정물량">{record.셀러정산조정물량 || '-'}</Descriptions.Item>
-              <Descriptions.Item label="셀러조정액">
-                <Text style={{ color: getProfitColor(record.셀러정산조정금액) }}>
-                  {formatCurrency(record.셀러정산조정금액)}
-                </Text>
-              </Descriptions.Item>
-              <Descriptions.Item label="기사조정액">
-                <Text style={{ color: getProfitColor(record.드라이버정산조정금액) }}>
-                  {formatCurrency(record.드라이버정산조정금액)}
-                </Text>
-              </Descriptions.Item>
-              <Descriptions.Item label="회계처리조정액" span={2}>
-                <Text style={{ color: getProfitColor(record.회계처리용조정금액) }}>
-                  {formatCurrency(record.회계처리용조정금액)}
-                </Text>
-              </Descriptions.Item>
-            </Descriptions>
-            <Divider style={{ margin: '12px 0' }} />
-          </>
+          <div style={{
+            backgroundColor: '#fff7e6',
+            padding: '12px',
+            borderRadius: '4px',
+            marginBottom: hasMemo ? '16px' : '0'
+          }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '12px', color: '#d46b08' }}>
+              ⚠️ 조정·클레임 정보
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(8, 1fr)',
+              gap: '12px 12px'
+            }}>
+              <Field label="유형" value={record['클레임/조정 유형']} span={2} />
+              <Field label="내용" value={record['클레임/조정 내용']} span={3} />
+              <Field
+                label="바이어조정액"
+                value={
+                  <span style={{ color: getProfitColor(record.바이어정산조정금액) }}>
+                    {formatCurrency(record.바이어정산조정금액)}
+                  </span>
+                }
+                isAmount
+              />
+              <Field label="셀러조정물량" value={record.셀러정산조정물량 || '-'} />
+              <Field
+                label="셀러조정액"
+                value={
+                  <span style={{ color: getProfitColor(record.셀러정산조정금액) }}>
+                    {formatCurrency(record.셀러정산조정금액)}
+                  </span>
+                }
+                isAmount
+              />
+              <Field
+                label="기사조정액"
+                value={
+                  <span style={{ color: getProfitColor(record.드라이버정산조정금액) }}>
+                    {formatCurrency(record.드라이버정산조정금액)}
+                  </span>
+                }
+                isAmount
+              />
+              <Field
+                label="회계처리조정액"
+                value={
+                  <span style={{ color: getProfitColor(record.회계처리용조정금액) }}>
+                    {formatCurrency(record.회계처리용조정금액)}
+                  </span>
+                }
+                span={2}
+                isAmount
+              />
+            </div>
+          </div>
         )}
 
-        {/* 6. 손익 */}
-        <div id="profit-section">
-          <Title level={5} style={{ fontSize: '14px', marginBottom: '8px' }}><DollarOutlined /> 손익</Title>
-          <Descriptions column={3} bordered size="small" labelStyle={{ padding: '4px 8px' }} contentStyle={{ padding: '4px 8px' }}>
-            <Descriptions.Item label="매출액">{formatCurrency(record.매출액)}</Descriptions.Item>
-            <Descriptions.Item label="매입액">{formatCurrency(record.매입액)}</Descriptions.Item>
-            <Descriptions.Item label="운송비(비용)">{formatCurrency(record['운송비(비용)'])}</Descriptions.Item>
-            <Descriptions.Item label="거래손익">
-              <Text style={{ color: getProfitColor(record.거래손익) }}>
-                {formatCurrency(record.거래손익)}
-              </Text>
-            </Descriptions.Item>
-            <Descriptions.Item label="상차수수료수익">{formatCurrency(record.상차수수료수익)}</Descriptions.Item>
-            <Descriptions.Item label="셀러조정손익">
-              <Text style={{ color: getProfitColor(record.셀러조정손익) }}>
-                {formatCurrency(record.셀러조정손익)}
-              </Text>
-            </Descriptions.Item>
-            <Descriptions.Item label="바이어조정손익">
-              <Text style={{ color: getProfitColor(record.바이어조정손익) }}>
-                {formatCurrency(record.바이어조정손익)}
-              </Text>
-            </Descriptions.Item>
-            <Descriptions.Item label="거래메모" span={3}>
-              <Text style={{ color: '#1890ff' }}>{record.거래메모 || '-'}</Text>
-            </Descriptions.Item>
-          </Descriptions>
-        </div>
+        {/* 거래메모 (조건부) */}
+        {hasMemo && (
+          <div id="profit-section" style={{
+            border: '1px solid #d9d9d9',
+            padding: '12px',
+            borderRadius: '4px'
+          }}>
+            <div style={{ fontSize: '11px', color: '#8c8c8c', marginBottom: '4px' }}>
+              거래메모
+            </div>
+            <div style={{ fontSize: '13px', color: '#1890ff', lineHeight: '1.6' }}>
+              {record.거래메모}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -299,12 +362,18 @@ function TransactionLedger() {
       dataIndex: '품목',
       key: '품목',
       width: 80,
+      filters: getUniqueValues(filteredData, '품목'),
+      onFilter: (value, record) => record.품목 === value,
+      filterSearch: true,
     },
     {
       title: '원산지',
       dataIndex: '원산지',
       key: '원산지',
       width: 80,
+      filters: getUniqueValues(filteredData, '원산지'),
+      onFilter: (value, record) => record.원산지 === value,
+      filterSearch: true,
     },
     {
       title: '규격',
@@ -331,12 +400,18 @@ function TransactionLedger() {
       dataIndex: '셀러그룹명',
       key: '셀러그룹명',
       width: 130,
+      filters: getUniqueValues(filteredData, '셀러그룹명'),
+      onFilter: (value, record) => record.셀러그룹명 === value,
+      filterSearch: true,
     },
     {
       title: '바이어그룹명',
       dataIndex: '바이어그룹명',
       key: '바이어그룹명',
       width: 130,
+      filters: getUniqueValues(filteredData, '바이어그룹명'),
+      onFilter: (value, record) => record.바이어그룹명 === value,
+      filterSearch: true,
     },
     {
       title: '매출액',
@@ -384,12 +459,18 @@ function TransactionLedger() {
       dataIndex: '품목',
       key: '품목',
       width: 80,
+      filters: getUniqueValues(filteredData, '품목'),
+      onFilter: (value, record) => record.품목 === value,
+      filterSearch: true,
     },
     {
       title: '원산지',
       dataIndex: '원산지',
       key: '원산지',
       width: 80,
+      filters: getUniqueValues(filteredData, '원산지'),
+      onFilter: (value, record) => record.원산지 === value,
+      filterSearch: true,
     },
     {
       title: '규격',
@@ -414,6 +495,23 @@ function TransactionLedger() {
       align: 'right',
     },
     {
+      title: '바이어그룹명',
+      dataIndex: '바이어그룹명',
+      key: '바이어그룹명',
+      width: 150,
+      filters: getUniqueValues(filteredData, '바이어그룹명'),
+      onFilter: (value, record) => record.바이어그룹명 === value,
+      filterSearch: true,
+    },
+    {
+      title: '도착단가정책',
+      dataIndex: '도착단가정책',
+      key: '도착단가정책',
+      width: 120,
+      render: (value) => value || '-',
+      align: 'center',
+    },
+    {
       title: (
         <span>
           알파수익단가
@@ -425,11 +523,11 @@ function TransactionLedger() {
       dataIndex: '알파수익단가',
       key: '알파수익단가',
       width: 130,
-      render: (value) => (
+      render: (value) => value !== null ? (
         <Text style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
         </Text>
-      ),
+      ) : '-',
       align: 'right',
     },
     {
@@ -455,18 +553,27 @@ function TransactionLedger() {
       dataIndex: '품목',
       key: '품목',
       width: 80,
+      filters: getUniqueValues(filteredData, '품목'),
+      onFilter: (value, record) => record.품목 === value,
+      filterSearch: true,
     },
     {
       title: '셀러그룹명',
       dataIndex: '셀러그룹명',
       key: '셀러그룹명',
       width: 130,
+      filters: getUniqueValues(filteredData, '셀러그룹명'),
+      onFilter: (value, record) => record.셀러그룹명 === value,
+      filterSearch: true,
     },
     {
       title: '바이어그룹명',
       dataIndex: '바이어그룹명',
       key: '바이어그룹명',
       width: 130,
+      filters: getUniqueValues(filteredData, '바이어그룹명'),
+      onFilter: (value, record) => record.바이어그룹명 === value,
+      filterSearch: true,
     },
     {
       title: '매출액',
@@ -508,14 +615,26 @@ function TransactionLedger() {
 
   // 탭 4: 전체 보기 - 동적 칼럼 생성
   const getAllColumns = () => {
+    // 칼럼 순서 정의 (체크박스 순서와 동일)
+    const fieldOrder = [
+      '주문코드', '거래코드', '운송코드',
+      '주문일', '납품일',
+      '품목', '원산지', '규격',
+      '주문수량', '주문중량', '상차단가', '상차수수료율', '통당운임단가', '운송비포함여부', '도착단가', '알파수익단가',
+      '셀러명', '셀러그룹명', '바이어명', '바이어그룹명', '바이어사업권역', '드라이버명',
+      '클레임/조정 유형', '클레임/조정 내용', '바이어정산조정금액', '셀러정산조정물량', '셀러정산조정금액', '드라이버정산조정금액', '회계처리용조정금액',
+      '매출액', '매입액', '운송비(비용)', '거래손익', '상차수수료수익', '셀러조정손익', '바이어조정손익',
+      '거래메모'
+    ];
+
     const allFields = {
       '주문코드': { width: 150 },
       '거래코드': { width: 150 },
       '운송코드': { width: 150 },
       '주문일': { width: 120 },
-      '납품일': { width: 120 },
-      '품목': { width: 100 },
-      '원산지': { width: 100 },
+      '납품일': { width: 120, filters: getUniqueValues(filteredData, '납품일'), onFilter: (value, record) => record.납품일 === value, filterSearch: true },
+      '품목': { width: 100, filters: getUniqueValues(filteredData, '품목'), onFilter: (value, record) => record.품목 === value, filterSearch: true },
+      '원산지': { width: 100, filters: getUniqueValues(filteredData, '원산지'), onFilter: (value, record) => record.원산지 === value, filterSearch: true },
       '규격': { width: 100 },
       '주문수량': { width: 100, render: (text, record) => `${text} ${record.주문단위}` },
       '주문중량': { width: 100, render: (text) => `${text}kg` },
@@ -525,11 +644,11 @@ function TransactionLedger() {
       '운송비포함여부': { width: 120 },
       '도착단가': { width: 120, render: formatCurrency, align: 'right' },
       '알파수익단가': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
-      '셀러명': { width: 120 },
-      '셀러그룹명': { width: 150 },
-      '바이어명': { width: 120 },
-      '바이어그룹명': { width: 150 },
-      '바이어사업권역': { width: 120 },
+      '셀러명': { width: 120, filters: getUniqueValues(filteredData, '셀러명'), onFilter: (value, record) => record.셀러명 === value, filterSearch: true },
+      '셀러그룹명': { width: 150, filters: getUniqueValues(filteredData, '셀러그룹명'), onFilter: (value, record) => record.셀러그룹명 === value, filterSearch: true },
+      '바이어명': { width: 120, filters: getUniqueValues(filteredData, '바이어명'), onFilter: (value, record) => record.바이어명 === value, filterSearch: true },
+      '바이어그룹명': { width: 150, filters: getUniqueValues(filteredData, '바이어그룹명'), onFilter: (value, record) => record.바이어그룹명 === value, filterSearch: true },
+      '바이어사업권역': { width: 120, filters: getUniqueValues(filteredData, '바이어사업권역'), onFilter: (value, record) => record.바이어사업권역 === value, filterSearch: true },
       '드라이버명': { width: 100 },
       '클레임/조정 유형': { width: 150 },
       '클레임/조정 내용': { width: 200 },
@@ -545,11 +664,12 @@ function TransactionLedger() {
       '상차수수료수익': { width: 120, render: formatCurrency, align: 'right' },
       '셀러조정손익': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
       '바이어조정손익': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
-      '거래메모': { width: 200 },
+      '거래메모': { width: 200, render: (text) => text || '' },
     };
 
-    return selectedColumns
-      .filter(col => allFields[col])
+    // fieldOrder 순서대로 필터링하여 반환
+    return fieldOrder
+      .filter(col => selectedColumns.includes(col))
       .map(col => ({
         title: col,
         dataIndex: col,
@@ -610,18 +730,16 @@ function TransactionLedger() {
 
       {/* 기간 설정 */}
       <Card className="mb-4">
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <Space wrap>
-            <Button onClick={() => handleQuickDate('today')}>오늘</Button>
-            <Button onClick={() => handleQuickDate('yesterday')}>어제</Button>
-            <Button onClick={() => handleQuickDate('7days')}>최근 7일</Button>
-            <Button onClick={() => handleQuickDate('30days')}>최근 30일</Button>
-          </Space>
+        <Space wrap>
+          <Button onClick={() => handleQuickDate('today')}>오늘</Button>
+          <Button onClick={() => handleQuickDate('yesterday')}>어제</Button>
+          <Button onClick={() => handleQuickDate('7days')}>최근 7일</Button>
+          <Button onClick={() => handleQuickDate('30days')}>최근 30일</Button>
           <RangePicker
             value={dateRange}
             onChange={setDateRange}
             format="YYYY-MM-DD"
-            style={{ width: '100%', maxWidth: 400 }}
+            style={{ width: 300 }}
           />
         </Space>
       </Card>
@@ -632,15 +750,38 @@ function TransactionLedger() {
           activeKey={activeTab}
           onChange={setActiveTab}
           tabBarExtraContent={
-            <Dropdown.Button
-              type="primary"
-              icon={<DownOutlined />}
-              loading={downloading}
-              onClick={() => handleCSVDownload('period')}
-              menu={{ items: downloadMenuItems }}
-            >
-              <DownloadOutlined /> CSV 다운로드
-            </Dropdown.Button>
+            <Space>
+              <Button
+                type="primary"
+                onClick={() => message.info('장부 한줄 등록 기능은 추후 구현 예정입니다.')}
+              >
+                장부 한줄 등록
+              </Button>
+              <Dropdown
+                menu={{ items: downloadMenuItems }}
+                trigger={['click']}
+              >
+                <Button
+                  loading={downloading}
+                  onClick={() => handleCSVDownload('period')}
+                  style={{
+                    backgroundColor: '#595959',
+                    borderColor: '#595959',
+                    color: '#fff',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#434343';
+                    e.currentTarget.style.borderColor = '#434343';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#595959';
+                    e.currentTarget.style.borderColor = '#595959';
+                  }}
+                >
+                  <DownloadOutlined /> CSV 다운로드 <DownOutlined />
+                </Button>
+              </Dropdown>
+            </Space>
           }
           items={[
             {
