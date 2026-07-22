@@ -753,7 +753,7 @@ function TransactionLedger() {
             <Space>
               <Button
                 type="primary"
-                onClick={() => message.info('장부 한줄 등록 기능은 추후 구현 예정입니다.')}
+                onClick={() => navigate('/transaction-ledger/register')}
               >
                 장부 한줄 등록
               </Button>

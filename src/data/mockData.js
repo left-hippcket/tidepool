@@ -52,7 +52,7 @@ export const productCategories = [
 // 품목 데이터
 export const products = [
   { id: 1, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '광어', orderUnit: '통', unitWeight: 1.2, originCount: 5, specCount: 8, status: 'active' },
-  { id: 2, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '넙치', orderUnit: '통', unitWeight: 1.5, originCount: 4, specCount: 6, status: 'active' },
+  { id: 2, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '넙치', orderUnit: '통', unitWeight: 250, originCount: 4, specCount: 6, status: 'active' },
   { id: 3, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '우럭', orderUnit: '통', unitWeight: 0.8, originCount: 6, specCount: 7, status: 'active' },
   { id: 4, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '강도다리', orderUnit: '통', unitWeight: 1.0, originCount: 3, specCount: 5, status: 'active' },
   { id: 5, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '우럭(활)', orderUnit: '통', unitWeight: 0.9, originCount: 5, specCount: 6, status: 'active' },
@@ -72,6 +72,9 @@ export const origins = [
   { id: 5, productId: 1, productName: '광어', name: '남해', status: 'inactive', createdAt: '2024-02-05' },
   { id: 6, productId: 2, productName: '넙치', name: '제주', status: 'active', createdAt: '2024-02-06' },
   { id: 7, productId: 2, productName: '넙치', name: '완도', status: 'active', createdAt: '2024-02-07' },
+  { id: 18, productId: 2, productName: '넙치', name: '완도(거문도)', status: 'active', createdAt: '2024-02-18' },
+  { id: 19, productId: 2, productName: '넙치', name: '통영', status: 'active', createdAt: '2024-02-19' },
+  { id: 20, productId: 2, productName: '넙치', name: '여수', status: 'active', createdAt: '2024-02-20' },
   { id: 8, productId: 3, productName: '우럭', name: '통영', status: 'active', createdAt: '2024-02-08' },
 ];
 
@@ -86,7 +89,7 @@ export const specifications = [
   { id: 7, productId: 2, productName: '넙치', name: '1.0kg', status: 'active', createdAt: '2024-02-07' },
   { id: 8, productId: 2, productName: '넙치', name: '1.1kg', status: 'active', createdAt: '2024-02-08' },
   { id: 9, productId: 2, productName: '넙치', name: '1.2kg', status: 'active', createdAt: '2024-02-09' },
-  { id: 10, productId: 2, productName: '넙치', name: '1.3kg', status: 'active', createdAt: '2024-02-10' },
+  { id: 10, productId: 2, productName: '넙치', name: '1.3kg(특대)', status: 'active', createdAt: '2024-02-10' },
   { id: 11, productId: 2, productName: '넙치', name: '1.4kg', status: 'active', createdAt: '2024-02-11' },
   { id: 12, productId: 2, productName: '넙치', name: '1.5kg', status: 'active', createdAt: '2024-02-12' },
   { id: 13, productId: 2, productName: '넙치', name: '1.6kg', status: 'active', createdAt: '2024-02-13' },

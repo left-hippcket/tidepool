@@ -28,6 +28,7 @@ import ProductList from './pages/ProductList';
 import StandardPrice from './pages/StandardPrice';
 import StandardPriceRegister from './pages/StandardPriceRegister';
 import TransactionLedger from './pages/TransactionLedger';
+import TransactionLedgerRegister from './pages/TransactionLedgerRegister';
 
 const { Header, Sider, Content } = Layout;
 
@@ -329,6 +330,7 @@ function App() {
             <Route path="/product" element={<ProductManagement />} />
             <Route path="/product-list" element={<ProductList />} />
             <Route path="/transaction-ledger" element={<TransactionLedger />} />
+            <Route path="/transaction-ledger/register" element={<TransactionLedgerRegister />} />
             <Route path="/standard-price" element={<StandardPrice />} />
             <Route path="/standard-price/register" element={<StandardPriceRegister />} />
           </Routes>
