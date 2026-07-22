@@ -145,6 +145,14 @@ function App() {
       label: '대시보드',
     },
     {
+      key: 'ledger',
+      icon: <BookOutlined />,
+      label: '거래장부',
+      children: [
+        { key: '/transaction-ledger', label: '장부 조회' },
+      ],
+    },
+    {
       key: 'partners',
       icon: <TeamOutlined />,
       label: '파트너 관리',
@@ -162,14 +170,6 @@ function App() {
       children: [
         { key: '/product', label: '상품 관리' },
         { key: '/product-list', label: '상품 리스트' },
-      ],
-    },
-    {
-      key: 'ledger',
-      icon: <BookOutlined />,
-      label: '거래장부',
-      children: [
-        { key: '/transaction-ledger', label: '장부 조회' },
       ],
     },
     {
