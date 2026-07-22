@@ -599,17 +599,19 @@ function TransactionLedger() {
   return (
     <div>
       {/* 헤더 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <Title level={2} style={{ margin: 0 }}>장부 조회</Title>
-        <Dropdown.Button
-          type="primary"
-          icon={<DownOutlined />}
-          loading={downloading}
-          onClick={() => handleCSVDownload('period')}
-          menu={{ items: downloadMenuItems }}
-        >
-          <DownloadOutlined /> CSV 다운로드
-        </Dropdown.Button>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Title level={2} style={{ margin: 0 }}>장부 조회</Title>
+          <Dropdown.Button
+            type="primary"
+            icon={<DownOutlined />}
+            loading={downloading}
+            onClick={() => handleCSVDownload('period')}
+            menu={{ items: downloadMenuItems }}
+          >
+            <DownloadOutlined /> CSV 다운로드
+          </Dropdown.Button>
+        </div>
       </div>
 
       {/* 기간 설정 */}
@@ -728,33 +730,33 @@ function TransactionLedger() {
                           onChange={handleColumnChange}
                           style={{ width: '100%' }}
                         >
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="주문코드">주문코드</Checkbox>
                             <Checkbox value="거래코드">거래코드</Checkbox>
                             <Checkbox value="운송코드">운송코드</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="날짜 정보" key="2">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="주문일">주문일</Checkbox>
                             <Checkbox value="납품일">납품일</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="품목 정보" key="3">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="품목">품목</Checkbox>
                             <Checkbox value="원산지">원산지</Checkbox>
                             <Checkbox value="규격">규격</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="수량/가격 정보" key="4">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="주문수량">주문수량</Checkbox>
                             <Checkbox value="주문단위">주문단위</Checkbox>
                             <Checkbox value="주문중량">주문중량</Checkbox>
@@ -764,24 +766,24 @@ function TransactionLedger() {
                             <Checkbox value="운송비포함여부">운송비포함여부</Checkbox>
                             <Checkbox value="도착단가">도착단가</Checkbox>
                             <Checkbox value="알파수익단가">알파수익단가</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="파트너 정보" key="5">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="셀러명">셀러명</Checkbox>
                             <Checkbox value="셀러그룹명">셀러그룹명</Checkbox>
                             <Checkbox value="바이어명">바이어명</Checkbox>
                             <Checkbox value="바이어그룹명">바이어그룹명</Checkbox>
                             <Checkbox value="바이어사업권역">바이어사업권역</Checkbox>
                             <Checkbox value="드라이버명">드라이버명</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="클레임/조정 정보" key="6">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="클레임/조정 유형">클레임/조정 유형</Checkbox>
                             <Checkbox value="클레임/조정 내용">클레임/조정 내용</Checkbox>
                             <Checkbox value="바이어정산조정금액">바이어정산조정금액</Checkbox>
@@ -789,12 +791,12 @@ function TransactionLedger() {
                             <Checkbox value="셀러정산조정금액">셀러정산조정금액</Checkbox>
                             <Checkbox value="드라이버정산조정금액">드라이버정산조정금액</Checkbox>
                             <Checkbox value="회계처리용조정금액">회계처리용조정금액</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="손익 정보" key="7">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="매출액">매출액</Checkbox>
                             <Checkbox value="매입액">매입액</Checkbox>
                             <Checkbox value="운송비(비용)">운송비(비용)</Checkbox>
@@ -802,14 +804,14 @@ function TransactionLedger() {
                             <Checkbox value="상차수수료수익">상차수수료수익</Checkbox>
                             <Checkbox value="셀러조정손익">셀러조정손익</Checkbox>
                             <Checkbox value="바이어조정손익">바이어조정손익</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                       <Collapse.Panel header="기타 정보" key="8">
                         <Checkbox.Group value={selectedColumns} onChange={handleColumnChange} style={{ width: '100%' }}>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                          <Space wrap>
                             <Checkbox value="거래메모">거래메모</Checkbox>
-                          </div>
+                          </Space>
                         </Checkbox.Group>
                       </Collapse.Panel>
                     </Collapse>
