@@ -286,57 +286,57 @@ function TransactionLedger() {
       title: '납품일',
       dataIndex: '납품일',
       key: '납품일',
-      width: 120,
+      width: 110,
     },
     {
       title: '품목',
       dataIndex: '품목',
       key: '품목',
-      width: 100,
+      width: 80,
     },
     {
       title: '원산지',
       dataIndex: '원산지',
       key: '원산지',
-      width: 100,
+      width: 80,
     },
     {
       title: '규격',
       dataIndex: '규격',
       key: '규격',
-      width: 100,
+      width: 90,
     },
     {
       title: '주문수량',
       dataIndex: '주문수량',
       key: '주문수량',
-      width: 100,
+      width: 90,
       render: (text, record) => `${text} ${record.주문단위}`,
     },
     {
       title: '주문중량',
       dataIndex: '주문중량',
       key: '주문중량',
-      width: 100,
+      width: 90,
       render: (text) => `${text}kg`,
     },
     {
       title: '셀러그룹명',
       dataIndex: '셀러그룹명',
       key: '셀러그룹명',
-      width: 150,
+      width: 130,
     },
     {
       title: '바이어그룹명',
       dataIndex: '바이어그룹명',
       key: '바이어그룹명',
-      width: 150,
+      width: 130,
     },
     {
       title: '매출액',
       dataIndex: '매출액',
       key: '매출액',
-      width: 120,
+      width: 110,
       render: formatCurrency,
       align: 'right',
     },
@@ -344,7 +344,7 @@ function TransactionLedger() {
       title: '거래손익',
       dataIndex: '거래손익',
       key: '거래손익',
-      width: 120,
+      width: 110,
       render: (value) => (
         <Text style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
@@ -356,7 +356,7 @@ function TransactionLedger() {
       title: '거래메모',
       dataIndex: '거래메모',
       key: '거래메모',
-      width: 100,
+      width: 90,
       render: (text, record) => text ? (
         <Button type="link" size="small" onClick={(e) => handleMemoClick(e, record)}>
           메모 보기
@@ -371,31 +371,31 @@ function TransactionLedger() {
       title: '납품일',
       dataIndex: '납품일',
       key: '납품일',
-      width: 120,
+      width: 110,
     },
     {
       title: '품목',
       dataIndex: '품목',
       key: '품목',
-      width: 100,
+      width: 80,
     },
     {
       title: '원산지',
       dataIndex: '원산지',
       key: '원산지',
-      width: 100,
+      width: 80,
     },
     {
       title: '규격',
       dataIndex: '규격',
       key: '규격',
-      width: 100,
+      width: 90,
     },
     {
       title: '상차단가',
       dataIndex: '상차단가',
       key: '상차단가',
-      width: 120,
+      width: 110,
       render: formatCurrency,
       align: 'right',
     },
@@ -403,7 +403,7 @@ function TransactionLedger() {
       title: '도착단가',
       dataIndex: '도착단가',
       key: '도착단가',
-      width: 120,
+      width: 110,
       render: formatCurrency,
       align: 'right',
     },
@@ -418,7 +418,7 @@ function TransactionLedger() {
       ),
       dataIndex: '알파수익단가',
       key: '알파수익단가',
-      width: 140,
+      width: 130,
       render: (value) => (
         <Text style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
@@ -442,31 +442,31 @@ function TransactionLedger() {
       title: '납품일',
       dataIndex: '납품일',
       key: '납품일',
-      width: 120,
+      width: 110,
     },
     {
       title: '품목',
       dataIndex: '품목',
       key: '품목',
-      width: 100,
+      width: 80,
     },
     {
       title: '셀러그룹명',
       dataIndex: '셀러그룹명',
       key: '셀러그룹명',
-      width: 150,
+      width: 130,
     },
     {
       title: '바이어그룹명',
       dataIndex: '바이어그룹명',
       key: '바이어그룹명',
-      width: 150,
+      width: 130,
     },
     {
       title: '매출액',
       dataIndex: '매출액',
       key: '매출액',
-      width: 120,
+      width: 110,
       render: formatCurrency,
       align: 'right',
     },
@@ -474,7 +474,7 @@ function TransactionLedger() {
       title: '매입액',
       dataIndex: '매입액',
       key: '매입액',
-      width: 120,
+      width: 110,
       render: formatCurrency,
       align: 'right',
     },
@@ -482,7 +482,7 @@ function TransactionLedger() {
       title: '운송비(비용)',
       dataIndex: '운송비(비용)',
       key: '운송비(비용)',
-      width: 120,
+      width: 110,
       render: formatCurrency,
       align: 'right',
     },
@@ -490,7 +490,7 @@ function TransactionLedger() {
       title: '거래손익',
       dataIndex: '거래손익',
       key: '거래손익',
-      width: 120,
+      width: 110,
       render: (value) => (
         <Text style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
@@ -599,8 +599,8 @@ function TransactionLedger() {
   return (
     <div>
       {/* 헤더 */}
-      <div className="flex justify-between items-center mb-6">
-        <Title level={2}>장부 조회</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={2} style={{ margin: 0 }}>장부 조회</Title>
         <Dropdown.Button
           type="primary"
           icon={<DownOutlined />}
