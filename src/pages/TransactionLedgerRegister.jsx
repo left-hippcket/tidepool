@@ -38,9 +38,14 @@ const TransactionLedgerRegister = () => {
 
   // 네비게이션 방지
   const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      form.isFieldsTouched() &&
-      currentLocation.pathname !== nextLocation.pathname
+    ({ currentLocation, nextLocation }) => {
+      try {
+        return form && form.isFieldsTouched() &&
+          currentLocation.pathname !== nextLocation.pathname;
+      } catch {
+        return false;
+      }
+    }
   );
 
   // beforeunload 이벤트 (브라우저 새로고침, 탭 닫기)
@@ -212,9 +217,8 @@ const TransactionLedgerRegister = () => {
       form.setFieldValue([`row_${rowId}`, 'loadingPrice'], undefined);
       form.setFieldValue([`row_${rowId}`, 'arrivalPrice'], undefined);
 
-      // 넙치가 아닌 경우 알파수익 필드 초기화
+      // 넙치가 아닌 경우 알파수익반영 필드만 초기화
       if (product.name !== '넙치') {
-        form.setFieldValue([`row_${rowId}`, 'alphaProfit'], null);
         form.setFieldValue([`row_${rowId}`, 'alphaProfitTarget'], undefined);
       }
     }
@@ -709,16 +713,8 @@ const TransactionLedgerRegister = () => {
                       ? arrivalPrice - loadingPrice - arrivalPricePolicy
                       : null;
 
-                    // Form value에도 저장
-                    if (product === '넙치') {
-                      form.setFieldValue([`row_${row.id}`, 'alphaProfit'], alphaProfit);
-                    } else {
-                      form.setFieldValue([`row_${row.id}`, 'alphaProfit'], null);
-                    }
-
                     return (
                       <Form.Item
-                        name={[`row_${row.id}`, 'alphaProfit']}
                         label={index === 0 ? '알파수익단가' : ''}
                         style={{ minWidth: 130 }}
                       >
@@ -743,11 +739,20 @@ const TransactionLedgerRegister = () => {
                 {/* 알파수익반영 */}
                 <Form.Item noStyle shouldUpdate={(prev, curr) =>
                   prev[`row_${row.id}`]?.product !== curr[`row_${row.id}`]?.product ||
-                  prev[`row_${row.id}`]?.alphaProfit !== curr[`row_${row.id}`]?.alphaProfit
+                  prev[`row_${row.id}`]?.loadingPrice !== curr[`row_${row.id}`]?.loadingPrice ||
+                  prev[`row_${row.id}`]?.arrivalPrice !== curr[`row_${row.id}`]?.arrivalPrice ||
+                  prev[`buyer_${row.id}`]?.arrivalPricePolicy !== curr[`buyer_${row.id}`]?.arrivalPricePolicy
                 }>
                   {() => {
                     const product = form.getFieldValue([`row_${row.id}`, 'product']);
-                    const alphaProfit = form.getFieldValue([`row_${row.id}`, 'alphaProfit']);
+                    const loadingPrice = form.getFieldValue([`row_${row.id}`, 'loadingPrice']) || 0;
+                    const arrivalPrice = form.getFieldValue([`row_${row.id}`, 'arrivalPrice']) || 0;
+                    const arrivalPricePolicy = form.getFieldValue([`buyer_${row.id}`, 'arrivalPricePolicy']) || 0;
+
+                    // alphaProfit 재계산
+                    const alphaProfit = product === '넙치'
+                      ? arrivalPrice - loadingPrice - arrivalPricePolicy
+                      : null;
 
                     const isEnabled = product === '넙치' && alphaProfit !== 0 && alphaProfit !== null;
 
