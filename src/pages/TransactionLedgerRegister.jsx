@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, unstable_useBlocker as useBlocker } from 'react-router-dom';
 import {
   Card,
   Button,
@@ -10,6 +10,7 @@ import {
   InputNumber,
   Input,
   Checkbox,
+  Select,
   message,
   Modal,
   Typography,
@@ -34,6 +35,47 @@ const TransactionLedgerRegister = () => {
   const [sellerOptions, setSellerOptions] = useState([]);
   const [driverOptions, setDriverOptions] = useState([]);
   const [, forceUpdate] = useState({});
+
+  // 네비게이션 방지
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      form.isFieldsTouched() &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // beforeunload 이벤트 (브라우저 새로고침, 탭 닫기)
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (form.isFieldsTouched()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [form]);
+
+  // blocker 상태 감지 및 모달 표시
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      Modal.confirm({
+        title: '입력한 내용이 저장되지 않습니다. 페이지를 떠나시겠습니까?',
+        content: '이 페이지를 떠나면 입력한 모든 데이터가 손실됩니다.',
+        okText: '떠나기',
+        cancelText: '머무르기',
+        onOk: () => {
+          blocker.proceed();
+        },
+        onCancel: () => {
+          blocker.reset();
+        }
+      });
+    }
+  }, [blocker]);
 
   // 바이어 데이터 (mockData에서 가져오기 - 추후 API 연동)
   const buyers = [
@@ -169,6 +211,12 @@ const TransactionLedgerRegister = () => {
       form.setFieldValue([`row_${rowId}`, 'spec'], undefined);
       form.setFieldValue([`row_${rowId}`, 'loadingPrice'], undefined);
       form.setFieldValue([`row_${rowId}`, 'arrivalPrice'], undefined);
+
+      // 넙치가 아닌 경우 알파수익 필드 초기화
+      if (product.name !== '넙치') {
+        form.setFieldValue([`row_${rowId}`, 'alphaProfit'], null);
+        form.setFieldValue([`row_${rowId}`, 'alphaProfitTarget'], undefined);
+      }
     }
   };
 
@@ -399,6 +447,9 @@ const TransactionLedgerRegister = () => {
           ? '거래가 등록되었습니다.'
           : `${rows.length}건의 거래가 등록되었습니다.`
       );
+
+      // 등록 성공 후 form 리셋하여 blocker 우회
+      form.resetFields();
 
       // 장부 조회 페이지로 이동
       navigate('/transaction-ledger');
@@ -639,6 +690,84 @@ const TransactionLedgerRegister = () => {
                     formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                     parser={value => value.replace(/,/g, '')}
                   />
+                </Form.Item>
+
+                {/* 알파수익단가 */}
+                <Form.Item noStyle shouldUpdate={(prev, curr) =>
+                  prev[`row_${row.id}`]?.product !== curr[`row_${row.id}`]?.product ||
+                  prev[`row_${row.id}`]?.loadingPrice !== curr[`row_${row.id}`]?.loadingPrice ||
+                  prev[`row_${row.id}`]?.arrivalPrice !== curr[`row_${row.id}`]?.arrivalPrice ||
+                  prev[`buyer_${row.id}`]?.arrivalPricePolicy !== curr[`buyer_${row.id}`]?.arrivalPricePolicy
+                }>
+                  {() => {
+                    const product = form.getFieldValue([`row_${row.id}`, 'product']);
+                    const loadingPrice = form.getFieldValue([`row_${row.id}`, 'loadingPrice']) || 0;
+                    const arrivalPrice = form.getFieldValue([`row_${row.id}`, 'arrivalPrice']) || 0;
+                    const arrivalPricePolicy = form.getFieldValue([`buyer_${row.id}`, 'arrivalPricePolicy']) || 0;
+
+                    const alphaProfit = product === '넙치'
+                      ? arrivalPrice - loadingPrice - arrivalPricePolicy
+                      : null;
+
+                    // Form value에도 저장
+                    if (product === '넙치') {
+                      form.setFieldValue([`row_${row.id}`, 'alphaProfit'], alphaProfit);
+                    } else {
+                      form.setFieldValue([`row_${row.id}`, 'alphaProfit'], null);
+                    }
+
+                    return (
+                      <Form.Item
+                        name={[`row_${row.id}`, 'alphaProfit']}
+                        label={index === 0 ? '알파수익단가' : ''}
+                        style={{ minWidth: 130 }}
+                      >
+                        <InputNumber
+                          disabled={product !== '넙치'}
+                          value={alphaProfit}
+                          style={{
+                            width: '100%',
+                            color: alphaProfit && alphaProfit < 0 ? '#ff4d4f' : undefined
+                          }}
+                          placeholder={product === '넙치' ? '자동계산' : '-'}
+                          addonAfter="원"
+                          formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          parser={value => value.replace(/,/g, '')}
+                          readOnly
+                        />
+                      </Form.Item>
+                    );
+                  }}
+                </Form.Item>
+
+                {/* 알파수익반영 */}
+                <Form.Item noStyle shouldUpdate={(prev, curr) =>
+                  prev[`row_${row.id}`]?.product !== curr[`row_${row.id}`]?.product ||
+                  prev[`row_${row.id}`]?.alphaProfit !== curr[`row_${row.id}`]?.alphaProfit
+                }>
+                  {() => {
+                    const product = form.getFieldValue([`row_${row.id}`, 'product']);
+                    const alphaProfit = form.getFieldValue([`row_${row.id}`, 'alphaProfit']);
+
+                    const isEnabled = product === '넙치' && alphaProfit !== 0 && alphaProfit !== null;
+
+                    return (
+                      <Form.Item
+                        name={[`row_${row.id}`, 'alphaProfitTarget']}
+                        label={index === 0 ? '알파수익반영' : ''}
+                        style={{ minWidth: 120 }}
+                      >
+                        <Select
+                          disabled={!isEnabled}
+                          placeholder="선택"
+                          options={[
+                            { value: 'buyer', label: '바이어' },
+                            { value: 'seller', label: '셀러' }
+                          ]}
+                        />
+                      </Form.Item>
+                    );
+                  }}
                 </Form.Item>
 
                 {/* 상차수수료율 */}
