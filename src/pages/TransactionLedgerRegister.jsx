@@ -731,6 +731,7 @@ const TransactionLedgerRegister = () => {
                         name={[`row_${row.id}`, 'alphaProfitTarget']}
                         label={index === 0 ? '알파수익반영' : ''}
                         style={{ minWidth: 120 }}
+                        initialValue="buyer"
                       >
                         <Select
                           disabled={!isEnabled}
