@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useBlocker } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Button,
@@ -36,22 +36,10 @@ const TransactionLedgerRegister = () => {
   const [driverOptions, setDriverOptions] = useState([]);
   const [, forceUpdate] = useState({});
 
-  // 네비게이션 방지
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) => {
-      try {
-        return form && form.isFieldsTouched() &&
-          currentLocation.pathname !== nextLocation.pathname;
-      } catch {
-        return false;
-      }
-    }
-  );
-
   // beforeunload 이벤트 (브라우저 새로고침, 탭 닫기)
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (form.isFieldsTouched()) {
+      if (form && form.isFieldsTouched()) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -63,24 +51,6 @@ const TransactionLedgerRegister = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [form]);
-
-  // blocker 상태 감지 및 모달 표시
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      Modal.confirm({
-        title: '입력한 내용이 저장되지 않습니다. 페이지를 떠나시겠습니까?',
-        content: '이 페이지를 떠나면 입력한 모든 데이터가 손실됩니다.',
-        okText: '떠나기',
-        cancelText: '머무르기',
-        onOk: () => {
-          blocker.proceed();
-        },
-        onCancel: () => {
-          blocker.reset();
-        }
-      });
-    }
-  }, [blocker]);
 
   // 바이어 데이터 (mockData에서 가져오기 - 추후 API 연동)
   const buyers = [
