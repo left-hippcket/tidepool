@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card, Table, Button, DatePicker, Space, Typography, Badge, message, Divider
 } from 'antd';
@@ -15,6 +16,7 @@ const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 function ClaimAdjustmentList() {
+  const navigate = useNavigate();
   const [dateRange, setDateRange] = useState([dayjs().subtract(29, 'day'), dayjs()]);
   const [expandedRowKey, setExpandedRowKey] = useState(null);
 
@@ -76,7 +78,7 @@ function ClaimAdjustmentList() {
   };
 
   const handleRegister = () => {
-    message.info('등록 기능은 다음 단계에서 구현됩니다.');
+    navigate('/claim-adjustment/register');
   };
 
   // 아코디언 상세 패널
