@@ -232,6 +232,7 @@ function JoinDistributionRegister() {
             <Form.Item
               name="territory"
               label="사업권역"
+              rules={[{ required: true, message: '사업권역을 선택해주세요.' }]}
             >
               <Select placeholder="사업권역 선택">
                 {territories.filter(t => t.status === 'active').map(t => (
@@ -243,6 +244,7 @@ function JoinDistributionRegister() {
             <Form.Item
               name="region"
               label="상세지역"
+              rules={[{ required: true, message: '상세지역을 선택해주세요.' }]}
             >
               <Select placeholder="상세지역 선택">
                 <Select.Option value="서울">서울</Select.Option>
