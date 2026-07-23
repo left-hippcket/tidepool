@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Card, Table, Button, DatePicker, Space, Typography, Badge, message, Divider
+  Card, Table, Button, DatePicker, Space, Typography, Badge, message, Divider, Modal
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -66,15 +66,42 @@ function ClaimAdjustmentList() {
     return unique.sort().map(value => ({ text: value, value }));
   };
 
-  // 액션 핸들러 (P2에서 구현)
+  // 액션 핸들러
   const handleEdit = (e, id) => {
     e.stopPropagation();
-    message.info('수정 기능은 P2 단계에서 구현됩니다.');
+    navigate(`/claim-adjustment/${id}/edit`);
   };
 
-  const handleDelete = (e, id) => {
+  const handleDelete = (e, record) => {
     e.stopPropagation();
-    message.info('삭제 기능은 P2 단계에서 구현됩니다.');
+
+    const contentText = record.장부반영여부
+      ? '이 클레임/조정을 삭제하시겠습니까? 장부에 반영된 조정액도 함께 제거됩니다.'
+      : '이 클레임/조정을 삭제하시겠습니까?';
+
+    Modal.confirm({
+      title: '클레임/조정 삭제',
+      content: (
+        <div>
+          <p>{contentText}</p>
+          <div style={{ marginTop: 12, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 4 }}>
+            <div style={{ marginBottom: 4 }}><strong>거래코드:</strong> {record.거래코드}</div>
+            <div style={{ marginBottom: 4 }}><strong>클레임유형:</strong> {record.클레임유형}</div>
+            {record.장부반영여부 && (
+              <div><strong>최종손실:</strong> <span style={{ color: '#ff4d4f' }}>{formatCurrency(record.최종손실)}</span></div>
+            )}
+          </div>
+        </div>
+      ),
+      okText: '삭제',
+      okType: 'danger',
+      cancelText: '취소',
+      onOk: () => {
+        // TODO: API 호출하여 클레임 삭제 및 거래장부 복구
+        message.success('클레임/조정이 삭제되었습니다.');
+        // 페이지 새로고침 (실제로는 데이터 다시 조회)
+      },
+    });
   };
 
   const handleRegister = () => {
@@ -334,7 +361,7 @@ function ClaimAdjustmentList() {
           <Button size="small" onClick={(e) => handleEdit(e, record.id)}>
             수정
           </Button>
-          <Button size="small" danger onClick={(e) => handleDelete(e, record.id)}>
+          <Button size="small" danger onClick={(e) => handleDelete(e, record)}>
             삭제
           </Button>
         </Space>

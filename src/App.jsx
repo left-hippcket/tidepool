@@ -31,6 +31,7 @@ import TransactionLedger from './pages/TransactionLedger';
 import TransactionLedgerRegister from './pages/TransactionLedgerRegister';
 import ClaimAdjustmentList from './pages/ClaimAdjustmentList';
 import ClaimAdjustmentRegister from './pages/ClaimAdjustmentRegister';
+import ClaimAdjustmentEdit from './pages/ClaimAdjustmentEdit';
 
 const { Header, Sider, Content } = Layout;
 
@@ -336,6 +337,7 @@ function App() {
             <Route path="/transaction-ledger/register" element={<TransactionLedgerRegister />} />
             <Route path="/claim-adjustment" element={<ClaimAdjustmentList />} />
             <Route path="/claim-adjustment/register" element={<ClaimAdjustmentRegister />} />
+            <Route path="/claim-adjustment/:id/edit" element={<ClaimAdjustmentEdit />} />
             <Route path="/standard-price" element={<StandardPrice />} />
             <Route path="/standard-price/register" element={<StandardPriceRegister />} />
           </Routes>
