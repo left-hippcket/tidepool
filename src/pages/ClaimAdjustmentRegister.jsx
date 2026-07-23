@@ -309,11 +309,8 @@ function ClaimAdjustmentRegister() {
       </div>
 
       <Form form={form} layout="vertical">
-        {/* 거래 찾기 + 클레임 내용 (2단 레이아웃) */}
-        <Row gutter={16}>
-          <Col span={14}>
-            {/* 거래 찾기 섹션 */}
-            <Card title="거래 찾기" style={{ marginBottom: 16 }} size="small">
+        {/* 거래 찾기 섹션 */}
+        <Card title="거래 찾기" style={{ marginBottom: 16 }} size="small">
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item
@@ -399,11 +396,11 @@ function ClaimAdjustmentRegister() {
                 </div>
               )}
             </Card>
-          </Col>
 
-          <Col span={10}>
-            {/* 클레임 내용 섹션 */}
-            <Card title="클레임 내용" style={{ marginBottom: 16 }} size="small">
+        {/* 클레임 내용 섹션 */}
+        <Card title="클레임 내용" style={{ marginBottom: 16 }} size="small">
+          <Row gutter={16}>
+            <Col span={12}>
               <Form.Item
                 name="claimType"
                 label="클레임/조정 유형"
@@ -420,7 +417,8 @@ function ClaimAdjustmentRegister() {
                   <Select.Option value="회계처리용">회계처리용</Select.Option>
                 </Select>
               </Form.Item>
-
+            </Col>
+            <Col span={12}>
               <Form.Item
                 name="severity"
                 label="심각도"
@@ -432,25 +430,25 @@ function ClaimAdjustmentRegister() {
                   <Radio value="보통">보통</Radio>
                 </Radio.Group>
               </Form.Item>
+            </Col>
+          </Row>
 
-              <Form.Item
-                name="claimContent"
-                label="클레임/조정 내용"
-                rules={[
-                  { required: true, message: '필수' },
-                  { min: 5, message: '5자 이상' }
-                ]}
-              >
-                <TextArea
-                  rows={6}
-                  maxLength={500}
-                  placeholder="클레임 또는 조정 사유를 입력해주세요"
-                  showCount
-                />
-              </Form.Item>
-            </Card>
-          </Col>
-        </Row>
+          <Form.Item
+            name="claimContent"
+            label="클레임/조정 내용"
+            rules={[
+              { required: true, message: '필수' },
+              { min: 5, message: '5자 이상' }
+            ]}
+          >
+            <TextArea
+              rows={4}
+              maxLength={500}
+              placeholder="클레임 또는 조정 사유를 입력해주세요"
+              showCount
+            />
+          </Form.Item>
+        </Card>
 
         {/* 거래 정보 요약 (선택 시에만 표시) */}
         {selectedTransaction && (
