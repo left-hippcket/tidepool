@@ -29,6 +29,7 @@ import StandardPrice from './pages/StandardPrice';
 import StandardPriceRegister from './pages/StandardPriceRegister';
 import TransactionLedger from './pages/TransactionLedger';
 import TransactionLedgerRegister from './pages/TransactionLedgerRegister';
+import ClaimAdjustmentList from './pages/ClaimAdjustmentList';
 
 const { Header, Sider, Content } = Layout;
 
@@ -151,6 +152,7 @@ function App() {
       label: '거래장부',
       children: [
         { key: '/transaction-ledger', label: '장부 조회' },
+        { key: '/claim-adjustment', label: '클레임/조정' },
       ],
     },
     {
@@ -331,6 +333,7 @@ function App() {
             <Route path="/product-list" element={<ProductList />} />
             <Route path="/transaction-ledger" element={<TransactionLedger />} />
             <Route path="/transaction-ledger/register" element={<TransactionLedgerRegister />} />
+            <Route path="/claim-adjustment" element={<ClaimAdjustmentList />} />
             <Route path="/standard-price" element={<StandardPrice />} />
             <Route path="/standard-price/register" element={<StandardPriceRegister />} />
           </Routes>
