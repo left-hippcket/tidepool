@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, unstable_useBlocker as useBlocker } from 'react-router-dom';
+import { useNavigate, useBlocker } from 'react-router-dom';
 import {
   Card,
   Button,
