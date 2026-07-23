@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Form, Input, Select, Button, Radio, Space, Card, Steps, Table, DatePicker, AutoComplete,
-  InputNumber, Checkbox, Alert, Descriptions, message, Divider, Modal
+  Form, Input, Select, Button, Radio, Space, Card, Table, DatePicker, AutoComplete,
+  InputNumber, Checkbox, Alert, Descriptions, message, Modal, Row, Col
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -13,13 +13,10 @@ const { TextArea } = Input;
 function ClaimAdjustmentRegister() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [currentStep, setCurrentStep] = useState(0);
 
-  // Step 1 상태
+  // 상태
   const [searchResults, setSearchResults] = useState([]);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-
-  // Step 2 상태
   const [needsLedgerUpdate, setNeedsLedgerUpdate] = useState(true);
   const [enabledAdjustments, setEnabledAdjustments] = useState({
     buyer: false,
@@ -72,26 +69,6 @@ function ClaimAdjustmentRegister() {
     setSelectedTransaction(record);
   };
 
-  // Step 1 → Step 2
-  const handleNextStep = async () => {
-    try {
-      const values = await form.validateFields(['claimType', 'severity', 'claimContent']);
-
-      if (!selectedTransaction) {
-        message.error('거래를 선택해주세요.');
-        return;
-      }
-
-      setCurrentStep(1);
-    } catch (error) {
-      console.error('Validation failed:', error);
-    }
-  };
-
-  // Step 2 → Step 1
-  const handlePrevStep = () => {
-    setCurrentStep(0);
-  };
 
   // 조정액 자동 계산
   const calculateAdjustments = () => {
@@ -154,6 +131,12 @@ function ClaimAdjustmentRegister() {
   // 등록 완료
   const handleSubmit = async () => {
     try {
+      // 거래 선택 확인
+      if (!selectedTransaction) {
+        message.error('거래를 선택해주세요.');
+        return;
+      }
+
       const values = await form.validateFields();
 
       // 장부 반영 필요 시 최소 하나의 조정 항목 필요
@@ -305,86 +288,96 @@ function ClaimAdjustmentRegister() {
   return (
     <div style={{ padding: '24px' }}>
       {/* 헤더 */}
-      <div style={{ marginBottom: 24 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={handleCancel}
-          style={{ marginBottom: 16 }}
-        >
-          목록으로
-        </Button>
-        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>클레임/조정 등록</h2>
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={handleCancel}
+          >
+            목록으로
+          </Button>
+          <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>클레임/조정 등록</h2>
+        </div>
+        <Space>
+          <Button size="large" onClick={handleCancel}>
+            취소
+          </Button>
+          <Button type="primary" size="large" onClick={handleSubmit}>
+            등록
+          </Button>
+        </Space>
       </div>
 
-      {/* Steps */}
-      <Steps
-        current={currentStep}
-        items={[
-          { title: '거래 찾기' },
-          { title: '장부 반영' },
-        ]}
-        style={{ marginBottom: 24 }}
-      />
-
       <Form form={form} layout="vertical">
-        {/* Step 1: 거래 찾기 */}
-        {currentStep === 0 && (
-          <>
+        {/* 거래 찾기 + 클레임 내용 (2단 레이아웃) */}
+        <Row gutter={16}>
+          <Col span={14}>
             {/* 거래 찾기 섹션 */}
-            <Card title="거래 찾기" style={{ marginBottom: 16 }}>
-              <Form.Item
-                name="deliveryDate"
-                label="납품일"
-                rules={[{ required: true, message: '납품일을 선택해주세요.' }]}
-              >
-                <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
-              </Form.Item>
+            <Card title="거래 찾기" style={{ marginBottom: 16 }} size="small">
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="deliveryDate"
+                    label="납품일"
+                    rules={[{ required: true, message: '납품일을 선택해주세요.' }]}
+                  >
+                    <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="buyerGroupName"
+                    label="바이어그룹명"
+                    rules={[{ required: true, message: '바이어그룹명을 입력해주세요.' }]}
+                  >
+                    <AutoComplete
+                      options={buyerGroups.map(g => ({ value: g.name }))}
+                      placeholder="필수"
+                      filterOption={(inputValue, option) =>
+                        option.value.toLowerCase().includes(inputValue.toLowerCase())
+                      }
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Form.Item
-                name="buyerGroupName"
-                label="바이어그룹명"
-                rules={[{ required: true, message: '바이어그룹명을 입력해주세요.' }]}
-              >
-                <AutoComplete
-                  options={buyerGroups.map(g => ({ value: g.name }))}
-                  placeholder="바이어그룹명 입력"
-                  filterOption={(inputValue, option) =>
-                    option.value.toLowerCase().includes(inputValue.toLowerCase())
-                  }
-                />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={8}>
+                  <Form.Item name="sellerGroupName" label="셀러그룹명">
+                    <AutoComplete
+                      options={sellerGroups.map(g => ({ value: g.name }))}
+                      placeholder="선택"
+                      filterOption={(inputValue, option) =>
+                        option.value.toLowerCase().includes(inputValue.toLowerCase())
+                      }
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="product" label="품목">
+                    <AutoComplete
+                      options={uniqueProducts.map(p => ({ value: p }))}
+                      placeholder="선택"
+                      filterOption={(inputValue, option) =>
+                        option.value.toLowerCase().includes(inputValue.toLowerCase())
+                      }
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name="spec" label="규격">
+                    <AutoComplete
+                      options={uniqueSpecs.map(s => ({ value: s }))}
+                      placeholder="선택"
+                      filterOption={(inputValue, option) =>
+                        option.value.toLowerCase().includes(inputValue.toLowerCase())
+                      }
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Form.Item name="sellerGroupName" label="셀러그룹명">
-                <AutoComplete
-                  options={sellerGroups.map(g => ({ value: g.name }))}
-                  placeholder="셀러그룹명 입력 (선택)"
-                  filterOption={(inputValue, option) =>
-                    option.value.toLowerCase().includes(inputValue.toLowerCase())
-                  }
-                />
-              </Form.Item>
-
-              <Form.Item name="product" label="품목">
-                <AutoComplete
-                  options={uniqueProducts.map(p => ({ value: p }))}
-                  placeholder="품목 입력 (선택)"
-                  filterOption={(inputValue, option) =>
-                    option.value.toLowerCase().includes(inputValue.toLowerCase())
-                  }
-                />
-              </Form.Item>
-
-              <Form.Item name="spec" label="규격">
-                <AutoComplete
-                  options={uniqueSpecs.map(s => ({ value: s }))}
-                  placeholder="규격 입력 (선택)"
-                  filterOption={(inputValue, option) =>
-                    option.value.toLowerCase().includes(inputValue.toLowerCase())
-                  }
-                />
-              </Form.Item>
-
-              <Button type="primary" onClick={handleSearch}>
+              <Button type="primary" onClick={handleSearch} block>
                 검색
               </Button>
 
@@ -393,27 +386,30 @@ function ClaimAdjustmentRegister() {
                   <Table
                     columns={searchColumns}
                     dataSource={searchResults}
-                    rowKey="id"
-                    pagination={{ defaultPageSize: 10 }}
+                    rowKey="key"
+                    pagination={{ defaultPageSize: 5, pageSize: 5 }}
                     rowSelection={{
                       type: 'radio',
-                      selectedRowKeys: selectedTransaction ? [selectedTransaction.id] : [],
+                      selectedRowKeys: selectedTransaction ? [selectedTransaction.key] : [],
                       onChange: (_, selectedRows) => handleSelectTransaction(selectedRows[0]),
                     }}
                     scroll={{ x: 1600 }}
+                    size="small"
                   />
                 </div>
               )}
             </Card>
+          </Col>
 
+          <Col span={10}>
             {/* 클레임 내용 섹션 */}
-            <Card title="클레임 내용" style={{ marginBottom: 16 }}>
+            <Card title="클레임 내용" style={{ marginBottom: 16 }} size="small">
               <Form.Item
                 name="claimType"
                 label="클레임/조정 유형"
-                rules={[{ required: true, message: '클레임/조정 유형을 선택해주세요.' }]}
+                rules={[{ required: true, message: '필수' }]}
               >
-                <Select placeholder="클레임 유형을 선택해주세요">
+                <Select placeholder="선택">
                   <Select.Option value="살밥">살밥</Select.Option>
                   <Select.Option value="로스">로스</Select.Option>
                   <Select.Option value="사이즈">사이즈</Select.Option>
@@ -428,7 +424,7 @@ function ClaimAdjustmentRegister() {
               <Form.Item
                 name="severity"
                 label="심각도"
-                rules={[{ required: true, message: '심각도를 선택해주세요.' }]}
+                rules={[{ required: true, message: '필수' }]}
               >
                 <Radio.Group>
                   <Radio value="매우심각">매우심각</Radio>
@@ -441,35 +437,24 @@ function ClaimAdjustmentRegister() {
                 name="claimContent"
                 label="클레임/조정 내용"
                 rules={[
-                  { required: true, message: '클레임/조정 내용을 입력해주세요.' },
-                  { min: 5, message: '클레임/조정 내용을 5자 이상 입력해주세요.' }
+                  { required: true, message: '필수' },
+                  { min: 5, message: '5자 이상' }
                 ]}
               >
                 <TextArea
-                  rows={3}
+                  rows={6}
                   maxLength={500}
-                  placeholder="클레임 또는 조정 사유를 입력해주세요 (예: 폐사 5kg 발생, 외관 상처 多)"
+                  placeholder="클레임 또는 조정 사유를 입력해주세요"
+                  showCount
                 />
               </Form.Item>
             </Card>
+          </Col>
+        </Row>
 
-            {/* 하단 버튼 */}
-            <Space>
-              <Button size="large" onClick={handleCancel}>
-                취소
-              </Button>
-              <Button type="primary" size="large" onClick={handleNextStep}>
-                다음: 장부 반영 설정 →
-              </Button>
-            </Space>
-          </>
-        )}
-
-        {/* Step 2: 장부 반영 */}
-        {currentStep === 1 && selectedTransaction && (
-          <>
-            {/* 거래 정보 요약 */}
-            <Card title="거래 정보 요약" style={{ marginBottom: 16 }}>
+        {/* 거래 정보 요약 (선택 시에만 표시) */}
+        {selectedTransaction && (
+          <Card title="선택된 거래 정보" style={{ marginBottom: 16 }} size="small">
               <Descriptions bordered size="small" column={3}>
                 <Descriptions.Item label="거래코드">{selectedTransaction.거래코드}</Descriptions.Item>
                 <Descriptions.Item label="품목 정보">
@@ -491,29 +476,29 @@ function ClaimAdjustmentRegister() {
               </Descriptions>
             </Card>
 
-            {/* 장부 반영 */}
-            <Card title="장부 반영" style={{ marginBottom: 16 }}>
-              <Form.Item
-                name="needsLedgerUpdate"
-                label="장부 반영 여부"
-                rules={[{ required: true, message: '장부 반영 여부를 선택해주세요.' }]}
-                initialValue={true}
-              >
-                <Radio.Group onChange={(e) => setNeedsLedgerUpdate(e.target.value)}>
-                  <Radio value={true}>필요함</Radio>
-                  <Radio value={false}>불필요</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Card>
+          <Card title="장부 반영 설정" style={{ marginBottom: 16 }}>
+            <Form.Item
+              name="needsLedgerUpdate"
+              label="장부 반영 여부"
+              rules={[{ required: true, message: '필수' }]}
+              initialValue={true}
+            >
+              <Radio.Group onChange={(e) => setNeedsLedgerUpdate(e.target.value)}>
+                <Radio value={true}>필요함</Radio>
+                <Radio value={false}>불필요</Radio>
+              </Radio.Group>
+            </Form.Item>
 
             {/* 조정 내역 */}
-            <Card
-              title="조정 내역"
-              style={{
-                marginBottom: 16,
+            <div style={{ marginTop: 16 }}>
+              <div style={{
+                marginBottom: 12,
+                fontWeight: 600,
+                fontSize: 14,
                 opacity: needsLedgerUpdate ? 1 : 0.5
-              }}
-            >
+              }}>
+                조정 내역
+              </div>
               {/* 바이어 매출 조정 */}
               <div style={{ marginBottom: 24 }}>
                 <Checkbox
@@ -696,47 +681,38 @@ function ClaimAdjustmentRegister() {
                   </div>
                 )}
               </div>
-            </Card>
+            </div>
+          </Card>
 
-            {/* 손실 귀책 지정 (조건부) */}
-            {needsLedgerUpdate && finalLoss < 0 && (
-              <Alert
-                type="warning"
-                message="손실 귀책 지정"
-                description={
-                  <div>
-                    <div style={{ color: '#ff4d4f', fontWeight: 600, marginBottom: 12 }}>
-                      최종 손실: {formatCurrency(finalLoss)} (모든 조정액 합계)
-                    </div>
-                    <div style={{ marginBottom: 8 }}>이 손실의 귀책은 누구에게 있나요?</div>
-                    <Form.Item
-                      name="accountability"
-                      rules={[{ required: true, message: '손실의 귀책 사유를 선택해주세요.' }]}
-                    >
-                      <Radio.Group>
-                        <Space direction="vertical">
-                          <Radio value="buyer">바이어 귀책</Radio>
-                          <Radio value="seller">셀러 귀책</Radio>
-                          <Radio value="shared">공동 귀책 (50:50)</Radio>
-                        </Space>
-                      </Radio.Group>
-                    </Form.Item>
-                  </div>
-                }
-                style={{ marginBottom: 16 }}
-              />
-            )}
+        )}
 
-            {/* 하단 버튼 */}
-            <Space>
-              <Button size="large" onClick={handlePrevStep}>
-                ← 이전
-              </Button>
-              <Button type="primary" size="large" onClick={handleSubmit}>
-                등록
-              </Button>
-            </Space>
-          </>
+        {/* 손실 귀책 지정 (조건부) */}
+        {selectedTransaction && needsLedgerUpdate && finalLoss < 0 && (
+          <Alert
+            type="warning"
+            message="손실 귀책 지정"
+            description={
+              <div>
+                <div style={{ color: '#ff4d4f', fontWeight: 600, marginBottom: 12 }}>
+                  최종 손실: {formatCurrency(finalLoss)} (모든 조정액 합계)
+                </div>
+                <div style={{ marginBottom: 8 }}>이 손실의 귀책은 누구에게 있나요?</div>
+                <Form.Item
+                  name="accountability"
+                  rules={[{ required: true, message: '필수' }]}
+                >
+                  <Radio.Group>
+                    <Space direction="vertical">
+                      <Radio value="buyer">바이어 귀책</Radio>
+                      <Radio value="seller">셀러 귀책</Radio>
+                      <Radio value="shared">공동 귀책 (50:50)</Radio>
+                    </Space>
+                  </Radio.Group>
+                </Form.Item>
+              </div>
+            }
+            style={{ marginBottom: 16 }}
+          />
         )}
       </Form>
     </div>
