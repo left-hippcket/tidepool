@@ -475,7 +475,10 @@ function ClaimAdjustmentRegister() {
                 </Descriptions.Item>
               </Descriptions>
             </Card>
+        )}
 
+        {/* 장부 반영 설정 (거래 선택 시에만 표시) */}
+        {selectedTransaction && (
           <Card title="장부 반영 설정" style={{ marginBottom: 16 }}>
             <Form.Item
               name="needsLedgerUpdate"
@@ -682,12 +685,9 @@ function ClaimAdjustmentRegister() {
                 )}
               </div>
             </div>
-          </Card>
 
-        )}
-
-        {/* 손실 귀책 지정 (조건부) */}
-        {selectedTransaction && needsLedgerUpdate && finalLoss < 0 && (
+            {/* 손실 귀책 지정 (조건부) */}
+            {needsLedgerUpdate && finalLoss < 0 && (
           <Alert
             type="warning"
             message="손실 귀책 지정"
@@ -713,6 +713,8 @@ function ClaimAdjustmentRegister() {
             }
             style={{ marginBottom: 16 }}
           />
+            )}
+          </Card>
         )}
       </Form>
     </div>
