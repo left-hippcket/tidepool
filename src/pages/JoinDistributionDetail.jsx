@@ -242,7 +242,7 @@ function JoinDistributionDetail() {
               <Form.Item label="상차 수수료율(%)" name="commissionRate" rules={[{ required: true }]}>
                 <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} />
               </Form.Item>
-              <Form.Item label="메인공급처" name="mainSuppliers">
+              <Form.Item label="메인판매처" name="mainSuppliers">
                 <Input placeholder="쉼표로 구분" maxLength={100} />
               </Form.Item>
               <Form.Item label="메인 양식장" name="mainFarms">
@@ -298,7 +298,7 @@ function JoinDistributionDetail() {
               <div className="text-base font-semibold text-gray-900">{detail.commissionRate}%</div>
             </div>
             <div>
-              <div className="text-sm text-gray-500 mb-1">메인공급처</div>
+              <div className="text-sm text-gray-500 mb-1">메인판매처</div>
               <div className="text-base font-semibold text-gray-900">{detail.mainSuppliers || '-'}</div>
             </div>
             <div>

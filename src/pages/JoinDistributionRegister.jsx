@@ -338,7 +338,7 @@ function JoinDistributionRegister() {
 
             <Form.Item
               name="mainSuppliers"
-              label="메인공급처"
+              label="메인판매처"
               rules={[{ max: 100, message: '최대 100자' }]}
             >
               <Input placeholder="쉼표로 구분 (예: 동주유통, ING)" />
