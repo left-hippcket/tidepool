@@ -311,16 +311,6 @@ function TerritoryManagement() {
       key: 'name',
       width: 200,
       render: (text, record) => {
-        if (record.id === 'new') {
-          return (
-            <Input
-              value={newTerritoryData.name}
-              onChange={(e) => setNewTerritoryData({ ...newTerritoryData, name: e.target.value })}
-              placeholder="권역명 입력"
-              maxLength={20}
-            />
-          );
-        }
         if (record.id === editingTerritoryId) {
           return (
             <Input
@@ -339,18 +329,6 @@ function TerritoryManagement() {
       key: 'displayOrder',
       width: 120,
       render: (text, record) => {
-        if (record.id === 'new') {
-          return (
-            <Input
-              type="number"
-              value={newTerritoryData.displayOrder}
-              onChange={(e) => setNewTerritoryData({ ...newTerritoryData, displayOrder: parseInt(e.target.value) || '' })}
-              placeholder="순서"
-              min={1}
-              style={{ width: 80 }}
-            />
-          );
-        }
         if (record.id === editingTerritoryId) {
           return (
             <Input
@@ -378,9 +356,6 @@ function TerritoryManagement() {
       key: 'status',
       width: 100,
       render: (status, record) => {
-        if (record.id === 'new') {
-          return <Tag color="green">활성</Tag>;
-        }
         if (record.id === editingTerritoryId) {
           return (
             <Select
@@ -405,7 +380,7 @@ function TerritoryManagement() {
       key: 'action',
       width: 150,
       render: (_, record) => {
-        if (record.id === 'new' || record.id === editingTerritoryId) {
+        if (record.id === editingTerritoryId) {
           return (
             <Space>
               <Button
@@ -444,22 +419,6 @@ function TerritoryManagement() {
       key: 'territoryName',
       width: 150,
       render: (text, record) => {
-        if (record.id === 'new') {
-          return (
-            <Select
-              value={newRegionData.territoryId}
-              onChange={(value) => setNewRegionData({ ...newRegionData, territoryId: value })}
-              placeholder="권역 선택"
-              style={{ width: '100%' }}
-            >
-              {territories.filter(t => t.status === 'active').map(t => (
-                <Select.Option key={t.id} value={t.id}>
-                  {t.name}
-                </Select.Option>
-              ))}
-            </Select>
-          );
-        }
         if (record.id === editingRegionId) {
           return (
             <Select
@@ -484,16 +443,6 @@ function TerritoryManagement() {
       key: 'name',
       width: 200,
       render: (text, record) => {
-        if (record.id === 'new') {
-          return (
-            <Input
-              value={newRegionData.name}
-              onChange={(e) => setNewRegionData({ ...newRegionData, name: e.target.value })}
-              placeholder="지역명 입력"
-              maxLength={20}
-            />
-          );
-        }
         if (record.id === editingRegionId) {
           return (
             <Input
@@ -512,18 +461,6 @@ function TerritoryManagement() {
       key: 'displayOrder',
       width: 120,
       render: (text, record) => {
-        if (record.id === 'new') {
-          return (
-            <Input
-              type="number"
-              value={newRegionData.displayOrder}
-              onChange={(e) => setNewRegionData({ ...newRegionData, displayOrder: parseInt(e.target.value) || '' })}
-              placeholder="순서"
-              min={1}
-              style={{ width: 80 }}
-            />
-          );
-        }
         if (record.id === editingRegionId) {
           return (
             <Input
@@ -544,9 +481,6 @@ function TerritoryManagement() {
       key: 'status',
       width: 100,
       render: (status, record) => {
-        if (record.id === 'new') {
-          return <Tag color="green">활성</Tag>;
-        }
         if (record.id === editingRegionId) {
           return (
             <Select
@@ -571,7 +505,7 @@ function TerritoryManagement() {
       key: 'action',
       width: 150,
       render: (_, record) => {
-        if (record.id === 'new' || record.id === editingRegionId) {
+        if (record.id === editingRegionId) {
           return (
             <Space>
               <Button
