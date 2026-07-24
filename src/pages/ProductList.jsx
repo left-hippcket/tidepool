@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Select } from 'antd';
+import { Select, Card, Space, Flex, Typography, Tag, Table } from 'antd';
+
+const { Title, Text } = Typography;
 import {
   products as initialProducts,
   origins as initialOrigins,
@@ -194,16 +196,17 @@ function ProductList() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">상품 리스트</h2>
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>상품 리스트</Title>
 
       {/* 필터 영역 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">품목분류:</span>
+      <Card>
+        <Space wrap size="middle">
+          <Space size="small">
+            <Text>품목분류:</Text>
             <Select
-              className="w-40"
+              style={{ width: 160 }}
               value={selectedCategory}
               onChange={handleCategoryChange}
             >
@@ -214,12 +217,12 @@ function ProductList() {
                 </Select.Option>
               ))}
             </Select>
-          </div>
+          </Space>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">품목명:</span>
+          <Space size="small">
+            <Text>품목명:</Text>
             <Select
-              className="w-40"
+              style={{ width: 160 }}
               value={selectedProduct}
               onChange={handleProductChange}
             >
@@ -230,12 +233,12 @@ function ProductList() {
                 </Select.Option>
               ))}
             </Select>
-          </div>
+          </Space>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">원산지:</span>
+          <Space size="small">
+            <Text>원산지:</Text>
             <Select
-              className="w-40"
+              style={{ width: 160 }}
               value={selectedOrigin}
               onChange={setSelectedOrigin}
             >
@@ -246,12 +249,12 @@ function ProductList() {
                 </Select.Option>
               ))}
             </Select>
-          </div>
+          </Space>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">활성상태:</span>
+          <Space size="small">
+            <Text>활성상태:</Text>
             <Select
-              className="w-32"
+              style={{ width: 128 }}
               value={selectedStatus}
               onChange={setSelectedStatus}
             >
@@ -259,95 +262,40 @@ function ProductList() {
               <Select.Option value="활성">활성</Select.Option>
               <Select.Option value="비활성">비활성</Select.Option>
             </Select>
-          </div>
-        </div>
-      </div>
+          </Space>
+        </Space>
+      </Card>
 
       {/* 결과 요약 */}
-      <div className="mb-4">
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">
-          총 {filteredData.length}개 상품
-        </span>
-      </div>
+      <Tag color="blue">총 {filteredData.length}개 상품</Tag>
 
-      {/* 테이블 - 데스크톱 */}
-      <div className="hidden md:block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">품목분류</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">품목</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">원산지</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">규격</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">주문단위당중량(kg)</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">주문단위</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">품목상태</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredData.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-gray-900">{item.categoryName}</td>
-                  <td className="px-4 py-3 text-gray-900">{item.productName}</td>
-                  <td className="px-4 py-3 text-gray-900">{item.originName || '-'}</td>
-                  <td className="px-4 py-3 text-gray-900">{item.specName || '-'}</td>
-                  <td className="px-4 py-3 text-gray-900">{item.unitWeight}</td>
-                  <td className="px-4 py-3 text-gray-900">{item.orderUnit}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                      item.overallStatus === 'active'
-                        ? 'bg-green-50 text-green-700 border border-green-200'
-                        : 'bg-gray-50 text-gray-700 border border-gray-200'
-                    }`}>
-                      {item.overallStatus === 'active' ? '활성' : '비활성'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 모바일 카드 리스트 */}
-      <div className="md:hidden space-y-3">
-        {filteredData.map((item) => (
-          <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <div className="text-sm text-gray-500">{item.categoryName}</div>
-                <div className="text-lg font-semibold text-gray-900">{item.productName}</div>
-              </div>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                item.overallStatus === 'active'
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-gray-50 text-gray-700 border border-gray-200'
-              }`}>
-                {item.overallStatus === 'active' ? '활성' : '비활성'}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">원산지</div>
-                <div className="font-medium text-gray-900">{item.originName || '-'}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">규격</div>
-                <div className="font-medium text-gray-900">{item.specName || '-'}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">주문단위당중량</div>
-                <div className="font-medium text-gray-900">{item.unitWeight}kg</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">주문단위</div>
-                <div className="font-medium text-gray-900">{item.orderUnit}</div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* 테이블 */}
+      <Card>
+        <Table
+          dataSource={filteredData}
+          rowKey="id"
+          pagination={{ pageSize: 20 }}
+          columns={[
+            { title: '품목분류', dataIndex: 'categoryName', key: 'categoryName' },
+            { title: '품목', dataIndex: 'productName', key: 'productName' },
+            { title: '원산지', dataIndex: 'originName', key: 'originName', render: (val) => val || '-' },
+            { title: '규격', dataIndex: 'specName', key: 'specName', render: (val) => val || '-' },
+            { title: '주문단위당중량(kg)', dataIndex: 'unitWeight', key: 'unitWeight' },
+            { title: '주문단위', dataIndex: 'orderUnit', key: 'orderUnit' },
+            {
+              title: '품목상태',
+              dataIndex: 'overallStatus',
+              key: 'overallStatus',
+              render: (status) => (
+                <Tag color={status === 'active' ? 'success' : 'default'}>
+                  {status === 'active' ? '활성' : '비활성'}
+                </Tag>
+              )
+            }
+          ]}
+        />
+      </Card>
+      </Space>
     </div>
   );
 }
