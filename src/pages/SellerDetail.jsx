@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image, Upload, Space } from 'antd';
+import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image, Upload, Space, Card, Flex, Descriptions, Row, Col, Statistic, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { sellerGroups, sellerDetails, managers, territories, regions, productCategories } from '../data/mockData';
 import { Column } from '@ant-design/charts';
+
+const { Title, Text } = Typography;
 
 function SellerDetail() {
   const { id } = useParams();
@@ -207,55 +209,44 @@ function SellerDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
       {/* 헤더 */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/seller')}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <ArrowLeftOutlined />
-            목록으로
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">{sellerGroup.name}</h1>
-        </div>
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-          sellerGroup.status === 'active'
-            ? 'bg-green-50 text-green-700 border border-green-200'
-            : 'bg-gray-50 text-gray-700 border border-gray-200'
-        }`}>
-          {sellerGroup.status === 'active' ? '활성' : '비활성'}
-        </span>
-      </div>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Flex justify="space-between" align="center" wrap="wrap" gap="middle">
+          <Space size="middle">
+            <Button onClick={() => navigate('/seller')} icon={<ArrowLeftOutlined />}>
+              목록으로
+            </Button>
+            <Title level={2} style={{ margin: 0 }}>{sellerGroup.name}</Title>
+          </Space>
+          <Tag color={sellerGroup.status === 'active' ? 'success' : 'default'}>
+            {sellerGroup.status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        </Flex>
 
       {/* 섹션 1: 셀러그룹 기본 정보 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">셀러그룹 기본 정보</h2>
-          {editMode ? (
-            <div className="flex gap-2">
+      <Card
+        title="셀러그룹 기본 정보"
+        extra={
+          editMode ? (
+            <Space>
               <Button icon={<SaveOutlined />} type="primary" onClick={handleSaveGroup} size="small">
                 저장
               </Button>
               <Button icon={<CloseOutlined />} onClick={handleCancelEdit} size="small">
                 취소
               </Button>
-            </div>
+            </Space>
           ) : (
-            <button
-              onClick={handleEditGroup}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <EditOutlined />
+            <Button type="link" onClick={handleEditGroup} icon={<EditOutlined />}>
               수정
-            </button>
-          )}
-        </div>
-
+            </Button>
+          )
+        }
+      >
         {editMode ? (
           <Form form={form} layout="vertical">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Row gutter={16}>
               <Form.Item label="셀러그룹명" name="name" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
@@ -302,11 +293,11 @@ function SellerDetail() {
                   <Select.Option value="inactive">비활성</Select.Option>
                 </Select>
               </Form.Item>
-            </div>
+            </Row>
 
             {/* 키맨 정보 편집 */}
-            <div className="mt-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
+            <div style={{ marginTop: 24 }}>
+              <Title level={5} style={{ marginBottom: 16 }}>키맨 정보</Title>
               <Form.List name="keymen">
                 {(fields, { add, remove }) => (
                   <>
@@ -414,101 +405,64 @@ function SellerDetail() {
           </Form>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <div className="text-sm text-gray-500 mb-1">셀러그룹명</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.name}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">소싱담당자</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.manager}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">주요품목분류</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.mainCategory}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">사업권역</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.territory}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">상세지역</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.region}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">상차 수수료율</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.commissionRate}%</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">사업자 수</div>
-                <div className="text-base font-semibold text-gray-900">{sellerGroup.businessCount}개</div>
-              </div>
-            </div>
+            <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }} size="middle" style={{ marginBottom: 24 }}>
+              <Descriptions.Item label="셀러그룹명">{sellerGroup.name}</Descriptions.Item>
+              <Descriptions.Item label="소싱담당자">{sellerGroup.manager}</Descriptions.Item>
+              <Descriptions.Item label="주요품목분류">{sellerGroup.mainCategory}</Descriptions.Item>
+              <Descriptions.Item label="사업권역">{sellerGroup.territory}</Descriptions.Item>
+              <Descriptions.Item label="상세지역">{sellerGroup.region}</Descriptions.Item>
+              <Descriptions.Item label="상차 수수료율">{sellerGroup.commissionRate}%</Descriptions.Item>
+              <Descriptions.Item label="사업자 수">{sellerGroup.businessCount}개</Descriptions.Item>
+            </Descriptions>
 
             {/* 키맨 정보 */}
           <div className="mt-8">
             <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
-            <div className="space-y-3">
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
               {detail.keymen.map((keyman, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <div className="text-xs text-gray-500 mb-1">이름</div>
-                      <div className="text-sm font-medium text-gray-900">{keyman.name}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500 mb-1">직책</div>
-                      <div className="text-sm font-medium text-gray-900">{keyman.position}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-gray-500 mb-1">연락처</div>
-                      <div className="text-sm font-medium text-gray-900">{keyman.phone}</div>
-                    </div>
-                  </div>
-                </div>
+                <Col xs={24} md={12} key={index}>
+                  <Card size="small">
+                    <Descriptions column={1} size="small">
+                      <Descriptions.Item label="이름">{keyman.name}</Descriptions.Item>
+                      <Descriptions.Item label="직책">{keyman.position}</Descriptions.Item>
+                      <Descriptions.Item label="연락처">{keyman.phone}</Descriptions.Item>
+                    </Descriptions>
+                  </Card>
+                </Col>
               ))}
-            </div>
+            </Row>
           </div>
 
           {/* 정성적 평가 */}
-          <div className="mt-8">
-            <h3 className="text-base font-semibold text-gray-900 mb-4">정성적 평가</h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div style={{ marginTop: 32 }}>
+            <Title level={5} style={{ marginBottom: 16 }}>정성적 평가</Title>
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
               {Object.entries(detail.qualitativeRatings).map(([key, value]) => (
-                <div key={key} className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
-                  <div className="text-xs text-blue-600 mb-2">{qualitativeLabels[key]}</div>
-                  <div className="text-base font-bold text-blue-700">{addEmoji(value)}</div>
-                </div>
+                <Col xs={12} sm={8} md={4} key={key}>
+                  <Card size="small" style={{ textAlign: 'center', background: '#e6f4ff', borderColor: '#91caff' }}>
+                    <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>{qualitativeLabels[key]}</Text>
+                    <Text strong style={{ fontSize: 14, color: '#0958d9' }}>{addEmoji(value)}</Text>
+                  </Card>
+                </Col>
               ))}
-            </div>
+            </Row>
           </div>
 
           {/* 기타 정보 */}
-          <div className="mt-8">
-            <h3 className="text-base font-semibold text-gray-900 mb-4">기타 정보</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <div className="text-sm text-gray-500 mb-1">양식장 수면적</div>
-                <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.farmArea}평</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">연간생산량</div>
-                <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.annualProduction}톤</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 mb-1">메인 유통사</div>
-                <div className="text-base font-semibold text-gray-900">{detail.additionalInfo.mainDistributors}</div>
-              </div>
-            </div>
+          <div style={{ marginTop: 32 }}>
+            <Title level={5} style={{ marginBottom: 16 }}>기타 정보</Title>
+            <Descriptions bordered column={{ xs: 1, md: 3 }} size="small">
+              <Descriptions.Item label="양식장 수면적">{detail.additionalInfo.farmArea}평</Descriptions.Item>
+              <Descriptions.Item label="연간생산량">{detail.additionalInfo.annualProduction}톤</Descriptions.Item>
+              <Descriptions.Item label="메인 유통사">{detail.additionalInfo.mainDistributors}</Descriptions.Item>
+            </Descriptions>
           </div>
           </>
         )}
-      </div>
+      </Card>
 
       {/* 섹션 2: 소속 사업자 정보 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">소속 사업자 정보</h2>
-
+      <Card title="소속 사업자 정보">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {detail.businesses.map((business, index) => (
             <div key={business.id} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
@@ -754,7 +708,7 @@ function SellerDetail() {
             <span className="text-base font-medium">사업자 추가</span>
           </button>
         </div>
-      </div>
+      </Card>
 
       {/* 섹션 3: 거래 실적 (P2 샘플) */}
       <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 opacity-60">
@@ -883,6 +837,7 @@ function SellerDetail() {
           </div>
         </div>
       </div>
+      </Space>
     </div>
   );
 }
