@@ -463,19 +463,21 @@ function SellerDetail() {
 
       {/* 섹션 2: 소속 사업자 정보 */}
       <Card title="소속 사업자 정보">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Row gutter={16}>
           {detail.businesses.map((business, index) => (
-            <div key={business.id} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-              <div className="bg-white px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-gray-900">{business.sellerName}</span>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                    business.status === 'active'
-                      ? 'bg-green-50 text-green-700 border border-green-200'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
+            <Col key={business.id} xs={24} lg={12}>
+              <Card size="small" style={{ marginBottom: 16 }}>
+              <Flex justify="space-between" align="center" wrap="wrap" gap="small" style={{ padding: '12px 0', borderBottom: '1px solid #f0f0f0', marginBottom: 16 }}>
+                <Flex wrap="wrap" align="center" gap="small">
+                  <Text strong>{business.sellerName}</Text>
+                  <Tag
+                    color={business.status === 'active' ? 'success' : 'default'}
+                    style={{
+                      border: business.status === 'active' ? '1px solid #b7eb8f' : 'none'
+                    }}
+                  >
                     {business.status === 'active' ? '활성' : '비활성'}
-                  </span>
+                  </Tag>
                   {business.hasCertificate ? (
                     <Image.PreviewGroup>
                       <Image
@@ -502,14 +504,14 @@ function SellerDetail() {
                       </Button>
                     </Image.PreviewGroup>
                   ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500 border border-gray-300">
+                    <Tag style={{ backgroundColor: '#f5f5f5', color: '#8c8c8c', border: '1px solid #d9d9d9' }}>
                       사업자등록증 미첨부
-                    </span>
+                    </Tag>
                   )}
-                </div>
+                </Flex>
 
                 {editingBusinessId === business.id ? (
-                  <div className="flex gap-2">
+                  <Flex gap="small">
                     <Button
                       icon={<SaveOutlined />}
                       type="primary"
@@ -525,63 +527,80 @@ function SellerDetail() {
                     >
                       취소
                     </Button>
-                  </div>
+                  </Flex>
                 ) : (
-                  <button
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<EditOutlined />}
                     onClick={() => handleEditBusiness(business)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
                   >
-                    <EditOutlined />
                     수정
-                  </button>
+                  </Button>
                 )}
-              </div>
+              </Flex>
 
               {editingBusinessId === business.id ? (
-                <div className="p-4">
+                <div style={{ padding: 16 }}>
                   <Form form={businessForm} layout="vertical">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Form.Item label="셀러명" name="sellerName" className="md:col-span-2">
-                        <Input maxLength={20} />
-                      </Form.Item>
-                      <Form.Item label="사업자등록번호" name="businessNumber">
-                        <Input disabled className="bg-gray-100" />
-                      </Form.Item>
-                      <Form.Item
-                        label="ticker"
-                        name="sellerId"
-                        help="티커는 수정할 수 없습니다"
-                      >
-                        <Input disabled className="bg-gray-100" />
-                      </Form.Item>
-                      <Form.Item label="사업자등록상호" name="businessName">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item label="대표자" name="representative">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item label="사업자등록주소" name="businessAddress" className="md:col-span-2">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item label="상차지 주소" name="loadingAddress" className="md:col-span-2">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item label="상태" name="status">
-                        <Select>
-                          <Select.Option value="active">활성</Select.Option>
-                          <Select.Option value="inactive">비활성</Select.Option>
-                        </Select>
-                      </Form.Item>
-                    </div>
+                    <Row gutter={16}>
+                      <Col xs={24}>
+                        <Form.Item label="셀러명" name="sellerName">
+                          <Input maxLength={20} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="사업자등록번호" name="businessNumber">
+                          <Input disabled style={{ backgroundColor: '#f5f5f5' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item
+                          label="ticker"
+                          name="sellerId"
+                          help="티커는 수정할 수 없습니다"
+                        >
+                          <Input disabled style={{ backgroundColor: '#f5f5f5' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="사업자등록상호" name="businessName">
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="대표자" name="representative">
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24}>
+                        <Form.Item label="사업자등록주소" name="businessAddress">
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24}>
+                        <Form.Item label="상차지 주소" name="loadingAddress">
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="상태" name="status">
+                          <Select>
+                            <Select.Option value="active">활성</Select.Option>
+                            <Select.Option value="inactive">비활성</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
                     {/* 은행계좌정보 */}
-                    <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">은행계좌정보</h4>
+                    <div style={{ marginTop: 24 }}>
+                      <Title level={5} style={{ marginBottom: 16 }}>은행계좌정보</Title>
                       <Form.List name="bankAccounts">
                         {(fields, { add, remove }) => (
                           <>
                             {fields.map((field, index) => (
-                              <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
+                              <div key={field.key} style={{ background: '#fafafa', border: '1px solid #d9d9d9', borderRadius: 8, padding: 16, marginBottom: 12 }}>
                                 <Space align="start" style={{ width: '100%', display: 'flex', flexWrap: 'wrap' }}>
                                   <Form.Item
                                     {...field}
@@ -635,7 +654,7 @@ function SellerDetail() {
                     </div>
 
                     {/* 사업자등록증 */}
-                    <div className="mt-6">
+                    <div style={{ marginTop: 24 }}>
                       <Form.Item
                         name="certificate"
                         label="사업자등록증"
@@ -650,64 +669,60 @@ function SellerDetail() {
                   </Form>
                 </div>
               ) : (
-                <div className="p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">사업자등록번호</div>
-                      <div className="text-base font-medium text-gray-900">{business.businessNumber}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">ticker</div>
-                      <div className="text-base font-medium text-gray-900">{business.sellerId}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">사업자등록상호</div>
-                      <div className="text-base font-medium text-gray-900">{business.businessName}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">대표자</div>
-                      <div className="text-base font-medium text-gray-900">{business.representative}</div>
-                    </div>
-                    <div className="md:col-span-2">
-                      <div className="text-sm text-gray-500 mb-1">사업자등록주소</div>
-                      <div className="text-base font-medium text-gray-900">{business.businessAddress}</div>
-                    </div>
-                    <div className="md:col-span-2">
-                      <div className="text-sm text-gray-500 mb-1">상차지 주소</div>
-                      <div className="text-base font-medium text-gray-900">{business.loadingAddress}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">은행계좌</div>
-                      <div className="space-y-1">
-                        {business.bankAccounts.map((account, idx) => (
-                          <div key={idx} className="text-base font-medium text-gray-900 flex items-center gap-2 flex-wrap">
-                            <span>{account.bank} {account.accountNumber} ({account.holder})</span>
-                            {account.isPrimary && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
-                                주사용
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <Descriptions bordered column={{ xs: 1, md: 2 }} size="small">
+                  <Descriptions.Item label="사업자등록번호">{business.businessNumber}</Descriptions.Item>
+                  <Descriptions.Item label="ticker">{business.sellerId}</Descriptions.Item>
+                  <Descriptions.Item label="사업자등록상호">{business.businessName}</Descriptions.Item>
+                  <Descriptions.Item label="대표자">{business.representative}</Descriptions.Item>
+                  <Descriptions.Item label="사업자등록주소" span={2}>{business.businessAddress}</Descriptions.Item>
+                  <Descriptions.Item label="상차지 주소" span={2}>{business.loadingAddress}</Descriptions.Item>
+                  <Descriptions.Item label="은행계좌" span={2}>
+                    <Space direction="vertical" size="small">
+                      {business.bankAccounts.map((account, idx) => (
+                        <Flex key={idx} gap="small" align="center" wrap="wrap">
+                          <Text>{account.bank} {account.accountNumber} ({account.holder})</Text>
+                          {account.isPrimary && (
+                            <Tag color="gold">주사용</Tag>
+                          )}
+                        </Flex>
+                      ))}
+                    </Space>
+                  </Descriptions.Item>
+                </Descriptions>
               )}
-            </div>
+            </Card>
+          </Col>
           ))}
 
           {/* 사업자 추가 카드 */}
-          <button
-            onClick={handleAddBusiness}
-            className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-all min-h-[200px] flex flex-col items-center justify-center gap-3 text-gray-500 hover:text-gray-700"
-          >
-            <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
-              <PlusOutlined className="text-2xl" />
-            </div>
-            <span className="text-base font-medium">사업자 추가</span>
-          </button>
-        </div>
+          <Col xs={24} lg={12}>
+            <Button
+              onClick={handleAddBusiness}
+              style={{
+                width: '100%',
+                minHeight: 200,
+                borderStyle: 'dashed',
+                borderWidth: 2
+              }}
+            >
+              <Space direction="vertical" align="center">
+                <div style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  border: '2px solid #d9d9d9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#fff'
+                }}>
+                  <PlusOutlined style={{ fontSize: 24 }} />
+                </div>
+                <Text style={{ fontSize: 16, fontWeight: 500 }}>사업자 추가</Text>
+              </Space>
+            </Button>
+          </Col>
+        </Row>
       </Card>
 
       {/* 섹션 3: 거래 실적 (P2 샘플) */}

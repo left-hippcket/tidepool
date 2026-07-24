@@ -765,12 +765,12 @@ function ProductManagement() {
 
       {/* 탭 3: 원산지/규격 관리 */}
       {activeTab === 'origin-spec' && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <Row gutter={16}>
           {/* 왼쪽: 품목 선택 */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">품목 선택</h3>
-              <div className="mb-3">
+          <Col xs={24} lg={6}>
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>품목 선택</Title>
+              <div style={{ marginBottom: 12 }}>
                 <Select
                   style={{ width: '100%' }}
                   placeholder="품목분류 필터"
@@ -787,36 +787,39 @@ function ProductManagement() {
                   ))}
                 </Select>
               </div>
-              <div className="max-h-[500px] overflow-auto space-y-2">
+              <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 500, overflow: 'auto' }}>
                 {filteredProducts.map(p => (
                   <div
                     key={p.id}
                     onClick={() => handleProductSelect(p)}
-                    className={`p-3 cursor-pointer rounded-lg border transition-colors ${
-                      selectedProduct?.id === p.id
-                        ? 'bg-blue-50 border-blue-500'
-                        : 'bg-white border-gray-200 hover:border-gray-300'
-                    }`}
+                    style={{
+                      padding: 12,
+                      cursor: 'pointer',
+                      borderRadius: 8,
+                      border: selectedProduct?.id === p.id ? '1px solid #1890ff' : '1px solid #d9d9d9',
+                      backgroundColor: selectedProduct?.id === p.id ? '#e6f7ff' : '#fff',
+                      transition: 'all 0.3s'
+                    }}
                   >
-                    <div className="text-sm font-medium text-gray-900">
+                    <Text style={{ fontSize: 14, fontWeight: 500 }}>
                       {p.categoryName} / {p.name}
-                    </div>
+                    </Text>
                     {p.status === 'inactive' && (
-                      <Tag size="small" className="mt-1">비활성</Tag>
+                      <Tag size="small" style={{ marginTop: 4 }}>비활성</Tag>
                     )}
                   </div>
                 ))}
-              </div>
-            </div>
-          </div>
+              </Space>
+            </Card>
+          </Col>
 
           {/* 중앙: 원산지 관리 */}
-          <div className="lg:col-span-1.5">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-semibold text-gray-900">
+          <Col xs={24} lg={9}>
+            <Card>
+              <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+                <Title level={5} style={{ margin: 0 }}>
                   {selectedProduct ? `${selectedProduct.categoryName} / ${selectedProduct.name}` : '원산지 관리'}
-                </h3>
+                </Title>
                 {selectedProduct && (
                   <Button
                     type="primary"
@@ -828,31 +831,32 @@ function ProductManagement() {
                     원산지 추가
                   </Button>
                 )}
-              </div>
+              </Flex>
               {!selectedProduct ? (
-                <div className="text-center py-10 text-gray-500">
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
                   왼쪽에서 품목을 선택해주세요.
                 </div>
               ) : (
-                <div className="max-h-[500px] overflow-auto space-y-2">
+                <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 500, overflow: 'auto' }}>
                   {selectedOrigins.length === 0 ? (
-                    <div className="text-center py-6 text-gray-500">
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#8c8c8c' }}>
                       등록된 원산지가 없습니다.
                     </div>
                   ) : (
                     selectedOrigins.map(origin => (
-                      <div
+                      <Card
                         key={origin.id}
-                        className={`p-3 rounded-lg border ${
-                          origin.status === 'active' ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-200'
-                        }`}
+                        size="small"
+                        style={{
+                          backgroundColor: origin.status === 'active' ? '#fff' : '#fafafa'
+                        }}
                       >
-                        <div className="flex justify-between items-center">
+                        <Flex justify="space-between" align="center">
                           <div>
-                            <span className="font-medium text-gray-900">{origin.name}</span>
+                            <Text style={{ fontWeight: 500 }}>{origin.name}</Text>
                             <Tag
                               color={origin.status === 'active' ? 'green' : 'default'}
-                              className="ml-2"
+                              style={{ marginLeft: 8 }}
                             >
                               {origin.status === 'active' ? '활성' : '비활성'}
                             </Tag>
@@ -865,22 +869,22 @@ function ProductManagement() {
                           >
                             수정
                           </Button>
-                        </div>
-                      </div>
+                        </Flex>
+                      </Card>
                     ))
                   )}
-                </div>
+                </Space>
               )}
-            </div>
-          </div>
+            </Card>
+          </Col>
 
           {/* 우측: 규격 관리 */}
-          <div className="lg:col-span-1.5">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-semibold text-gray-900">
+          <Col xs={24} lg={9}>
+            <Card>
+              <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+                <Title level={5} style={{ margin: 0 }}>
                   {selectedProduct ? `${selectedProduct.categoryName} / ${selectedProduct.name}` : '규격 관리'}
-                </h3>
+                </Title>
                 {selectedProduct && (
                   <Button
                     type="primary"
@@ -892,31 +896,32 @@ function ProductManagement() {
                     규격 추가
                   </Button>
                 )}
-              </div>
+              </Flex>
               {!selectedProduct ? (
-                <div className="text-center py-10 text-gray-500">
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
                   왼쪽에서 품목을 선택해주세요.
                 </div>
               ) : (
-                <div className="max-h-[500px] overflow-auto space-y-2">
+                <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 500, overflow: 'auto' }}>
                   {selectedSpecs.length === 0 ? (
-                    <div className="text-center py-6 text-gray-500">
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#8c8c8c' }}>
                       등록된 규격이 없습니다.
                     </div>
                   ) : (
                     selectedSpecs.map(spec => (
-                      <div
+                      <Card
                         key={spec.id}
-                        className={`p-3 rounded-lg border ${
-                          spec.status === 'active' ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-200'
-                        }`}
+                        size="small"
+                        style={{
+                          backgroundColor: spec.status === 'active' ? '#fff' : '#fafafa'
+                        }}
                       >
-                        <div className="flex justify-between items-center">
+                        <Flex justify="space-between" align="center">
                           <div>
-                            <span className="font-medium text-gray-900">{spec.name}</span>
+                            <Text style={{ fontWeight: 500 }}>{spec.name}</Text>
                             <Tag
                               color={spec.status === 'active' ? 'green' : 'default'}
-                              className="ml-2"
+                              style={{ marginLeft: 8 }}
                             >
                               {spec.status === 'active' ? '활성' : '비활성'}
                             </Tag>
@@ -929,15 +934,15 @@ function ProductManagement() {
                           >
                             수정
                           </Button>
-                        </div>
-                      </div>
+                        </Flex>
+                      </Card>
                     ))
                   )}
-                </div>
+                </Space>
               )}
-            </div>
-          </div>
-        </div>
+            </Card>
+          </Col>
+        </Row>
       )}
       </Space>
 

@@ -585,85 +585,97 @@ function JoinDistributionDetail() {
           </div>
 
           {/* 섹션 3: 통합지표 & 등급 정보 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Row gutter={24} style={{ marginBottom: 24 }}>
             {/* 통합지표 */}
-            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6">
-              <h2 className="text-lg font-semibold text-gray-500 mb-4">통합지표 (P2 예정) (최근 3개월)</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">매입액</div>
-                  <div className="text-xl font-bold text-gray-600">
-                    {(joinSalesDetails[id].metrics.totalPurchase / 100000000).toFixed(1)}억
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">매출액</div>
-                  <div className="text-xl font-bold text-gray-600">
-                    {(joinSalesDetails[id].metrics.totalSales / 100000000).toFixed(1)}억
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">조정손익액</div>
-                  <div className="text-xl font-bold text-gray-600">
-                    {(joinSalesDetails[id].metrics.adjustedProfit / 100000000).toFixed(1)}억
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">조정손익률</div>
-                  <div className="text-xl font-bold text-gray-600">
-                    {joinSalesDetails[id].metrics.adjustedProfitRate}%
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">기말미수금</div>
-                  <div className="text-xl font-bold text-gray-600">
-                    {(joinSalesDetails[id].metrics.receivable / 100000000).toFixed(1)}억
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500 mb-1">자본회전율</div>
-                  <div className="text-xl font-bold text-gray-600">
-                    {joinSalesDetails[id].metrics.turnoverRate}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Col xs={24} lg={12}>
+              <Card style={{ backgroundColor: '#fafafa' }}>
+                <Title level={5} style={{ color: '#8c8c8c', marginBottom: 16 }}>통합지표 (P2 예정) (최근 3개월)</Title>
+                <Row gutter={[16, 16]}>
+                  <Col span={12}>
+                    <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>매입액</Text>
+                    <Text style={{ display: 'block', fontSize: 20, fontWeight: 'bold', color: '#595959' }}>
+                      {(joinSalesDetails[id].metrics.totalPurchase / 100000000).toFixed(1)}억
+                    </Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>매출액</Text>
+                    <Text style={{ display: 'block', fontSize: 20, fontWeight: 'bold', color: '#595959' }}>
+                      {(joinSalesDetails[id].metrics.totalSales / 100000000).toFixed(1)}억
+                    </Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>조정손익액</Text>
+                    <Text style={{ display: 'block', fontSize: 20, fontWeight: 'bold', color: '#595959' }}>
+                      {(joinSalesDetails[id].metrics.adjustedProfit / 100000000).toFixed(1)}억
+                    </Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>조정손익률</Text>
+                    <Text style={{ display: 'block', fontSize: 20, fontWeight: 'bold', color: '#595959' }}>
+                      {joinSalesDetails[id].metrics.adjustedProfitRate}%
+                    </Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>기말미수금</Text>
+                    <Text style={{ display: 'block', fontSize: 20, fontWeight: 'bold', color: '#595959' }}>
+                      {(joinSalesDetails[id].metrics.receivable / 100000000).toFixed(1)}억
+                    </Text>
+                  </Col>
+                  <Col span={12}>
+                    <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>자본회전율</Text>
+                    <Text style={{ display: 'block', fontSize: 20, fontWeight: 'bold', color: '#595959' }}>
+                      {joinSalesDetails[id].metrics.turnoverRate}
+                    </Text>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
 
             {/* 등급 정보 */}
-            <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6">
-              <h2 className="text-lg font-semibold text-gray-500 mb-4">조인유통 등급 (P2 예정)</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                  <div className="text-sm text-gray-500 mb-1">매입액 순위</div>
-                  <div className="text-2xl font-bold text-gray-600">
-                    상위 {joinSalesDetails[id].grade.purchaseRank}%
-                  </div>
-                </div>
-                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                  <div className="text-sm text-gray-500 mb-1">매출액 순위</div>
-                  <div className="text-2xl font-bold text-gray-600">
-                    상위 {joinSalesDetails[id].grade.salesRank}%
-                  </div>
-                </div>
-                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                  <div className="text-sm text-gray-500 mb-1">거래손익 순위</div>
-                  <div className="text-2xl font-bold text-gray-600">
-                    상위 {joinSalesDetails[id].grade.profitRank}%
-                  </div>
-                </div>
-                <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                  <div className="text-sm text-gray-500 mb-1">자본회전율 등급</div>
-                  <div className="text-2xl font-bold text-gray-600">
-                    {joinSalesDetails[id].grade.turnoverGrade}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            <Col xs={24} lg={12}>
+              <Card style={{ backgroundColor: '#fafafa' }}>
+                <Title level={5} style={{ color: '#8c8c8c', marginBottom: 16 }}>조인유통 등급 (P2 예정)</Title>
+                <Row gutter={[16, 16]}>
+                  <Col span={12}>
+                    <div style={{ backgroundColor: '#f5f5f5', borderRadius: 8, padding: 16, border: '1px solid #d9d9d9' }}>
+                      <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>매입액 순위</Text>
+                      <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                        상위 {joinSalesDetails[id].grade.purchaseRank}%
+                      </Text>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div style={{ backgroundColor: '#f5f5f5', borderRadius: 8, padding: 16, border: '1px solid #d9d9d9' }}>
+                      <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>매출액 순위</Text>
+                      <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                        상위 {joinSalesDetails[id].grade.salesRank}%
+                      </Text>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div style={{ backgroundColor: '#f5f5f5', borderRadius: 8, padding: 16, border: '1px solid #d9d9d9' }}>
+                      <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>거래손익 순위</Text>
+                      <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                        상위 {joinSalesDetails[id].grade.profitRank}%
+                      </Text>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div style={{ backgroundColor: '#f5f5f5', borderRadius: 8, padding: 16, border: '1px solid #d9d9d9' }}>
+                      <Text style={{ display: 'block', fontSize: 14, color: '#8c8c8c', marginBottom: 4 }}>자본회전율 등급</Text>
+                      <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                        {joinSalesDetails[id].grade.turnoverGrade}
+                      </Text>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          </Row>
 
           {/* 섹션 4: 거래 세부내역 */}
-          <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-500 mb-6">거래 세부내역 (P2 예정)</h2>
+          <Card style={{ backgroundColor: '#fafafa', marginBottom: 24 }}>
+            <Title level={5} style={{ color: '#8c8c8c', marginBottom: 24 }}>거래 세부내역 (P2 예정)</Title>
 
             {/* 테이블 */}
             <div className="overflow-x-auto mb-6">
@@ -755,7 +767,7 @@ function JoinDistributionDetail() {
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
