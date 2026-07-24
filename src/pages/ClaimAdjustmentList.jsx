@@ -372,31 +372,33 @@ function ClaimAdjustmentList() {
   return (
     <div>
       {/* 헤더 */}
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Title level={2} style={{ margin: 0 }}>클레임/조정 관리</Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleRegister}
-        >
-          클레임/조정 등록
-        </Button>
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ margin: 0, marginBottom: 16 }}>클레임/조정 관리</Title>
       </div>
 
-      {/* 날짜 필터 */}
+      {/* 날짜 필터 + 등록 버튼 */}
       <Card style={{ marginBottom: 16 }}>
-        <Space wrap>
-          <Button onClick={() => handleQuickDate('today')}>오늘</Button>
-          <Button onClick={() => handleQuickDate('yesterday')}>어제</Button>
-          <Button onClick={() => handleQuickDate('7days')}>최근 7일</Button>
-          <Button onClick={() => handleQuickDate('30days')}>최근 30일</Button>
-          <RangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            format="YYYY-MM-DD"
-            style={{ width: 300 }}
-          />
-        </Space>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Space wrap>
+            <Button onClick={() => handleQuickDate('today')}>오늘</Button>
+            <Button onClick={() => handleQuickDate('yesterday')}>어제</Button>
+            <Button onClick={() => handleQuickDate('7days')}>최근 7일</Button>
+            <Button onClick={() => handleQuickDate('30days')}>최근 30일</Button>
+            <RangePicker
+              value={dateRange}
+              onChange={setDateRange}
+              format="YYYY-MM-DD"
+              style={{ width: 300 }}
+            />
+          </Space>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleRegister}
+          >
+            클레임/조정 등록
+          </Button>
+        </div>
       </Card>
 
       {/* 테이블 */}
