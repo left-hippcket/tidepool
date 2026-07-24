@@ -11,9 +11,9 @@ function StandardPriceRegister() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [allPriceData, setAllPriceData] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기 id
+  const [selectedProduct, setSelectedProduct] = useState(2); // 넙치 id
+  const [selectedOrigin, setSelectedOrigin] = useState(7); // 완도 id
 
   // 기존 가격 데이터 로드
   useEffect(() => {
@@ -117,7 +117,13 @@ function StandardPriceRegister() {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{ applyDate: dayjs(), source: '피시파더' }}
+          initialValues={{
+            applyDate: dayjs(),
+            source: '피시파더',
+            categoryId: 1,
+            productId: 2,
+            originId: 7
+          }}
         >
           {/* 기본 정보 섹션 */}
           <div style={{ marginBottom: 32 }}>
@@ -211,6 +217,7 @@ function StandardPriceRegister() {
                             formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             parser={value => value.replace(/,/g, '')}
                             addonAfter="원"
+                            step={500}
                           />
                         </Form.Item>
                       </Space>
