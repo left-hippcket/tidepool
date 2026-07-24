@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Form, Input, Select, Button, Space, message, Upload, Tag
+  Form, Input, Select, Button, Space, message, Upload, Tag, Card, Flex, Typography, Row, Col
 } from 'antd';
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
 import { businessRegistry } from '../data/mockData';
+
+const { Title } = Typography;
 
 function DriverRegister() {
   const navigate = useNavigate();
@@ -75,28 +77,21 @@ function DriverRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-      {/* 헤더 */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/driver')}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <ArrowLeftOutlined />
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* 헤더 */}
+        <div>
+          <Button onClick={() => navigate('/driver')} icon={<ArrowLeftOutlined />} style={{ marginBottom: 16 }}>
             목록으로
-          </button>
-          <h2 className="text-2xl font-bold text-gray-900">드라이버 등록</h2>
+          </Button>
+          <Title level={2}>드라이버 등록</Title>
         </div>
-      </div>
 
       <Form form={form} layout="vertical">
         {/* 드라이버 기본 정보 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">드라이버 기본 정보</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
+        <Card title="드라이버 기본 정보">
+          <Row gutter={16}>
+            <Col xs={24} md={12}><Form.Item
               name="name"
               label="드라이버명"
               rules={[
@@ -105,9 +100,9 @@ function DriverRegister() {
               ]}
             >
               <Input placeholder="예: 정훈" />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item
+            <Col xs={24} md={12}><Form.Item
               name="phone"
               label="전화번호"
               rules={[
@@ -115,9 +110,9 @@ function DriverRegister() {
               ]}
             >
               <Input placeholder="010-1234-5678" />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item name="vehicleType" label="차종">
+            <Col xs={24} md={12}><Form.Item name="vehicleType" label="차종">
               <Select
                 placeholder="차종 선택"
                 onChange={handleVehicleTypeChange}
@@ -126,9 +121,9 @@ function DriverRegister() {
                   { value: '1.0톤', label: '1.0톤' }
                 ]}
               />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item name="tankCount" label="보유통수">
+            <Col xs={24} md={12}><Form.Item name="tankCount" label="보유통수">
               <Select
                 placeholder="보유통수 선택"
                 options={[
@@ -141,9 +136,9 @@ function DriverRegister() {
                   { value: 10, label: '10통' }
                 ]}
               />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item name="driverLevel" label="Driver Level" initialValue="모름">
+            <Col xs={24} md={12}><Form.Item name="driverLevel" label="Driver Level" initialValue="모름">
               <Select
                 options={[
                   { value: '잘함', label: '잘함' },
@@ -152,16 +147,14 @@ function DriverRegister() {
                   { value: '모름', label: '모름' }
                 ]}
               />
-            </Form.Item>
-          </div>
-        </div>
+            </Form.Item></Col>
+          </Row>
+        </Card>
 
         {/* 정산사업자 정보 (선택사항) */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">정산사업자 정보 (선택사항)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
+        <Card title="정산사업자 정보 (선택사항)">
+          <Row gutter={16}>
+            <Col xs={24} md={12}><Form.Item
               name="businessNumber"
               label="사업자등록번호"
               rules={[
@@ -170,9 +163,9 @@ function DriverRegister() {
               extra="등록된 사업자번호 입력 시 상호, 대표자, 주소, 과세유형이 자동으로 입력됩니다"
             >
               <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item
+            <Col xs={24} md={12}><Form.Item
               name="ticker"
               label="Ticker"
               rules={[
@@ -182,33 +175,33 @@ function DriverRegister() {
               ]}
             >
               <Input placeholder="예: JH01" />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item
+            <Col xs={24} md={12}><Form.Item
               name="businessName"
               label="사업자등록상호"
               rules={[{ max: 50, message: '최대 50자' }]}
             >
               <Input placeholder="만진수산" />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item
+            <Col xs={24} md={12}><Form.Item
               name="representative"
               label="대표자"
               rules={[{ max: 10, message: '최대 10자' }]}
             >
               <Input placeholder="김만진" />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item
+            <Col xs={24} md={12}><Form.Item
               name="businessAddress"
               label="사업자등록주소"
               rules={[{ max: 100, message: '최대 100자' }]}
             >
               <Input placeholder="경기도 수지구 동천동 230-3" />
-            </Form.Item>
+            </Form.Item></Col>
 
-            <Form.Item name="taxType" label="사업자 과세유형">
+            <Col xs={24} md={12}><Form.Item name="taxType" label="사업자 과세유형">
               <Select
                 placeholder="선택"
                 options={[
@@ -217,10 +210,10 @@ function DriverRegister() {
                   { value: '면세', label: '면세' }
                 ]}
               />
-            </Form.Item>
-          </div>
+            </Form.Item></Col>
+          </Row>
 
-          <div className="mt-4">
+          <div style={{ marginTop: 16 }}>
             <label className="block text-sm font-medium text-gray-700 mb-2">은행계좌정보</label>
             <Form.List name="bankAccounts" initialValue={[{}]}>
               {(fields, { add, remove }) => (
@@ -228,30 +221,30 @@ function DriverRegister() {
                   {fields.map((field, index) => (
                     <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
                       <Space align="start" style={{ width: '100%' }}>
-                        <Form.Item
+                        <Col xs={24} md={12}><Form.Item
                           {...field}
                           name={[field.name, 'bank']}
                           label="은행명"
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="하나은행" />
-                        </Form.Item>
-                        <Form.Item
+                        </Form.Item></Col>
+                        <Col xs={24} md={12}><Form.Item
                           {...field}
                           name={[field.name, 'accountNumber']}
                           label="계좌번호"
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="123-456789-01234" />
-                        </Form.Item>
-                        <Form.Item
+                        </Form.Item></Col>
+                        <Col xs={24} md={12}><Form.Item
                           {...field}
                           name={[field.name, 'holder']}
                           label="예금주"
                           style={{ marginBottom: 0 }}
                         >
                           <Input placeholder="김만진" />
-                        </Form.Item>
+                        </Form.Item></Col>
                         {fields.length > 1 && (
                           <MinusCircleOutlined
                             onClick={() => remove(field.name)}
@@ -270,12 +263,12 @@ function DriverRegister() {
             </Form.List>
           </div>
 
-          <Form.Item name="certificate" label="사업자등록증" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList} className="mt-4">
+          <Form.Item name="certificate" label="사업자등록증" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList} style={{ marginTop: 16 }}>
             <Upload beforeUpload={() => false} maxCount={1} accept="image/*,.pdf">
               <Button icon={<UploadOutlined />}>사업자등록증 첨부하기 (최대 10MB)</Button>
             </Upload>
           </Form.Item>
-        </div>
+        </Card>
 
         {/* 하단 버튼 */}
         <Space>
@@ -287,6 +280,7 @@ function DriverRegister() {
           </Button>
         </Space>
       </Form>
+      </Space>
     </div>
   );
 }
