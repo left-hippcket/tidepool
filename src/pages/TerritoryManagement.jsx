@@ -116,39 +116,7 @@ function TerritoryManagement() {
 
   // 사업권역 저장 핸들러
   const handleSaveTerritory = (record) => {
-    if (record.id === 'new') {
-      // 신규 추가
-      if (!newTerritoryData.name) {
-        message.error('권역명을 입력해주세요.');
-        return;
-      }
-      if (!newTerritoryData.displayOrder) {
-        message.error('표시순서를 입력해주세요.');
-        return;
-      }
-      if (!/^[가-힣()\/\s]+$/.test(newTerritoryData.name)) {
-        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
-        return;
-      }
-
-      const newId = Math.max(...territories.map(t => t.id)) + 1;
-
-      // 표시순서 재정렬
-      let updatedTerritories = [...territories, {
-        id: newId,
-        name: newTerritoryData.name,
-        displayOrder: parseInt(newTerritoryData.displayOrder),
-        regionCount: 0,
-        status: 'active',
-      }];
-
-      updatedTerritories = reorderTerritories(updatedTerritories, newId, parseInt(newTerritoryData.displayOrder));
-
-      setTerritories(updatedTerritories);
-      setIsAddingTerritory(false);
-      setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
-      message.success(`사업권역 '${newTerritoryData.name}'이 등록되었습니다.`);
-    } else {
+    if (!record || record.id === editingTerritoryId) {
       // 기존 항목 수정
       if (!editingTerritoryData.name) {
         message.error('권역명을 입력해주세요.');
@@ -180,17 +148,48 @@ function TerritoryManagement() {
       setEditingTerritoryId(null);
       setEditingTerritoryData({});
       message.success('사업권역 정보가 수정되었습니다.');
+    } else {
+      // 신규 추가 (고정 폼에서)
+      if (!newTerritoryData.name) {
+        message.error('권역명을 입력해주세요.');
+        return;
+      }
+      if (!newTerritoryData.displayOrder) {
+        message.error('표시순서를 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(newTerritoryData.name)) {
+        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+        return;
+      }
+
+      const newId = Math.max(...territories.map(t => t.id)) + 1;
+
+      let updatedTerritories = [...territories, {
+        id: newId,
+        name: newTerritoryData.name,
+        displayOrder: parseInt(newTerritoryData.displayOrder),
+        regionCount: 0,
+        status: newTerritoryData.status,
+      }];
+
+      updatedTerritories = reorderTerritories(updatedTerritories, newId, parseInt(newTerritoryData.displayOrder));
+
+      setTerritories(updatedTerritories);
+      setIsAddingTerritory(false);
+      setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
+      message.success(`사업권역 '${newTerritoryData.name}'이 등록되었습니다.`);
     }
   };
 
   // 사업권역 취소 핸들러
   const handleCancelTerritory = (record) => {
-    if (record.id === 'new') {
-      setIsAddingTerritory(false);
-      setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
-    } else {
+    if (record && record.id === editingTerritoryId) {
       setEditingTerritoryId(null);
       setEditingTerritoryData({});
+    } else {
+      setIsAddingTerritory(false);
+      setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
     }
   };
 
@@ -221,8 +220,35 @@ function TerritoryManagement() {
 
   // 상세지역 저장 핸들러
   const handleSaveRegion = (record) => {
-    if (record.id === 'new') {
-      // 신규 추가
+    if (!record || record.id === editingRegionId) {
+      // 기존 항목 수정
+      if (!editingRegionData.name) {
+        message.error('상세지역명을 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(editingRegionData.name)) {
+        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+        return;
+      }
+
+      let updatedRegions = regions.map(r =>
+        r.id === record.id ? {
+          ...r,
+          ...editingRegionData,
+          territoryName: territories.find(t => t.id === editingRegionData.territoryId)?.name || r.territoryName
+        } : r
+      );
+
+      if (editingRegionData.displayOrder !== record.displayOrder) {
+        updatedRegions = reorderRegions(updatedRegions, record.id, parseInt(editingRegionData.displayOrder), editingRegionData.territoryId);
+      }
+
+      setRegions(updatedRegions);
+      setEditingRegionId(null);
+      setEditingRegionData({});
+      message.success('상세지역 정보가 수정되었습니다.');
+    } else {
+      // 신규 추가 (고정 폼에서)
       if (!newRegionData.territoryId) {
         message.error('사업권역을 선택해주세요.');
         return;
@@ -252,7 +278,6 @@ function TerritoryManagement() {
         status: 'active',
       }];
 
-      // 표시순서 재정렬
       updatedRegions = reorderRegions(updatedRegions, newId, parseInt(newRegionData.displayOrder), newRegionData.territoryId);
 
       setRegions(updatedRegions);
@@ -264,44 +289,17 @@ function TerritoryManagement() {
       setIsAddingRegion(false);
       setNewRegionData({ territoryId: '', name: '', displayOrder: '', status: 'active' });
       message.success(`상세지역 '${newRegionData.name}'이 등록되었습니다.`);
-    } else {
-      // 기존 항목 수정
-      if (!editingRegionData.name) {
-        message.error('상세지역명을 입력해주세요.');
-        return;
-      }
-      if (!/^[가-힣()\/\s]+$/.test(editingRegionData.name)) {
-        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
-        return;
-      }
-
-      let updatedRegions = regions.map(r =>
-        r.id === record.id ? {
-          ...r,
-          ...editingRegionData,
-          territoryName: territories.find(t => t.id === editingRegionData.territoryId)?.name || r.territoryName
-        } : r
-      );
-
-      if (editingRegionData.displayOrder !== record.displayOrder) {
-        updatedRegions = reorderRegions(updatedRegions, record.id, parseInt(editingRegionData.displayOrder), editingRegionData.territoryId);
-      }
-
-      setRegions(updatedRegions);
-      setEditingRegionId(null);
-      setEditingRegionData({});
-      message.success('상세지역 정보가 수정되었습니다.');
     }
   };
 
   // 상세지역 취소 핸들러
   const handleCancelRegion = (record) => {
-    if (record.id === 'new') {
-      setIsAddingRegion(false);
-      setNewRegionData({ territoryId: '', name: '', displayOrder: '', status: 'active' });
-    } else {
+    if (record && record.id === editingRegionId) {
       setEditingRegionId(null);
       setEditingRegionData({});
+    } else {
+      setIsAddingRegion(false);
+      setNewRegionData({ territoryId: '', name: '', displayOrder: '', status: 'active' });
     }
   };
 
@@ -623,14 +621,7 @@ function TerritoryManagement() {
     return colors[index % 2];
   };
 
-  // 테이블 dataSource에 임시 행 추가
-  const territoryDataSource = isAddingTerritory
-    ? [...territories, { id: 'new', ...newTerritoryData, regionCount: 0 }]
-    : territories;
-
-  const regionDataSource = isAddingRegion
-    ? [...filteredRegions, { id: 'new', ...newRegionData }]
-    : filteredRegions;
+  // 사업권역별 색상 맵 생성 (상세지역용)
 
   return (
     <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
@@ -663,14 +654,65 @@ function TerritoryManagement() {
       {/* 탭 1: 사업권역 */}
       {activeTab === 'territory' && (
         <div>
-          <div className="flex justify-end mb-4">
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTerritory}>
-              권역 추가
-            </Button>
-          </div>
+          {!isAddingTerritory && (
+            <div className="flex justify-end mb-4">
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTerritory}>
+                권역 추가
+              </Button>
+            </div>
+          )}
+
+          {isAddingTerritory && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">사업권역 등록</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    권역명 <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    value={newTerritoryData.name}
+                    onChange={(e) => setNewTerritoryData({ ...newTerritoryData, name: e.target.value })}
+                    placeholder="권역명 입력"
+                    maxLength={20}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    표시순서 <span className="text-red-500">*</span>
+                  </label>
+                  <InputNumber
+                    value={newTerritoryData.displayOrder}
+                    onChange={(value) => setNewTerritoryData({ ...newTerritoryData, displayOrder: value })}
+                    placeholder="표시순서"
+                    style={{ width: '100%' }}
+                    min={1}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    상태
+                  </label>
+                  <Select
+                    value={newTerritoryData.status}
+                    onChange={(value) => setNewTerritoryData({ ...newTerritoryData, status: value })}
+                    style={{ width: '100%' }}
+                  >
+                    <Select.Option value="active">활성</Select.Option>
+                    <Select.Option value="inactive">비활성</Select.Option>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button onClick={handleCancelTerritory}>취소</Button>
+                <Button type="primary" onClick={handleSaveTerritory}>저장</Button>
+              </div>
+            </div>
+          )}
+
           <Table
             columns={territoryColumns}
-            dataSource={territoryDataSource}
+            dataSource={territories}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
@@ -696,17 +738,76 @@ function TerritoryManagement() {
                 ))}
               </Select>
             </Space>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRegion}>
-              지역 추가
-            </Button>
+            {!isAddingRegion && (
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRegion}>
+                지역 추가
+              </Button>
+            )}
           </div>
+
+          {isAddingRegion && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">상세지역 등록</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    사업권역 <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={newRegionData.territoryId}
+                    onChange={(value) => {
+                      const territory = territories.find(t => t.id === value);
+                      setNewRegionData({
+                        ...newRegionData,
+                        territoryId: value,
+                        territoryName: territory?.name || ''
+                      });
+                    }}
+                    placeholder="사업권역 선택"
+                    style={{ width: '100%' }}
+                  >
+                    {territories.filter(t => t.status === 'active').map(t => (
+                      <Select.Option key={t.id} value={t.id}>{t.name}</Select.Option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    지역명 <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    value={newRegionData.name}
+                    onChange={(e) => setNewRegionData({ ...newRegionData, name: e.target.value })}
+                    placeholder="지역명 입력"
+                    maxLength={20}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    표시순서 <span className="text-red-500">*</span>
+                  </label>
+                  <InputNumber
+                    value={newRegionData.displayOrder}
+                    onChange={(value) => setNewRegionData({ ...newRegionData, displayOrder: value })}
+                    placeholder="표시순서"
+                    style={{ width: '100%' }}
+                    min={1}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button onClick={handleCancelRegion}>취소</Button>
+                <Button type="primary" onClick={handleSaveRegion}>저장</Button>
+              </div>
+            </div>
+          )}
+
           <Table
             columns={regionColumns}
-            dataSource={regionDataSource}
+            dataSource={filteredRegions}
             rowKey="id"
             pagination={false}
             rowClassName={(record) => {
-              if (record.id === 'new') return '';
               const backgroundColor = getTerritoryColor(record.territoryId);
               return backgroundColor === '#f5f5f5' ? 'bg-gray-50' : '';
             }}

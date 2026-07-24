@@ -37,16 +37,6 @@ function ProductManagement() {
       key: 'name',
       width: 200,
       render: (text, record) => {
-        if (record.id === 'new') {
-          return (
-            <Input
-              value={newCategoryData.name}
-              onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
-              placeholder="품목분류명 입력"
-              maxLength={20}
-            />
-          );
-        }
         if (record.id === editingCategoryId) {
           return (
             <Input
@@ -64,12 +54,7 @@ function ProductManagement() {
       dataIndex: 'itemCount',
       key: 'itemCount',
       width: 100,
-      render: (count, record) => {
-        if (record.id === 'new') {
-          return '0개';
-        }
-        return `${count}개`;
-      },
+      render: (count) => `${count}개`,
     },
     {
       title: '상태',
@@ -77,9 +62,6 @@ function ProductManagement() {
       key: 'status',
       width: 100,
       render: (status, record) => {
-        if (record.id === 'new') {
-          return <Tag color="green">활성</Tag>;
-        }
         if (record.id === editingCategoryId) {
           return (
             <Select
@@ -104,7 +86,7 @@ function ProductManagement() {
       key: 'action',
       width: 150,
       render: (_, record) => {
-        if (record.id === 'new' || record.id === editingCategoryId) {
+        if (record.id === editingCategoryId) {
           return (
             <Space>
               <Button
@@ -154,27 +136,8 @@ function ProductManagement() {
   };
 
   const handleSaveCategory = (record) => {
-    if (record.id === 'new') {
-      if (!newCategoryData.name || newCategoryData.name.trim() === '') {
-        message.error('품목분류명을 입력해주세요.');
-        return;
-      }
-      if (newCategoryData.name.length > 20) {
-        message.error('최대 20자까지 입력 가능합니다.');
-        return;
-      }
-
-      const newId = Math.max(...categories.map(c => c.id)) + 1;
-      setCategories([...categories, {
-        id: newId,
-        name: newCategoryData.name,
-        itemCount: 0,
-        status: 'active',
-      }]);
-      setIsAddingCategory(false);
-      setNewCategoryData({ name: '' });
-      message.success(`품목분류 '${newCategoryData.name}'이 등록되었습니다.`);
-    } else {
+    if (!record || record.id === editingCategoryId) {
+      // 기존 항목 수정
       if (!editingCategoryData.name || editingCategoryData.name.trim() === '') {
         message.error('품목분류명을 입력해주세요.');
         return;
@@ -199,16 +162,37 @@ function ProductManagement() {
       setEditingCategoryId(null);
       setEditingCategoryData({});
       message.success('품목분류 정보가 수정되었습니다.');
+    } else {
+      // 신규 추가 (고정 폼에서)
+      if (!newCategoryData.name || newCategoryData.name.trim() === '') {
+        message.error('품목분류명을 입력해주세요.');
+        return;
+      }
+      if (newCategoryData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      const newId = Math.max(...categories.map(c => c.id)) + 1;
+      setCategories([...categories, {
+        id: newId,
+        name: newCategoryData.name,
+        itemCount: 0,
+        status: 'active',
+      }]);
+      setIsAddingCategory(false);
+      setNewCategoryData({ name: '' });
+      message.success(`품목분류 '${newCategoryData.name}'이 등록되었습니다.`);
     }
   };
 
   const handleCancelCategory = (record) => {
-    if (record.id === 'new') {
-      setIsAddingCategory(false);
-      setNewCategoryData({ name: '' });
-    } else {
+    if (record && record.id === editingCategoryId) {
       setEditingCategoryId(null);
       setEditingCategoryData({});
+    } else {
+      setIsAddingCategory(false);
+      setNewCategoryData({ name: '' });
     }
   };
 
@@ -503,18 +487,43 @@ function ProductManagement() {
       {/* 탭 1: 품목분류 관리 */}
       {activeTab === 'category' && (
         <div>
-          <div className="flex justify-end mb-4">
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory}>
-              품목분류 등록
-            </Button>
-          </div>
+          {!isAddingCategory && (
+            <div className="flex justify-end mb-4">
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory}>
+                품목분류 등록
+              </Button>
+            </div>
+          )}
+
+          {isAddingCategory && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">품목분류 등록</h3>
+              <div className="flex items-end gap-3">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    품목분류명 <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    value={newCategoryData.name}
+                    onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
+                    placeholder="예: 누운고기"
+                    maxLength={20}
+                    onPressEnter={handleSaveCategory}
+                  />
+                </div>
+                <Space>
+                  <Button onClick={handleCancelCategory}>취소</Button>
+                  <Button type="primary" onClick={handleSaveCategory}>
+                    저장
+                  </Button>
+                </Space>
+              </div>
+            </div>
+          )}
+
           <Table
             columns={categoryColumns}
-            dataSource={
-              isAddingCategory
-                ? [...categories, { id: 'new', ...newCategoryData, itemCount: 0, status: 'active' }]
-                : categories
-            }
+            dataSource={categories}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
