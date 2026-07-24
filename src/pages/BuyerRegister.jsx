@@ -55,8 +55,9 @@ function BuyerRegister() {
   // 주요품목분류 변경 시 주요품목 필터링
   const handleCategoryChange = (values) => {
     setSelectedCategory(values);
+    let filtered = [];
     if (values && values.length > 0) {
-      const filtered = products.filter(p => values.includes(p.categoryName));
+      filtered = products.filter(p => values.includes(p.categoryName));
       setAvailableProducts(filtered);
     } else {
       setAvailableProducts([]);
