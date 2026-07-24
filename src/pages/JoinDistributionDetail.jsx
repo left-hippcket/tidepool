@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, InputNumber, message, Modal, Image, Upload, Space } from 'antd';
+import { Button, Form, Input, Select, InputNumber, message, Modal, Image, Upload, Space, Card, Tag, Flex, Descriptions, Row, Col, Statistic, Table, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { joinGroups, joinDetails, managers, territories, joinSalesDetails, joinSalesHistoryMemos } from '../data/mockData';
+
+const { Title, Text } = Typography;
 
 function JoinDistributionDetail() {
   const { id } = useParams();
@@ -21,15 +23,13 @@ function JoinDistributionDetail() {
 
   if (!joinGroup || !detail) {
     return (
-      <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-        <button
-          onClick={() => navigate('/join-distribution')}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <ArrowLeftOutlined />
+      <div style={{ minHeight: '100vh', padding: 24, background: '#f5f5f5' }}>
+        <Button onClick={() => navigate('/join-distribution')} icon={<ArrowLeftOutlined />}>
           목록으로 돌아가기
-        </button>
-        <div className="mt-8 text-lg text-gray-600">조인유통 그룹을 찾을 수 없습니다.</div>
+        </Button>
+        <Card style={{ marginTop: 24 }}>
+          <Text type="secondary">조인유통 그룹을 찾을 수 없습니다.</Text>
+        </Card>
       </div>
     );
   }
@@ -157,208 +157,179 @@ function JoinDistributionDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
       {/* 헤더 */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/join-distribution')}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <ArrowLeftOutlined />
-            목록으로
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">{joinGroup.name}</h1>
-        </div>
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-          joinGroup.status === 'active'
-            ? 'bg-green-50 text-green-700 border border-green-200'
-            : 'bg-gray-50 text-gray-700 border border-gray-200'
-        }`}>
-          {joinGroup.status === 'active' ? '활성' : '비활성'}
-        </span>
-      </div>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Flex justify="space-between" align="center" wrap="wrap" gap="middle">
+          <Space size="middle">
+            <Button onClick={() => navigate('/join-distribution')} icon={<ArrowLeftOutlined />}>
+              목록으로
+            </Button>
+            <Title level={2} style={{ margin: 0 }}>{joinGroup.name}</Title>
+          </Space>
+          <Tag color={joinGroup.status === 'active' ? 'success' : 'default'}>
+            {joinGroup.status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        </Flex>
 
       {/* 섹션 1: 조인유통그룹 기본 정보 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">조인유통그룹 기본 정보</h2>
-          {editMode ? (
-            <div className="flex gap-2">
+      <Card
+        title="조인유통그룹 기본 정보"
+        extra={
+          editMode ? (
+            <Space>
               <Button icon={<SaveOutlined />} type="primary" onClick={handleSaveGroup} size="small">
                 저장
               </Button>
               <Button icon={<CloseOutlined />} onClick={handleCancelEdit} size="small">
                 취소
               </Button>
-            </div>
+            </Space>
           ) : (
-            <button
-              onClick={handleEditGroup}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              <EditOutlined />
+            <Button type="link" onClick={handleEditGroup} icon={<EditOutlined />}>
               수정
-            </button>
-          )}
-        </div>
-
+            </Button>
+          )
+        }
+      >
         {editMode ? (
           <Form form={form} layout="vertical">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Form.Item label="조인유통그룹명" name="name" rules={[{ required: true }]}>
-                <Input maxLength={30} />
-              </Form.Item>
-              <Form.Item label="담당영업사원" name="salesPerson" rules={[{ required: true }]}>
-                <Select>
-                  {managers.map(m => (
-                    <Select.Option key={m} value={m}>{m}</Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item label="사업권역" name="territory" rules={[{ required: true }]}>
-                <Select>
-                  {territories.filter(t => t.status === 'active').map(t => (
-                    <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item label="상세지역" name="region" rules={[{ required: true }]}>
-                <Select>
-                  <Select.Option value="서울">서울</Select.Option>
-                  <Select.Option value="경기">경기</Select.Option>
-                  <Select.Option value="인천">인천</Select.Option>
-                </Select>
-              </Form.Item>
-              <Form.Item label="카톡단톡방이름" name="kakaoGroupName">
-                <Input maxLength={50} />
-              </Form.Item>
-              <Form.Item label="결제주기(조건)" name="paymentCycle">
-                <Input.TextArea rows={2} maxLength={200} />
-              </Form.Item>
-              <Form.Item label="도착단가 정책 (상차단가+)" name="arrivalPricePolicy">
-                <InputNumber style={{ width: '100%' }} min={0} addonAfter="원" />
-              </Form.Item>
-              <Form.Item label="상차 수수료율(%)" name="commissionRate" rules={[{ required: true }]}>
-                <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} />
-              </Form.Item>
-              <Form.Item label="메인판매처" name="mainSuppliers">
-                <Input placeholder="쉼표로 구분" maxLength={100} />
-              </Form.Item>
-              <Form.Item label="메인 양식장" name="mainFarms">
-                <Input placeholder="쉼표로 구분" maxLength={100} />
-              </Form.Item>
-              <Form.Item label="정성적 평가 - 재무상황" name="financial">
-                <Select placeholder="선택">
-                  <Select.Option value="좋음">좋음</Select.Option>
-                  <Select.Option value="보통">보통</Select.Option>
-                  <Select.Option value="나쁨">나쁨</Select.Option>
-                </Select>
-              </Form.Item>
-              <Form.Item label="상태" name="status" rules={[{ required: true }]}>
-                <Select onChange={handleStatusChange}>
-                  <Select.Option value="active">활성</Select.Option>
-                  <Select.Option value="inactive">비활성</Select.Option>
-                </Select>
-              </Form.Item>
-            </div>
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item label="조인유통그룹명" name="name" rules={[{ required: true }]}>
+                  <Input maxLength={30} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="담당영업사원" name="salesPerson" rules={[{ required: true }]}>
+                  <Select>
+                    {managers.map(m => (
+                      <Select.Option key={m} value={m}>{m}</Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="사업권역" name="territory" rules={[{ required: true }]}>
+                  <Select>
+                    {territories.filter(t => t.status === 'active').map(t => (
+                      <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="상세지역" name="region" rules={[{ required: true }]}>
+                  <Select>
+                    <Select.Option value="서울">서울</Select.Option>
+                    <Select.Option value="경기">경기</Select.Option>
+                    <Select.Option value="인천">인천</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="카톡단톡방이름" name="kakaoGroupName">
+                  <Input maxLength={50} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="결제주기(조건)" name="paymentCycle">
+                  <Input.TextArea rows={2} maxLength={200} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="도착단가 정책 (상차단가+)" name="arrivalPricePolicy">
+                  <InputNumber style={{ width: '100%' }} min={0} addonAfter="원" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="상차 수수료율(%)" name="commissionRate" rules={[{ required: true }]}>
+                  <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="메인판매처" name="mainSuppliers">
+                  <Input placeholder="쉼표로 구분" maxLength={100} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="메인 양식장" name="mainFarms">
+                  <Input placeholder="쉼표로 구분" maxLength={100} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="정성적 평가 - 재무상황" name="financial">
+                  <Select placeholder="선택">
+                    <Select.Option value="좋음">좋음</Select.Option>
+                    <Select.Option value="보통">보통</Select.Option>
+                    <Select.Option value="나쁨">나쁨</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="상태" name="status" rules={[{ required: true }]}>
+                  <Select onChange={handleStatusChange}>
+                    <Select.Option value="active">활성</Select.Option>
+                    <Select.Option value="inactive">비활성</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
           </Form>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-sm text-gray-500 mb-1">조인유통그룹명</div>
-              <div className="text-base font-semibold text-gray-900">{joinGroup.name}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">담당영업사원</div>
-              <div className="text-base font-semibold text-gray-900">{joinGroup.salesPerson}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">사업권역</div>
-              <div className="text-base font-semibold text-gray-900">{joinGroup.territory}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">상세지역</div>
-              <div className="text-base font-semibold text-gray-900">{joinGroup.region}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">카톡단톡방이름</div>
-              <div className="text-base font-semibold text-gray-900">{detail.kakaoGroupName || '-'}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">결제주기</div>
-              <div className="text-base font-semibold text-gray-900">{detail.paymentCycle || '-'}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">도착단가 정책</div>
-              <div className="text-base font-semibold text-gray-900">상차단가 + {detail.arrivalPricePolicy}원</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">상차 수수료율</div>
-              <div className="text-base font-semibold text-gray-900">{detail.commissionRate}%</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">메인판매처</div>
-              <div className="text-base font-semibold text-gray-900">{detail.mainSuppliers || '-'}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">메인 양식장</div>
-              <div className="text-base font-semibold text-gray-900">{detail.mainFarms || '-'}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">재무상황</div>
-              <div className="text-base font-semibold text-gray-900">{detail.financial || '-'}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-500 mb-1">사업자 수</div>
-              <div className="text-base font-semibold text-gray-900">{joinGroup.businessCount}개</div>
-            </div>
-          </div>
+          <Descriptions column={{ xs: 1, sm: 2, md: 3 }} bordered>
+            <Descriptions.Item label="조인유통그룹명">{joinGroup.name}</Descriptions.Item>
+            <Descriptions.Item label="담당영업사원">{joinGroup.salesPerson}</Descriptions.Item>
+            <Descriptions.Item label="사업권역">{joinGroup.territory}</Descriptions.Item>
+            <Descriptions.Item label="상세지역">{joinGroup.region}</Descriptions.Item>
+            <Descriptions.Item label="카톡단톡방이름">{detail.kakaoGroupName || '-'}</Descriptions.Item>
+            <Descriptions.Item label="결제주기">{detail.paymentCycle || '-'}</Descriptions.Item>
+            <Descriptions.Item label="도착단가 정책">상차단가 + {detail.arrivalPricePolicy}원</Descriptions.Item>
+            <Descriptions.Item label="상차 수수료율">{detail.commissionRate}%</Descriptions.Item>
+            <Descriptions.Item label="메인판매처">{detail.mainSuppliers || '-'}</Descriptions.Item>
+            <Descriptions.Item label="메인 양식장">{detail.mainFarms || '-'}</Descriptions.Item>
+            <Descriptions.Item label="재무상황">{detail.financial || '-'}</Descriptions.Item>
+            <Descriptions.Item label="사업자 수">{joinGroup.businessCount}개</Descriptions.Item>
+          </Descriptions>
         )}
 
         {/* 키맨 정보 */}
-        <div className="mt-8">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h3>
-          <div className="space-y-3">
-            {detail.keymen.map((keyman, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">이름</div>
-                    <div className="text-sm font-medium text-gray-900">{keyman.name}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">직책</div>
-                    <div className="text-sm font-medium text-gray-900">{keyman.position}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">연락처</div>
-                    <div className="text-sm font-medium text-gray-900">{keyman.phone}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+        <Title level={5} style={{ marginTop: 24 }}>키맨 정보</Title>
+        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+          {detail.keymen.map((keyman, index) => (
+            <Card key={index} size="small" style={{ background: '#fafafa' }}>
+              <Row gutter={16}>
+                <Col xs={24} sm={8}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>이름</Text>
+                  <div><Text strong>{keyman.name}</Text></div>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>직책</Text>
+                  <div><Text strong>{keyman.position}</Text></div>
+                </Col>
+                <Col xs={24} sm={8}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>연락처</Text>
+                  <div><Text strong>{keyman.phone}</Text></div>
+                </Col>
+              </Row>
+            </Card>
+          ))}
+        </Space>
+      </Card>
 
       {/* 섹션 2: 소속 사업자 정보 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">소속 사업자 정보</h2>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <Card title="소속 사업자 정보">
+        <Row gutter={[16, 16]}>
           {detail.businesses.map((business) => (
-            <div key={business.id} className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-              <div className="bg-white px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-gray-900">{business.joinName}</span>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                    business.status === 'active'
-                      ? 'bg-green-50 text-green-700 border border-green-200'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {business.status === 'active' ? '활성' : '비활성'}
-                  </span>
+            <Col xs={24} lg={12} key={business.id}>
+              <Card
+                size="small"
+                title={
+                  <Space>
+                    <Text strong>{business.joinName}</Text>
+                    <Tag color={business.status === 'active' ? 'success' : 'default'}>
+                      {business.status === 'active' ? '활성' : '비활성'}
+                    </Tag>
                   <Image.PreviewGroup>
                     <Image
                       src="/images/business-certificate-sample.png"
@@ -383,10 +354,11 @@ function JoinDistributionDetail() {
                       사업자등록증
                     </Button>
                   </Image.PreviewGroup>
-                </div>
-
-                {editingBusinessId === business.id ? (
-                  <div className="flex gap-2">
+                  </Space>
+                }
+                extra={
+                  editingBusinessId === business.id ? (
+                    <Space>
                     <Button
                       icon={<SaveOutlined />}
                       type="primary"
@@ -402,54 +374,65 @@ function JoinDistributionDetail() {
                     >
                       취소
                     </Button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleEditBusiness(business)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                  >
-                    <EditOutlined />
-                    수정
-                  </button>
-                )}
-              </div>
-
+                  </Space>
+                  ) : (
+                    <Button type="link" onClick={() => handleEditBusiness(business)} icon={<EditOutlined />}>
+                      수정
+                    </Button>
+                  )
+                }
+              >
               {editingBusinessId === business.id ? (
-                <div className="p-4">
-                  <Form form={businessForm} layout="vertical">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Form.Item label="조인유통명" name="joinName" className="md:col-span-2">
-                        <Input maxLength={20} />
-                      </Form.Item>
-                      <Form.Item label="사업자등록번호" name="businessNumber">
-                        <Input disabled className="bg-gray-100" />
-                      </Form.Item>
-                      <Form.Item label="ticker" name="ticker">
-                        <Input disabled className="bg-gray-100" />
-                      </Form.Item>
-                      <Form.Item label="사업자등록상호" name="businessName">
-                        <Input maxLength={50} />
-                      </Form.Item>
-                      <Form.Item label="대표자" name="representative">
-                        <Input maxLength={10} />
-                      </Form.Item>
-                      <Form.Item label="사업자등록주소" name="businessAddress" className="md:col-span-2">
-                        <Input maxLength={100} />
-                      </Form.Item>
-                      <Form.Item label="세금계산서 이메일" name="taxInvoiceEmail">
-                        <Input type="email" />
-                      </Form.Item>
-                      <Form.Item label="상태" name="status">
-                        <Select>
-                          <Select.Option value="active">활성</Select.Option>
-                          <Select.Option value="inactive">비활성</Select.Option>
-                        </Select>
-                      </Form.Item>
-                    </div>
+                <Form form={businessForm} layout="vertical">
+                  <Row gutter={16}>
+                      <Col span={24}>
+                        <Form.Item label="조인유통명" name="joinName">
+                          <Input maxLength={20} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="사업자등록번호" name="businessNumber">
+                          <Input disabled style={{ background: '#f5f5f5' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="ticker" name="ticker">
+                          <Input disabled style={{ background: '#f5f5f5' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="사업자등록상호" name="businessName">
+                          <Input maxLength={50} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="대표자" name="representative">
+                          <Input maxLength={10} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={24}>
+                        <Form.Item label="사업자등록주소" name="businessAddress">
+                          <Input maxLength={100} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="세금계산서 이메일" name="taxInvoiceEmail">
+                          <Input type="email" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="상태" name="status">
+                          <Select>
+                            <Select.Option value="active">활성</Select.Option>
+                            <Select.Option value="inactive">비활성</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
                     {/* 은행계좌정보 */}
-                    <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-4">은행계좌정보</h4>
+                    <div style={{ marginTop: 24 }}>
+                      <Title level={5} style={{ marginBottom: 16 }}>은행계좌정보</Title>
                       <Form.List name="bankAccounts">
                         {(fields, { add, remove }) => (
                           <>
@@ -521,67 +504,57 @@ function JoinDistributionDetail() {
                       </Form.Item>
                     </div>
                   </Form>
-                </div>
               ) : (
-                <div className="p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">사업자등록번호</div>
-                      <div className="text-base font-medium text-gray-900">{business.businessNumber}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">ticker</div>
-                      <div className="text-base font-medium text-gray-900">{business.ticker}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">사업자등록상호</div>
-                      <div className="text-base font-medium text-gray-900">{business.businessName}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">대표자</div>
-                      <div className="text-base font-medium text-gray-900">{business.representative}</div>
-                    </div>
-                    <div className="md:col-span-2">
-                      <div className="text-sm text-gray-500 mb-1">사업자등록주소</div>
-                      <div className="text-base font-medium text-gray-900">{business.businessAddress}</div>
-                    </div>
-                    <div className="md:col-span-2">
-                      <div className="text-sm text-gray-500 mb-1">세금계산서 이메일</div>
-                      <div className="text-base font-medium text-gray-900">{business.taxInvoiceEmail}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">은행계좌</div>
-                      <div className="space-y-1">
+                  <Descriptions column={{ xs: 1, md: 2 }} size="small" bordered>
+                    <Descriptions.Item label="사업자등록번호">{business.businessNumber}</Descriptions.Item>
+                    <Descriptions.Item label="ticker">{business.ticker}</Descriptions.Item>
+                    <Descriptions.Item label="사업자등록상호">{business.businessName}</Descriptions.Item>
+                    <Descriptions.Item label="대표자">{business.representative}</Descriptions.Item>
+                    <Descriptions.Item label="사업자등록주소" span={2}>{business.businessAddress}</Descriptions.Item>
+                    <Descriptions.Item label="세금계산서 이메일" span={2}>{business.taxInvoiceEmail}</Descriptions.Item>
+                    <Descriptions.Item label="은행계좌">
+                      <Space direction="vertical" size="small">
                         {business.bankAccounts.map((account, idx) => (
-                          <div key={idx} className="text-base font-medium text-gray-900 flex items-center gap-2 flex-wrap">
-                            <span>{account.bank} {account.accountNumber} ({account.holder})</span>
-                            {idx === 0 && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
-                                주사용
-                              </span>
-                            )}
+                          <div key={idx}>
+                            <Text>{account.bank} {account.accountNumber} ({account.holder})</Text>
+                            {idx === 0 && <Tag color="gold" style={{ marginLeft: 8 }}>주사용</Tag>}
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                      </Space>
+                    </Descriptions.Item>
+                  </Descriptions>
               )}
-            </div>
+            </Card>
+            </Col>
           ))}
 
           {/* 사업자 추가 카드 */}
-          <button
-            onClick={handleAddBusiness}
-            className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-all min-h-[200px] flex flex-col items-center justify-center gap-3 text-gray-500 hover:text-gray-700"
-          >
-            <div className="w-16 h-16 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
-              <PlusOutlined className="text-2xl" />
-            </div>
-            <span className="text-base font-medium">사업자 추가</span>
-          </button>
-        </div>
-      </div>
+          <Col xs={24} lg={12}>
+            <Card
+              onClick={handleAddBusiness}
+              hoverable
+              style={{
+                height: 200,
+                borderStyle: 'dashed',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              bodyStyle={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <PlusOutlined style={{ fontSize: 32, marginBottom: 8 }} />
+              <Text>사업자 추가</Text>
+            </Card>
+          </Col>
+        </Row>
+      </Card>
 
       {/* P2 섹션 시작 */}
       {joinSalesDetails[id] && (
@@ -907,6 +880,7 @@ function JoinDistributionDetail() {
           </div>
         </div>
       )}
+      </Space>
     </div>
   );
 }
