@@ -590,8 +590,8 @@ function TerritoryManagement() {
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Flex gap="middle" wrap="wrap">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    권역명 <span className="text-red-500">*</span>
+                  <label>
+                    권역명 <span>*</span>
                   </label>
                   <Input
                     value={newTerritoryData.name}
@@ -601,8 +601,8 @@ function TerritoryManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    표시순서 <span className="text-red-500">*</span>
+                  <label>
+                    표시순서 <span>*</span>
                   </label>
                   <InputNumber
                     value={newTerritoryData.displayOrder}
@@ -613,7 +613,7 @@ function TerritoryManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label>
                     상태
                   </label>
                   <Select
@@ -677,8 +677,8 @@ function TerritoryManagement() {
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Flex gap="middle" wrap="wrap">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    사업권역 <span className="text-red-500">*</span>
+                  <label>
+                    사업권역 <span>*</span>
                   </label>
                   <Select
                     value={newRegionData.territoryId}
@@ -699,8 +699,8 @@ function TerritoryManagement() {
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    지역명 <span className="text-red-500">*</span>
+                  <label>
+                    지역명 <span>*</span>
                   </label>
                   <Input
                     value={newRegionData.name}
@@ -710,8 +710,8 @@ function TerritoryManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    표시순서 <span className="text-red-500">*</span>
+                  <label>
+                    표시순서 <span>*</span>
                   </label>
                   <InputNumber
                     value={newRegionData.displayOrder}

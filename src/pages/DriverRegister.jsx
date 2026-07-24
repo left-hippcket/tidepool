@@ -214,12 +214,12 @@ function DriverRegister() {
           </Row>
 
           <div style={{ marginTop: 16 }}>
-            <label className="block text-sm font-medium text-gray-700 mb-2">은행계좌정보</label>
+            <label>은행계좌정보</label>
             <Form.List name="bankAccounts" initialValue={[{}]}>
               {(fields, { add, remove }) => (
                 <>
                   {fields.map((field, index) => (
-                    <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
+                    <div key={field.key}>
                       <Space align="start" style={{ width: '100%' }}>
                         <Col xs={24} md={12}><Form.Item
                           {...field}

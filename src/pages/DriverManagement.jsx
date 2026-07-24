@@ -143,7 +143,7 @@ function DriverManagement() {
             type="checkbox"
             checked={hasCertificate || false}
             disabled
-            className="rounded border-gray-300"
+           
           />
         );
       },
