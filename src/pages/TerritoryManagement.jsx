@@ -217,10 +217,26 @@ function TerritoryManagement() {
     }
   };
 
-  // 필터링된 상세지역 목록
-  const filteredRegions = selectedTerritoryFilter === 'all'
+  // 필터링 및 정렬된 상세지역 목록
+  const filteredRegions = (selectedTerritoryFilter === 'all'
     ? regions
-    : regions.filter(r => r.territoryId === parseInt(selectedTerritoryFilter));
+    : regions.filter(r => r.territoryId === parseInt(selectedTerritoryFilter))
+  ).sort((a, b) => {
+    // 1차: 사업권역 ID로 정렬
+    if (a.territoryId !== b.territoryId) {
+      return a.territoryId - b.territoryId;
+    }
+    // 2차: 표시순서로 정렬
+    return a.displayOrder - b.displayOrder;
+  });
+
+  // 사업권역별 색상 맵 생성
+  const getTerritoryColor = (territoryId) => {
+    const colors = ['#ffffff', '#f5f5f5']; // 흰색과 회색 번갈아가며
+    const uniqueTerritoryIds = [...new Set(filteredRegions.map(r => r.territoryId))].sort();
+    const index = uniqueTerritoryIds.indexOf(territoryId);
+    return colors[index % 2];
+  };
 
   return (
     <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
@@ -294,7 +310,16 @@ function TerritoryManagement() {
             columns={regionColumns}
             dataSource={filteredRegions}
             rowKey="id"
-            pagination={{ pageSize: 10 }}
+            pagination={{
+              defaultPageSize: 10,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              showSizeChanger: true,
+              showTotal: (total) => `전체 ${total}건`,
+            }}
+            rowClassName={(record) => {
+              const backgroundColor = getTerritoryColor(record.territoryId);
+              return backgroundColor === '#f5f5f5' ? 'bg-gray-50' : '';
+            }}
           />
         </div>
       )}
