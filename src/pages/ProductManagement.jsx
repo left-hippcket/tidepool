@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space, Card, Flex, Typography, Tabs } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space, Card, Flex, Typography, Tabs, Row, Col } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
