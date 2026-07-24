@@ -726,40 +726,48 @@ function SellerDetail() {
       </Card>
 
       {/* 섹션 3: 거래 실적 (P2 샘플) */}
-      <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 opacity-60">
-        <h2 className="text-lg font-semibold text-gray-500 mb-6">거래 실적 (P2 예정)</h2>
+      <Card style={{ backgroundColor: '#fafafa', opacity: 0.6 }}>
+        <Title level={5} style={{ color: '#8c8c8c', marginBottom: 24 }}>거래 실적 (P2 예정)</Title>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
-            <div className="text-xs text-gray-500 mb-2">매입액 (누적)</div>
-            <div className="text-2xl font-bold text-gray-600">
-              {(sellerGroup.totalPurchase / 100000000).toFixed(1)}억
-            </div>
-          </div>
-          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
-            <div className="text-xs text-gray-500 mb-2">매입액 (최근 3개월)</div>
-            <div className="text-2xl font-bold text-gray-600">
-              {(sellerGroup.purchase3M / 100000000).toFixed(1)}억
-            </div>
-          </div>
-          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
-            <div className="text-xs text-gray-500 mb-2">매입액 (최근 1개월)</div>
-            <div className="text-2xl font-bold text-gray-600">
-              {(sellerGroup.purchase1M / 100000000).toFixed(1)}억
-            </div>
-          </div>
-          <div className="bg-gray-100 rounded-lg p-4 text-center border border-gray-300">
-            <div className="text-xs text-gray-500 mb-2">최근거래일</div>
-            <div className="text-2xl font-bold text-gray-600">
-              {sellerGroup.lastTradeDate}
-            </div>
-          </div>
-        </div>
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={12} sm={12} lg={6}>
+            <Card size="small" style={{ textAlign: 'center', backgroundColor: '#f5f5f5', border: '1px solid #d9d9d9' }}>
+              <Text style={{ display: 'block', fontSize: 12, color: '#8c8c8c', marginBottom: 8 }}>매입액 (누적)</Text>
+              <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                {(sellerGroup.totalPurchase / 100000000).toFixed(1)}억
+              </Text>
+            </Card>
+          </Col>
+          <Col xs={12} sm={12} lg={6}>
+            <Card size="small" style={{ textAlign: 'center', backgroundColor: '#f5f5f5', border: '1px solid #d9d9d9' }}>
+              <Text style={{ display: 'block', fontSize: 12, color: '#8c8c8c', marginBottom: 8 }}>매입액 (최근 3개월)</Text>
+              <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                {(sellerGroup.purchase3M / 100000000).toFixed(1)}억
+              </Text>
+            </Card>
+          </Col>
+          <Col xs={12} sm={12} lg={6}>
+            <Card size="small" style={{ textAlign: 'center', backgroundColor: '#f5f5f5', border: '1px solid #d9d9d9' }}>
+              <Text style={{ display: 'block', fontSize: 12, color: '#8c8c8c', marginBottom: 8 }}>매입액 (최근 1개월)</Text>
+              <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                {(sellerGroup.purchase1M / 100000000).toFixed(1)}억
+              </Text>
+            </Card>
+          </Col>
+          <Col xs={12} sm={12} lg={6}>
+            <Card size="small" style={{ textAlign: 'center', backgroundColor: '#f5f5f5', border: '1px solid #d9d9d9' }}>
+              <Text style={{ display: 'block', fontSize: 12, color: '#8c8c8c', marginBottom: 8 }}>최근거래일</Text>
+              <Text style={{ display: 'block', fontSize: 24, fontWeight: 'bold', color: '#595959' }}>
+                {sellerGroup.lastTradeDate}
+              </Text>
+            </Card>
+          </Col>
+        </Row>
 
-        <div className="border-t border-gray-200 pt-6 mb-6"></div>
+        <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 24, marginBottom: 24 }}></div>
 
         {/* 기간 필터 */}
-        <div className="mb-6 flex flex-wrap gap-2">
+        <Space wrap style={{ marginBottom: 24 }}>
           {[
             { key: '1M', label: '최근 1개월' },
             { key: '3M', label: '최근 3개월' },
@@ -769,19 +777,16 @@ function SellerDetail() {
             { key: 'thisYear', label: '올해' },
             { key: 'total', label: '누적' },
           ].map(({ key, label }) => (
-            <button
+            <Button
               key={key}
               onClick={() => setPeriodFilter(key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                periodFilter === key
-                  ? 'bg-gray-400 text-gray-700 shadow-sm'
-                  : 'bg-gray-200 text-gray-600 border border-gray-300'
-              }`}
+              type={periodFilter === key ? 'primary' : 'default'}
+              ghost={periodFilter !== key}
             >
               {label}
-            </button>
+            </Button>
           ))}
-        </div>
+        </Space>
 
         {/* 기간별 실적 표 */}
         <div style={{ marginBottom: 24 }}>
@@ -832,12 +837,12 @@ function SellerDetail() {
 
         {/* 매입액 막대차트 */}
         <div>
-          <h3 className="text-base font-semibold text-gray-500 mb-4">매입액 추이</h3>
-          <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
+          <Title level={5} style={{ color: '#8c8c8c', marginBottom: 16 }}>매입액 추이</Title>
+          <Card size="small" style={{ backgroundColor: '#f5f5f5', border: '1px solid #d9d9d9' }}>
             <Column {...chartConfig} />
-          </div>
+          </Card>
         </div>
-      </div>
+      </Card>
       </Space>
     </div>
   );
