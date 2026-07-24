@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Input, Select, message, Tag, Space } from 'antd';
+import { Table, Button, Input, InputNumber, Select, message, Tag, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { territories as initialTerritories, regions as initialRegions } from '../data/mockData';
 
