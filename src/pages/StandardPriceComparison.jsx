@@ -9,10 +9,10 @@ const { Option } = Select;
 
 function StandardPriceComparison() {
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
-  const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기 id
-  const [selectedProduct, setSelectedProduct] = useState(2); // 넙치 id
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedOrigins, setSelectedOrigins] = useState([]);
-  const [selectedSpec, setSelectedSpec] = useState('1.5kg');
+  const [selectedSpec, setSelectedSpec] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [availableOrigins, setAvailableOrigins] = useState([]);
   const [availableSpecs, setAvailableSpecs] = useState([]);
