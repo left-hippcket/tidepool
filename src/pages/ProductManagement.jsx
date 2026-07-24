@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space, Card, Flex, Typography, Tabs } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 import {
   productCategories as initialCategories,
   products as initialProducts,
@@ -591,62 +593,40 @@ function ProductManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">상품 관리</h2>
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>상품 관리</Title>
 
       {/* 탭 버튼 */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab('category')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === 'category'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          품목분류 관리
-        </button>
-        <button
-          onClick={() => setActiveTab('product')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === 'product'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          품목 관리
-        </button>
-        <button
-          onClick={() => setActiveTab('origin-spec')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === 'origin-spec'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          원산지/규격 관리
-        </button>
-      </div>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={[
+          { key: 'category', label: '품목분류 관리' },
+          { key: 'product', label: '품목 관리' },
+          { key: 'origin-spec', label: '원산지/규격 관리' }
+        ]}
+      />
 
       {/* 탭 1: 품목분류 관리 */}
       {activeTab === 'category' && (
-        <div>
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           {!isAddingCategory && (
-            <div className="flex justify-end mb-4">
+            <Flex justify="flex-end">
               <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory}>
                 품목분류 등록
               </Button>
-            </div>
+            </Flex>
           )}
 
           {isAddingCategory && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">품목분류 등록</h3>
-              <div className="flex items-end gap-3">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    품목분류명 <span className="text-red-500">*</span>
-                  </label>
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>품목분류 등록</Title>
+              <Flex align="flex-end" gap="middle">
+                <div style={{ flex: 1 }}>
+                  <Text style={{ display: 'block', marginBottom: 4 }}>
+                    품목분류명 <Text type="danger">*</Text>
+                  </Text>
                   <Input
                     value={newCategoryData.name}
                     onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
@@ -661,25 +641,27 @@ function ProductManagement() {
                     저장
                   </Button>
                 </Space>
-              </div>
-            </div>
+              </Flex>
+            </Card>
           )}
 
-          <Table
-            columns={categoryColumns}
-            dataSource={categories}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-          />
-        </div>
+          <Card>
+            <Table
+              columns={categoryColumns}
+              dataSource={categories}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </Space>
       )}
 
       {/* 탭 2: 품목 관리 */}
       {activeTab === 'product' && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Flex justify="space-between" align="center">
             <Space>
-              <span className="text-sm text-gray-700">품목분류:</span>
+              <Text>품목분류:</Text>
               <Select
                 style={{ width: 150 }}
                 value={selectedCategoryFilter}
@@ -698,16 +680,17 @@ function ProductManagement() {
                 품목 등록
               </Button>
             )}
-          </div>
+          </Flex>
 
           {isAddingProduct && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">품목 등록</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    품목분류 <span className="text-red-500">*</span>
-                  </label>
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>품목 등록</Title>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Flex gap="middle" wrap="wrap">
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      품목분류 <Text type="danger">*</Text>
+                    </Text>
                   <Select
                     value={newProductData.categoryId}
                     onChange={(value) => setNewProductData({ ...newProductData, categoryId: value })}
@@ -720,61 +703,64 @@ function ProductManagement() {
                       </Select.Option>
                     ))}
                   </Select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    품목명 <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    value={newProductData.name}
-                    onChange={(e) => setNewProductData({ ...newProductData, name: e.target.value })}
-                    placeholder="예: 광어"
-                    maxLength={20}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    주문단위 <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={newProductData.orderUnit}
-                    onChange={(value) => setNewProductData({ ...newProductData, orderUnit: value })}
-                    placeholder="주문단위 선택"
-                    style={{ width: '100%' }}
-                  >
-                    <Select.Option value="통">통</Select.Option>
-                    <Select.Option value="박스">박스</Select.Option>
-                    <Select.Option value="kg">kg</Select.Option>
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    주문단위당중량(kg) <span className="text-red-500">*</span>
-                  </label>
-                  <InputNumber
-                    value={newProductData.unitWeight}
-                    onChange={(value) => setNewProductData({ ...newProductData, unitWeight: value })}
-                    placeholder="예: 1.2"
-                    style={{ width: '100%' }}
-                    min={0.1}
-                    step={0.1}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button onClick={handleCancelProduct}>취소</Button>
-                <Button type="primary" onClick={handleSaveProduct}>저장</Button>
-              </div>
-            </div>
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      품목명 <Text type="danger">*</Text>
+                    </Text>
+                    <Input
+                      value={newProductData.name}
+                      onChange={(e) => setNewProductData({ ...newProductData, name: e.target.value })}
+                      placeholder="예: 광어"
+                      maxLength={20}
+                    />
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      주문단위 <Text type="danger">*</Text>
+                    </Text>
+                    <Select
+                      value={newProductData.orderUnit}
+                      onChange={(value) => setNewProductData({ ...newProductData, orderUnit: value })}
+                      placeholder="주문단위 선택"
+                      style={{ width: '100%' }}
+                    >
+                      <Select.Option value="통">통</Select.Option>
+                      <Select.Option value="박스">박스</Select.Option>
+                      <Select.Option value="kg">kg</Select.Option>
+                    </Select>
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      주문단위당중량(kg) <Text type="danger">*</Text>
+                    </Text>
+                    <InputNumber
+                      value={newProductData.unitWeight}
+                      onChange={(value) => setNewProductData({ ...newProductData, unitWeight: value })}
+                      placeholder="예: 1.2"
+                      style={{ width: '100%' }}
+                      min={0.1}
+                      step={0.1}
+                    />
+                  </div>
+                </Flex>
+                <Flex justify="flex-end" gap="small">
+                  <Button onClick={handleCancelProduct}>취소</Button>
+                  <Button type="primary" onClick={handleSaveProduct}>저장</Button>
+                </Flex>
+              </Space>
+            </Card>
           )}
 
-          <Table
-            columns={productColumns}
-            dataSource={filteredProducts}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-          />
-        </div>
+          <Card>
+            <Table
+              columns={productColumns}
+              dataSource={filteredProducts}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </Space>
       )}
 
       {/* 탭 3: 원산지/규격 관리 */}
@@ -953,6 +939,7 @@ function ProductManagement() {
           </div>
         </div>
       )}
+      </Space>
 
       {/* 공통 모달 (원산지/규격 전용) */}
       <Modal
