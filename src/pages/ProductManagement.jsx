@@ -29,6 +29,12 @@ function ProductManagement() {
   const [newCategoryData, setNewCategoryData] = useState({ name: '' });
   const [editingCategoryData, setEditingCategoryData] = useState({});
 
+  // 품목 인라인 편집 state
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [newProductData, setNewProductData] = useState({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+  const [editingProductData, setEditingProductData] = useState({});
+
   // ===== 탭 1: 품목분류 관리 =====
   const categoryColumns = [
     {
@@ -209,18 +215,60 @@ function ProductManagement() {
       dataIndex: 'name',
       key: 'name',
       width: 150,
+      render: (text, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Input
+              value={editingProductData.name}
+              onChange={(e) => setEditingProductData({ ...editingProductData, name: e.target.value })}
+              maxLength={20}
+            />
+          );
+        }
+        return text;
+      },
     },
     {
       title: '주문단위',
       dataIndex: 'orderUnit',
       key: 'orderUnit',
       width: 100,
+      render: (text, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Select
+              value={editingProductData.orderUnit}
+              onChange={(value) => setEditingProductData({ ...editingProductData, orderUnit: value })}
+              style={{ width: '100%' }}
+            >
+              <Select.Option value="통">통</Select.Option>
+              <Select.Option value="박스">박스</Select.Option>
+              <Select.Option value="kg">kg</Select.Option>
+            </Select>
+          );
+        }
+        return text;
+      },
     },
     {
       title: '주문단위당중량(kg)',
       dataIndex: 'unitWeight',
       key: 'unitWeight',
       width: 150,
+      render: (text, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <InputNumber
+              value={editingProductData.unitWeight}
+              onChange={(value) => setEditingProductData({ ...editingProductData, unitWeight: value })}
+              min={0.1}
+              step={0.1}
+              style={{ width: '100%' }}
+            />
+          );
+        }
+        return text;
+      },
     },
     {
       title: '원산지 개수',
@@ -241,36 +289,166 @@ function ProductManagement() {
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status) => (
-        <Tag color={status === 'active' ? 'green' : 'default'}>
-          {status === 'active' ? '활성' : '비활성'}
-        </Tag>
-      ),
+      render: (status, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Select
+              value={editingProductData.status}
+              onChange={(value) => setEditingProductData({ ...editingProductData, status: value })}
+              style={{ width: 80 }}
+            >
+              <Select.Option value="active">활성</Select.Option>
+              <Select.Option value="inactive">비활성</Select.Option>
+            </Select>
+          );
+        }
+        return (
+          <Tag color={status === 'active' ? 'green' : 'default'}>
+            {status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        );
+      },
     },
     {
-      title: '수정',
+      title: '액션',
       key: 'action',
-      width: 80,
-      render: (_, record) => (
-        <Button type="link" onClick={() => handleEditProduct(record)}>
-          수정
-        </Button>
-      ),
+      width: 150,
+      render: (_, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSaveProduct(record)}
+              >
+                저장
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleCancelProduct(record)}
+              >
+                취소
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Button type="link" onClick={() => handleEditProduct(record)}>
+            수정
+          </Button>
+        );
+      },
     },
   ];
 
   const handleAddProduct = () => {
-    setModalType('product');
-    setEditingItem(null);
-    form.resetFields();
-    setIsModalOpen(true);
+    if (editingProductId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setNewProductData({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+    setIsAddingProduct(true);
   };
 
   const handleEditProduct = (record) => {
-    setModalType('product');
-    setEditingItem(record);
-    form.setFieldsValue(record);
-    setIsModalOpen(true);
+    if (isAddingProduct || editingProductId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setEditingProductId(record.id);
+    setEditingProductData({
+      name: record.name,
+      orderUnit: record.orderUnit,
+      unitWeight: record.unitWeight,
+      status: record.status,
+    });
+  };
+
+  const handleSaveProduct = (record) => {
+    if (!record || record.id === editingProductId) {
+      // 기존 항목 수정
+      if (!editingProductData.name || editingProductData.name.trim() === '') {
+        message.error('품목명을 입력해주세요.');
+        return;
+      }
+      if (!editingProductData.orderUnit) {
+        message.error('주문단위를 선택해주세요.');
+        return;
+      }
+      if (!editingProductData.unitWeight || editingProductData.unitWeight <= 0) {
+        message.error('주문단위당중량을 입력해주세요.');
+        return;
+      }
+
+      const activeOriginCount = origins.filter(
+        o => o.productId === record.id && o.status === 'active'
+      ).length;
+      const activeSpecCount = specs.filter(
+        s => s.productId === record.id && s.status === 'active'
+      ).length;
+
+      if (editingProductData.status === 'inactive' && (activeOriginCount > 0 || activeSpecCount > 0)) {
+        message.error(`소속된 활성 원산지/규격이 ${activeOriginCount + activeSpecCount}개 남아있어 비활성화할 수 없습니다. 먼저 '원산지/규격 관리' 탭에서 모든 원산지와 규격을 비활성화해주세요.`);
+        return;
+      }
+
+      setProducts(products.map(p =>
+        p.id === record.id ? { ...p, ...editingProductData } : p
+      ));
+      setEditingProductId(null);
+      setEditingProductData({});
+      message.success('품목 정보가 수정되었습니다.');
+    } else {
+      // 신규 추가 (고정 폼에서)
+      if (!newProductData.categoryId) {
+        message.error('품목분류를 선택해주세요.');
+        return;
+      }
+      if (!newProductData.name || newProductData.name.trim() === '') {
+        message.error('품목명을 입력해주세요.');
+        return;
+      }
+      if (newProductData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+      if (!newProductData.orderUnit) {
+        message.error('주문단위를 선택해주세요.');
+        return;
+      }
+      if (!newProductData.unitWeight || newProductData.unitWeight <= 0) {
+        message.error('주문단위당중량을 입력해주세요.');
+        return;
+      }
+
+      const newId = Math.max(...products.map(p => p.id)) + 1;
+      const category = categories.find(c => c.id === newProductData.categoryId);
+      setProducts([...products, {
+        id: newId,
+        categoryId: newProductData.categoryId,
+        categoryName: category.name,
+        name: newProductData.name,
+        orderUnit: newProductData.orderUnit,
+        unitWeight: parseFloat(newProductData.unitWeight),
+        originCount: 0,
+        specCount: 0,
+        status: 'active',
+      }]);
+      setIsAddingProduct(false);
+      setNewProductData({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+      message.success(`품목 '${category.name} / ${newProductData.name}'이 등록되었습니다. 원산지와 규격은 '원산지/규격 관리' 탭에서 추가하실 수 있습니다.`);
+    }
+  };
+
+  const handleCancelProduct = (record) => {
+    if (record && record.id === editingProductId) {
+      setEditingProductId(null);
+      setEditingProductData({});
+    } else {
+      setIsAddingProduct(false);
+      setNewProductData({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+    }
   };
 
   const filteredProducts = selectedCategoryFilter === 'all'
@@ -326,46 +504,12 @@ function ProductManagement() {
     ? specs.filter(s => s.productId === selectedProduct.id)
     : [];
 
-  // ===== 공통 제출 핸들러 =====
+  // ===== 공통 제출 핸들러 (원산지/규격 전용) =====
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
 
-      if (modalType === 'product') {
-        if (editingItem) {
-          const activeOriginCount = origins.filter(
-            o => o.productId === editingItem.id && o.status === 'active'
-          ).length;
-          const activeSpecCount = specs.filter(
-            s => s.productId === editingItem.id && s.status === 'active'
-          ).length;
-
-          if (values.status === 'inactive' && (activeOriginCount > 0 || activeSpecCount > 0)) {
-            message.error(`소속된 활성 원산지/규격이 ${activeOriginCount + activeSpecCount}개 남아있어 비활성화할 수 없습니다. 먼저 '원산지/규격 관리' 탭에서 모든 원산지와 규격을 비활성화해주세요.`);
-            return;
-          }
-
-          setProducts(products.map(p =>
-            p.id === editingItem.id ? { ...p, ...values } : p
-          ));
-          message.success('품목 정보가 수정되었습니다.');
-        } else {
-          const newId = Math.max(...products.map(p => p.id)) + 1;
-          const category = categories.find(c => c.id === values.categoryId);
-          setProducts([...products, {
-            id: newId,
-            categoryId: values.categoryId,
-            categoryName: category.name,
-            name: values.name,
-            orderUnit: values.orderUnit,
-            unitWeight: values.unitWeight,
-            originCount: 0,
-            specCount: 0,
-            status: 'active',
-          }]);
-          message.success(`품목 '${category.name} / ${values.name}'이 등록되었습니다. 원산지와 규격은 '원산지/규격 관리' 탭에서 추가하실 수 있습니다.`);
-        }
-      } else if (modalType === 'origin') {
+      if (modalType === 'origin') {
         if (editingItem) {
           setOrigins(origins.map(o =>
             o.id === editingItem.id ? { ...o, ...values } : o
@@ -549,10 +693,81 @@ function ProductManagement() {
                 ))}
               </Select>
             </Space>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddProduct}>
-              품목 등록
-            </Button>
+            {!isAddingProduct && (
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddProduct}>
+                품목 등록
+              </Button>
+            )}
           </div>
+
+          {isAddingProduct && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+              <h3 className="text-base font-semibold text-gray-900 mb-4">품목 등록</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    품목분류 <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={newProductData.categoryId}
+                    onChange={(value) => setNewProductData({ ...newProductData, categoryId: value })}
+                    placeholder="품목분류 선택"
+                    style={{ width: '100%' }}
+                  >
+                    {categories.filter(c => c.status === 'active').map(c => (
+                      <Select.Option key={c.id} value={c.id}>
+                        {c.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    품목명 <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    value={newProductData.name}
+                    onChange={(e) => setNewProductData({ ...newProductData, name: e.target.value })}
+                    placeholder="예: 광어"
+                    maxLength={20}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    주문단위 <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={newProductData.orderUnit}
+                    onChange={(value) => setNewProductData({ ...newProductData, orderUnit: value })}
+                    placeholder="주문단위 선택"
+                    style={{ width: '100%' }}
+                  >
+                    <Select.Option value="통">통</Select.Option>
+                    <Select.Option value="박스">박스</Select.Option>
+                    <Select.Option value="kg">kg</Select.Option>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    주문단위당중량(kg) <span className="text-red-500">*</span>
+                  </label>
+                  <InputNumber
+                    value={newProductData.unitWeight}
+                    onChange={(value) => setNewProductData({ ...newProductData, unitWeight: value })}
+                    placeholder="예: 1.2"
+                    style={{ width: '100%' }}
+                    min={0.1}
+                    step={0.1}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button onClick={handleCancelProduct}>취소</Button>
+                <Button type="primary" onClick={handleSaveProduct}>저장</Button>
+              </div>
+            </div>
+          )}
+
           <Table
             columns={productColumns}
             dataSource={filteredProducts}
@@ -739,10 +954,9 @@ function ProductManagement() {
         </div>
       )}
 
-      {/* 공통 모달 */}
+      {/* 공통 모달 (원산지/규격 전용) */}
       <Modal
         title={
-          modalType === 'product' ? (editingItem ? '품목 수정' : '품목 등록') :
           modalType === 'origin' ? (editingItem ? '원산지 수정' : `원산지 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
           modalType === 'spec' ? (editingItem ? '규격 수정' : `규격 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
           ''
@@ -758,74 +972,6 @@ function ProductManagement() {
         width={500}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
-          {modalType === 'product' && (
-            <>
-              {!editingItem && (
-                <Form.Item
-                  label="품목분류"
-                  name="categoryId"
-                  rules={[{ required: true, message: '품목분류를 선택해주세요' }]}
-                >
-                  <Select placeholder="품목분류 선택">
-                    {categories.filter(c => c.status === 'active').map(c => (
-                      <Select.Option key={c.id} value={c.id}>
-                        {c.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              )}
-              <Form.Item
-                label="품목명"
-                name="name"
-                rules={[
-                  { required: true, message: '품목명을 입력해주세요' },
-                  { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                ]}
-              >
-                <Input placeholder="예: 광어" />
-              </Form.Item>
-              <Form.Item
-                label="주문단위"
-                name="orderUnit"
-                rules={[{ required: true, message: '주문단위를 선택해주세요' }]}
-              >
-                <Select placeholder="주문단위 선택">
-                  <Select.Option value="통">통</Select.Option>
-                  <Select.Option value="박스">박스</Select.Option>
-                  <Select.Option value="kg">kg</Select.Option>
-                </Select>
-              </Form.Item>
-              <Form.Item
-                label="주문단위당중량(kg)"
-                name="unitWeight"
-                rules={[
-                  { required: true, message: '주문단위당중량을 입력해주세요' },
-                  { type: 'number', min: 0.1, message: '0보다 큰 값을 입력해주세요' }
-                ]}
-              >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  min={0.1}
-                  step={0.1}
-                  placeholder="예: 1.2"
-                />
-              </Form.Item>
-              {editingItem && (
-                <Form.Item
-                  label="상태"
-                  name="status"
-                  rules={[{ required: true }]}
-                >
-                  <Select>
-                    <Select.Option value="active">활성</Select.Option>
-                    <Select.Option value="inactive">비활성</Select.Option>
-                  </Select>
-                </Form.Item>
-              )}
-            </>
-          )}
-
           {modalType === 'origin' && (
             <>
               {editingItem ? (
