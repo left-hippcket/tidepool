@@ -15,13 +15,19 @@ function ProductManagement() {
   const [specs, setSpecs] = useState(initialSpecs);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(''); // 'category' | 'product' | 'origin' | 'spec'
+  const [modalType, setModalType] = useState(''); // 'product' | 'origin' | 'spec'
   const [editingItem, setEditingItem] = useState(null);
   const [form] = Form.useForm();
 
   const [activeTab, setActiveTab] = useState('category');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // 품목분류 인라인 편집 state
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryData, setNewCategoryData] = useState({ name: '' });
+  const [editingCategoryData, setEditingCategoryData] = useState({});
 
   // ===== 탭 1: 품목분류 관리 =====
   const categoryColumns = [
@@ -30,49 +36,180 @@ function ProductManagement() {
       dataIndex: 'name',
       key: 'name',
       width: 200,
+      render: (text, record) => {
+        if (record.id === 'new') {
+          return (
+            <Input
+              value={newCategoryData.name}
+              onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
+              placeholder="품목분류명 입력"
+              maxLength={20}
+            />
+          );
+        }
+        if (record.id === editingCategoryId) {
+          return (
+            <Input
+              value={editingCategoryData.name}
+              onChange={(e) => setEditingCategoryData({ ...editingCategoryData, name: e.target.value })}
+              maxLength={20}
+            />
+          );
+        }
+        return text;
+      },
     },
     {
       title: '품목수',
       dataIndex: 'itemCount',
       key: 'itemCount',
       width: 100,
-      render: (count) => `${count}개`,
+      render: (count, record) => {
+        if (record.id === 'new') {
+          return '0개';
+        }
+        return `${count}개`;
+      },
     },
     {
       title: '상태',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status) => (
-        <Tag color={status === 'active' ? 'green' : 'default'}>
-          {status === 'active' ? '활성' : '비활성'}
-        </Tag>
-      ),
+      render: (status, record) => {
+        if (record.id === 'new') {
+          return <Tag color="green">활성</Tag>;
+        }
+        if (record.id === editingCategoryId) {
+          return (
+            <Select
+              value={editingCategoryData.status}
+              onChange={(value) => setEditingCategoryData({ ...editingCategoryData, status: value })}
+              style={{ width: 80 }}
+            >
+              <Select.Option value="active">활성</Select.Option>
+              <Select.Option value="inactive">비활성</Select.Option>
+            </Select>
+          );
+        }
+        return (
+          <Tag color={status === 'active' ? 'green' : 'default'}>
+            {status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        );
+      },
     },
     {
-      title: '수정',
+      title: '액션',
       key: 'action',
-      width: 80,
-      render: (_, record) => (
-        <Button type="link" onClick={() => handleEditCategory(record)}>
-          수정
-        </Button>
-      ),
+      width: 150,
+      render: (_, record) => {
+        if (record.id === 'new' || record.id === editingCategoryId) {
+          return (
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSaveCategory(record)}
+              >
+                저장
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleCancelCategory(record)}
+              >
+                취소
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Button type="link" onClick={() => handleEditCategory(record)}>
+            수정
+          </Button>
+        );
+      },
     },
   ];
 
   const handleAddCategory = () => {
-    setModalType('category');
-    setEditingItem(null);
-    form.resetFields();
-    setIsModalOpen(true);
+    if (isAddingCategory || editingCategoryId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setNewCategoryData({ name: '' });
+    setIsAddingCategory(true);
   };
 
   const handleEditCategory = (record) => {
-    setModalType('category');
-    setEditingItem(record);
-    form.setFieldsValue(record);
-    setIsModalOpen(true);
+    if (isAddingCategory || editingCategoryId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setEditingCategoryId(record.id);
+    setEditingCategoryData({
+      name: record.name,
+      status: record.status,
+    });
+  };
+
+  const handleSaveCategory = (record) => {
+    if (record.id === 'new') {
+      if (!newCategoryData.name || newCategoryData.name.trim() === '') {
+        message.error('품목분류명을 입력해주세요.');
+        return;
+      }
+      if (newCategoryData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      const newId = Math.max(...categories.map(c => c.id)) + 1;
+      setCategories([...categories, {
+        id: newId,
+        name: newCategoryData.name,
+        itemCount: 0,
+        status: 'active',
+      }]);
+      setIsAddingCategory(false);
+      setNewCategoryData({ name: '' });
+      message.success(`품목분류 '${newCategoryData.name}'이 등록되었습니다.`);
+    } else {
+      if (!editingCategoryData.name || editingCategoryData.name.trim() === '') {
+        message.error('품목분류명을 입력해주세요.');
+        return;
+      }
+      if (editingCategoryData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      const activeItemCount = products.filter(
+        p => p.categoryId === record.id && p.status === 'active'
+      ).length;
+
+      if (editingCategoryData.status === 'inactive' && activeItemCount > 0) {
+        message.error(`해당 분류에 ${activeItemCount}개의 품목이 사용중이어서 비활성화할 수 없습니다. 먼저 모든 품목을 비활성화해주세요.`);
+        return;
+      }
+
+      setCategories(categories.map(c =>
+        c.id === record.id ? { ...c, ...editingCategoryData } : c
+      ));
+      setEditingCategoryId(null);
+      setEditingCategoryData({});
+      message.success('품목분류 정보가 수정되었습니다.');
+    }
+  };
+
+  const handleCancelCategory = (record) => {
+    if (record.id === 'new') {
+      setIsAddingCategory(false);
+      setNewCategoryData({ name: '' });
+    } else {
+      setEditingCategoryId(null);
+      setEditingCategoryData({});
+    }
   };
 
   // ===== 탭 2: 품목 관리 =====
@@ -210,32 +347,7 @@ function ProductManagement() {
     try {
       const values = await form.validateFields();
 
-      if (modalType === 'category') {
-        if (editingItem) {
-          const activeItemCount = products.filter(
-            p => p.categoryId === editingItem.id && p.status === 'active'
-          ).length;
-
-          if (values.status === 'inactive' && activeItemCount > 0) {
-            message.error(`해당 분류에 ${activeItemCount}개의 품목이 사용중이어서 비활성화할 수 없습니다. 먼저 모든 품목을 비활성화해주세요.`);
-            return;
-          }
-
-          setCategories(categories.map(c =>
-            c.id === editingItem.id ? { ...c, ...values } : c
-          ));
-          message.success('품목분류 정보가 수정되었습니다.');
-        } else {
-          const newId = Math.max(...categories.map(c => c.id)) + 1;
-          setCategories([...categories, {
-            id: newId,
-            ...values,
-            itemCount: 0,
-            status: 'active',
-          }]);
-          message.success(`품목분류 '${values.name}'이 등록되었습니다.`);
-        }
-      } else if (modalType === 'product') {
+      if (modalType === 'product') {
         if (editingItem) {
           const activeOriginCount = origins.filter(
             o => o.productId === editingItem.id && o.status === 'active'
@@ -398,7 +510,11 @@ function ProductManagement() {
           </div>
           <Table
             columns={categoryColumns}
-            dataSource={categories}
+            dataSource={
+              isAddingCategory
+                ? [...categories, { id: 'new', ...newCategoryData, itemCount: 0, status: 'active' }]
+                : categories
+            }
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
@@ -617,7 +733,6 @@ function ProductManagement() {
       {/* 공통 모달 */}
       <Modal
         title={
-          modalType === 'category' ? (editingItem ? '품목분류 수정' : '품목분류 등록') :
           modalType === 'product' ? (editingItem ? '품목 수정' : '품목 등록') :
           modalType === 'origin' ? (editingItem ? '원산지 수정' : `원산지 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
           modalType === 'spec' ? (editingItem ? '규격 수정' : `규격 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
@@ -634,33 +749,6 @@ function ProductManagement() {
         width={500}
       >
         <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
-          {modalType === 'category' && (
-            <>
-              <Form.Item
-                label="품목분류명"
-                name="name"
-                rules={[
-                  { required: true, message: '품목분류명을 입력해주세요' },
-                  { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                ]}
-              >
-                <Input placeholder="예: 누운고기" />
-              </Form.Item>
-              {editingItem && (
-                <Form.Item
-                  label="상태"
-                  name="status"
-                  rules={[{ required: true }]}
-                >
-                  <Select>
-                    <Select.Option value="active">활성</Select.Option>
-                    <Select.Option value="inactive">비활성</Select.Option>
-                  </Select>
-                </Form.Item>
-              )}
-            </>
-          )}
-
           {modalType === 'product' && (
             <>
               {!editingItem && (
