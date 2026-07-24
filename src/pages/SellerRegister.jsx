@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Form, Input, Select, Button, Radio, Space, Divider,
-  message, AutoComplete, Upload, InputNumber, Tag
+  message, AutoComplete, Upload, InputNumber, Tag, Card, Typography, Row, Col
 } from 'antd';
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
 import { sellerGroups, managers, territories, regions, productCategories, products, businessRegistry } from '../data/mockData';
+
+const { Title } = Typography;
 
 function SellerRegister() {
   const navigate = useNavigate();
@@ -125,33 +127,28 @@ function SellerRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
       {/* 헤더 */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/seller')}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <ArrowLeftOutlined />
-            목록으로
-          </button>
-          <h2 className="text-2xl font-bold text-gray-900">셀러 등록</h2>
-        </div>
+      <div>
+        <Button onClick={() => navigate('/seller')} icon={<ArrowLeftOutlined />} style={{ marginBottom: 16 }}>
+          목록으로
+        </Button>
+        <Title level={2}>셀러 등록</Title>
       </div>
 
       {/* 등록 유형 선택 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+      <Card>
         <Radio.Group value={registrationType} onChange={handleTypeChange}>
           <Radio value="new">신규 셀러그룹 생성</Radio>
           <Radio value="existing">기존 셀러그룹에 사업자 추가</Radio>
         </Radio.Group>
-      </div>
+      </Card>
 
       <Form form={form} layout="vertical">
         {/* 기존 그룹 검색 (기존 그룹 추가 시) */}
         {registrationType === 'existing' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+          <Card title="기존 셀러그룹 선택">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">셀러그룹 검색</h3>
             <Form.Item
               name="searchGroup"
@@ -172,7 +169,7 @@ function SellerRegister() {
             </Form.Item>
 
             {selectedGroup && (
-              <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+              <div style={{ background: "#f5f5f5", padding: 16, borderRadius: 8, border: "1px solid #d9d9d9" }}>
                 <div className="space-y-2 text-sm">
                   <div><span className="font-semibold text-gray-700">셀러그룹명:</span> <span className="text-gray-900">{selectedGroup.name}</span></div>
                   <div><span className="font-semibold text-gray-700">소싱담당자:</span> <span className="text-gray-900">{selectedGroup.manager}</span></div>
@@ -181,12 +178,12 @@ function SellerRegister() {
                 </div>
               </div>
             )}
-          </div>
+          </Card>
         )}
 
         {/* 셀러그룹 기본 정보 (신규 생성 시) */}
         {registrationType === 'new' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+          <Card>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">셀러그룹 기본 정보</h3>
             <Form.Item
               name="groupName"
@@ -413,12 +410,12 @@ function SellerRegister() {
                 placeholder="1.0"
               />
             </Form.Item>
-          </div>
+          </Card>
         )}
 
         {/* 사업자 정보 (공통) */}
         {(registrationType === 'new' || selectedGroup) && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+          <Card>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
 
             <Form.Item
@@ -555,7 +552,7 @@ function SellerRegister() {
                 <Button icon={<UploadOutlined />}>사업자등록증 첨부하기</Button>
               </Upload>
             </Form.Item>
-          </div>
+          </Card>
         )}
 
         {/* 하단 버튼 */}
@@ -568,6 +565,7 @@ function SellerRegister() {
           </Button>
         </Space>
       </Form>
+      </Space>
     </div>
   );
 }

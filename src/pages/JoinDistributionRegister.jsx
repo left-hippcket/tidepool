@@ -104,7 +104,7 @@ function JoinDistributionRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
       {/* 헤더 */}
       <div className="mb-6">
         <div className="flex items-center gap-3">
@@ -115,7 +115,7 @@ function JoinDistributionRegister() {
             <ArrowLeftOutlined />
             목록으로
           </button>
-          <h2 className="text-2xl font-bold text-gray-900">조인유통 등록</h2>
+          <h2 level={2}>조인유통 등록</h2>
         </div>
       </div>
 
@@ -151,7 +151,7 @@ function JoinDistributionRegister() {
             </Form.Item>
 
             {selectedGroup && (
-              <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+              <div style={{ background: "#f5f5f5", padding: 16, borderRadius: 8, border: "1px solid #d9d9d9" }}>
                 <div className="space-y-2 text-sm">
                   <div><span className="font-semibold text-gray-700">조인유통그룹명:</span> <span className="text-gray-900">{selectedGroup.name}</span></div>
                   <div><span className="font-semibold text-gray-700">담당영업사원:</span> <span className="text-gray-900">{selectedGroup.salesPerson}</span></div>
