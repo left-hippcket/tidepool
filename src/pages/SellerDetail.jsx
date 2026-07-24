@@ -781,7 +781,6 @@ function SellerDetail() {
               key={key}
               onClick={() => setPeriodFilter(key)}
               type={periodFilter === key ? 'primary' : 'default'}
-              ghost={periodFilter !== key}
             >
               {label}
             </Button>
