@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Button, Input, InputNumber, Select, message, Tag, Space } from 'antd';
+import { Table, Button, Input, InputNumber, Select, message, Tag, Space, Card, Flex, Typography, Tabs } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
 import { territories as initialTerritories, regions as initialRegions } from '../data/mockData';
 
 function TerritoryManagement() {
@@ -558,48 +560,35 @@ function TerritoryManagement() {
   // 사업권역별 색상 맵 생성 (상세지역용)
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">사업권역 관리</h2>
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>사업권역 관리</Title>
 
-      {/* 탭 버튼 */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab('territory')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === 'territory'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          사업권역 ({territories.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('region')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
-            activeTab === 'region'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          상세지역 ({regions.length})
-        </button>
-      </div>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={[
+          { key: 'territory', label: `사업권역 (${territories.length})` },
+          { key: 'region', label: `상세지역 (${regions.length})` }
+        ]}
+      />
 
       {/* 탭 1: 사업권역 */}
       {activeTab === 'territory' && (
-        <div>
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           {!isAddingTerritory && (
-            <div className="flex justify-end mb-4">
+            <Flex justify="flex-end">
               <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTerritory}>
                 권역 추가
               </Button>
-            </div>
+            </Flex>
           )}
 
           {isAddingTerritory && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">사업권역 등록</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>사업권역 등록</Title>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Flex gap="middle" wrap="wrap">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     권역명 <span className="text-red-500">*</span>
@@ -636,29 +625,32 @@ function TerritoryManagement() {
                     <Select.Option value="inactive">비활성</Select.Option>
                   </Select>
                 </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button onClick={handleCancelTerritory}>취소</Button>
-                <Button type="primary" onClick={handleSaveTerritory}>저장</Button>
-              </div>
-            </div>
+                </Flex>
+                <Flex justify="flex-end" gap="small">
+                  <Button onClick={handleCancelTerritory}>취소</Button>
+                  <Button type="primary" onClick={handleSaveTerritory}>저장</Button>
+                </Flex>
+              </Space>
+            </Card>
           )}
 
-          <Table
-            columns={territoryColumns}
-            dataSource={territories}
-            rowKey="id"
-            pagination={{ pageSize: 10 }}
-          />
-        </div>
+          <Card>
+            <Table
+              columns={territoryColumns}
+              dataSource={territories}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </Space>
       )}
 
       {/* 탭 2: 상세지역 */}
       {activeTab === 'region' && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Flex justify="space-between" align="center">
             <Space>
-              <span className="text-sm text-gray-700">권역 필터:</span>
+              <Text>권역 필터:</Text>
               <Select
                 style={{ width: 150 }}
                 value={selectedTerritoryFilter}
@@ -677,12 +669,13 @@ function TerritoryManagement() {
                 지역 추가
               </Button>
             )}
-          </div>
+          </Flex>
 
           {isAddingRegion && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-4">상세지역 등록</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>상세지역 등록</Title>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Flex gap="middle" wrap="wrap">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     사업권역 <span className="text-red-500">*</span>
@@ -728,15 +721,17 @@ function TerritoryManagement() {
                     min={1}
                   />
                 </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button onClick={handleCancelRegion}>취소</Button>
-                <Button type="primary" onClick={handleSaveRegion}>저장</Button>
-              </div>
-            </div>
+                </Flex>
+                <Flex justify="flex-end" gap="small">
+                  <Button onClick={handleCancelRegion}>취소</Button>
+                  <Button type="primary" onClick={handleSaveRegion}>저장</Button>
+                </Flex>
+              </Space>
+            </Card>
           )}
 
-          <Table
+          <Card>
+            <Table
             columns={regionColumns}
             dataSource={filteredRegions}
             rowKey="id"
@@ -745,9 +740,11 @@ function TerritoryManagement() {
               const backgroundColor = getTerritoryColor(record.territoryId);
               return backgroundColor === '#f5f5f5' ? 'bg-gray-50' : '';
             }}
-          />
-        </div>
+            />
+          </Card>
+        </Space>
       )}
+      </Space>
     </div>
   );
 }
