@@ -231,7 +231,7 @@ function BuyerRegister() {
               rules={[
                 { required: true, message: '바이어그룹명을 입력해주세요' },
                 { max: 30, message: '최대 30자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
+                { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
               ]}
             >
               <Input placeholder="예: 명성횟집 그룹" />
@@ -454,7 +454,7 @@ function BuyerRegister() {
               rules={[
                 { required: true, message: '바이어명을 입력해주세요' },
                 { max: 20, message: '최대 20자' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용' }
+                { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용' }
               ]}
             >
               <Input placeholder="대박집" />

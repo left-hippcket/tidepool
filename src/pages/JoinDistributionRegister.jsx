@@ -173,7 +173,7 @@ function JoinDistributionRegister() {
               rules={[
                 { required: true, message: '조인유통그룹명을 입력해주세요' },
                 { max: 30, message: '최대 30자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9()]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
+                { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
               ]}
             >
               <Input placeholder="예: 호경유통 그룹" />
@@ -373,7 +373,7 @@ function JoinDistributionRegister() {
               rules={[
                 { required: true, message: '조인유통명을 입력해주세요' },
                 { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                { pattern: /^[가-힣a-zA-Z0-9()]+$/, message: '한글, 영문, 숫자, 괄호()만 허용됩니다' }
+                { pattern: /^[가-힣a-zA-Z0-9() ]+$/, message: '한글, 영문, 숫자, 괄호()만 허용됩니다' }
               ]}
             >
               <Input placeholder="호경" />
