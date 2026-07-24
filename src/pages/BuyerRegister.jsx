@@ -15,7 +15,7 @@ function BuyerRegister() {
   const [form] = Form.useForm();
   const [registrationType, setRegistrationType] = useState('new'); // 'new' | 'existing'
   const [selectedGroup, setSelectedGroup] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [selectedTerritory, setSelectedTerritory] = useState(null);
   const [availableRegions, setAvailableRegions] = useState([]);
@@ -53,15 +53,20 @@ function BuyerRegister() {
   };
 
   // 주요품목분류 변경 시 주요품목 필터링
-  const handleCategoryChange = (value) => {
-    setSelectedCategory(value);
-    if (value) {
-      const filtered = products.filter(p => p.categoryName === value);
+  const handleCategoryChange = (values) => {
+    setSelectedCategory(values);
+    if (values && values.length > 0) {
+      const filtered = products.filter(p => values.includes(p.categoryName));
       setAvailableProducts(filtered);
     } else {
       setAvailableProducts([]);
     }
-    form.setFieldsValue({ mainProducts: [] });
+    // 기존 선택된 주요품목 중 현재 카테고리에 속하지 않는 것 제거
+    const currentProducts = form.getFieldValue('mainProducts') || [];
+    const validProducts = currentProducts.filter(productName =>
+      filtered.some(p => p.name === productName)
+    );
+    form.setFieldsValue({ mainProducts: validProducts });
   };
 
   // 사업권역 변경 시 상세지역 필터링
@@ -342,7 +347,8 @@ function BuyerRegister() {
               rules={[{ required: true, message: '주요품목분류를 선택해주세요' }]}
             >
               <Select
-                placeholder="품목분류 선택"
+                mode="multiple"
+                placeholder="품목분류 선택 (복수 선택 가능)"
                 onChange={handleCategoryChange}
               >
                 {productCategories.map(c => (
@@ -358,11 +364,11 @@ function BuyerRegister() {
               <Select
                 mode="multiple"
                 placeholder="주요품목 선택 (선택사항)"
-                disabled={!selectedCategory}
+                disabled={!selectedCategory || selectedCategory.length === 0}
               >
                 {availableProducts.map(p => (
                   <Select.Option key={p.id} value={p.name}>
-                    {p.name}
+                    {p.categoryName} / {p.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -370,14 +376,19 @@ function BuyerRegister() {
 
             <Form.Item
               name="arrivalPricePolicy"
-              label="도착단가 정책"
+              label="넙치 도착단가 정책"
+              tooltip="상차단가에 추가할 금액을 입력하세요"
             >
-              <Select placeholder="선택">
-                <Select.Option value="상차단가 + 0원">상차단가 + 0원</Select.Option>
-                <Select.Option value="상차단가 + 700원">상차단가 + 700원</Select.Option>
-                <Select.Option value="상차단가 + 800원">상차단가 + 800원</Select.Option>
-                <Select.Option value="상차단가 + 900원">상차단가 + 900원</Select.Option>
-              </Select>
+              <InputNumber
+                style={{ width: '100%' }}
+                placeholder="예: 800"
+                addonBefore="상차단가 +"
+                addonAfter="원"
+                step={100}
+                min={0}
+                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={value => value.replace(/,/g, '')}
+              />
             </Form.Item>
 
             <Divider orientation="left">거래 정보</Divider>
