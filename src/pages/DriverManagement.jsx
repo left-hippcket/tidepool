@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Select, Tag, Button } from 'antd';
+import { Table, Select, Tag, Button, Card, Space, Flex, Typography, Row, Col } from 'antd';
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { drivers, driverDetails } from '../data/mockData';
+
+const { Title, Text } = Typography;
 
 function DriverManagement() {
   const navigate = useNavigate();
@@ -160,15 +162,15 @@ function DriverManagement() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-      {/* 헤더 */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">드라이버 관리</h2>
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>드라이버 관리</Title>
 
       {/* 필터 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">차종</label>
+      <Card>
+        <Row gutter={16}>
+          <Col xs={24} md={8}>
+            <Text style={{ display: 'block', marginBottom: 8 }}>차종</Text>
             <Select
               value={vehicleTypeFilter}
               onChange={setVehicleTypeFilter}
@@ -179,9 +181,9 @@ function DriverManagement() {
                 { value: '1.0톤', label: '1.0톤' },
               ]}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">과세유형</label>
+          </Col>
+          <Col xs={24} md={8}>
+            <Text style={{ display: 'block', marginBottom: 8 }}>과세유형</Text>
             <Select
               value={taxTypeFilter}
               onChange={setTaxTypeFilter}
@@ -193,9 +195,9 @@ function DriverManagement() {
                 { value: '미등록', label: '미등록' },
               ]}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">상태</label>
+          </Col>
+          <Col xs={24} md={8}>
+            <Text style={{ display: 'block', marginBottom: 8 }}>상태</Text>
             <Select
               value={statusFilter}
               onChange={setStatusFilter}
@@ -206,22 +208,20 @@ function DriverManagement() {
                 { value: '전체', label: '전체' },
               ]}
             />
-          </div>
-        </div>
-      </div>
+          </Col>
+        </Row>
+      </Card>
 
       {/* 상단 버튼 영역 */}
-      <div className="flex justify-between items-center mb-4">
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">
-          총 {sortedDrivers.length}명
-        </span>
+      <Flex justify="space-between" align="center">
+        <Tag color="blue">총 {sortedDrivers.length}명</Tag>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/driver/register')}>
           드라이버 등록
         </Button>
-      </div>
+      </Flex>
 
-      {/* 테이블 (데스크톱) */}
-      <div className="hidden md:block bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* 테이블 */}
+      <Card>
         <Table
           columns={columns}
           dataSource={sortedDrivers}
@@ -229,56 +229,8 @@ function DriverManagement() {
           pagination={{ pageSize: 20, showSizeChanger: false }}
           rowClassName={(record) => record.status === 'inactive' ? 'opacity-50' : ''}
         />
-      </div>
-
-      {/* 카드 리스트 (모바일) */}
-      <div className="md:hidden space-y-3">
-        {sortedDrivers.map((driver) => (
-          <div
-            key={driver.id}
-            className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 ${
-              driver.status === 'inactive' ? 'opacity-50' : ''
-            }`}
-            onClick={() => navigate(`/driver/${driver.id}`)}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-base font-semibold text-gray-900">{driver.name}</h3>
-                  <span className="text-xs text-gray-500">{driver.ticker}</span>
-                </div>
-                <p className="text-sm text-gray-600">{driver.phone}</p>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <span className="text-sm font-medium text-gray-700">{driver.vehicleType}</span>
-                <span className="text-xs text-gray-500">{driver.tankCount}통</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">정산사업자:</span>
-                <span className="text-xs text-gray-900">{driver.settlementBusiness || '-'}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {driver.taxType ? (
-                  <Tag color={driver.taxType === '과세' ? '#1890FF' : '#52C41A'} style={{ margin: 0 }}>
-                    {driver.taxType}
-                  </Tag>
-                ) : (
-                  <Tag color="#D9D9D9" style={{ margin: 0 }}>미등록</Tag>
-                )}
-                <input
-                  type="checkbox"
-                  checked={driverDetails[driver.id]?.settlementInfo?.hasCertificate || false}
-                  disabled
-                  className="rounded border-gray-300"
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      </Card>
+      </Space>
     </div>
   );
 }
