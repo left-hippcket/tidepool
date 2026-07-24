@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Form, Input, Select, Button, Radio, Space, Card, Steps, Table, DatePicker, AutoComplete,
-  InputNumber, Checkbox, Alert, Descriptions, message, Divider, Modal
+  InputNumber, Checkbox, Alert, Descriptions, message, Divider, Modal, Row, Col
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -28,6 +28,8 @@ function ClaimAdjustmentEdit() {
   });
   const [sellerAdjustmentType, setSellerAdjustmentType] = useState('quantity'); // 'quantity' | 'amount'
   const [finalLoss, setFinalLoss] = useState(0);
+  const [accountabilityType, setAccountabilityType] = useState('single'); // 'single' | 'shared'
+  const [sharedAccountability, setSharedAccountability] = useState({ buyer: 0, seller: 0 });
 
   // 데이터 로드
   useEffect(() => {
@@ -111,12 +113,26 @@ function ClaimAdjustmentEdit() {
       setFinalLoss(loss);
 
       if (loss < 0 && claim.귀책) {
-        const accountabilityMap = {
-          '바이어': 'buyer',
-          '셀러': 'seller',
-          '공동': 'shared',
-        };
-        form.setFieldValue('accountability', accountabilityMap[claim.귀책] || 'shared');
+        // 귀책이 "공동"이고 바이어/셀러 귀책액이 있으면 shared, 아니면 single
+        if (claim.귀책 === '공동' && claim.바이어귀책액 && claim.셀러귀책액) {
+          setAccountabilityType('shared');
+          form.setFieldsValue({
+            accountabilityType: 'shared',
+            buyerAccountabilityAmount: claim.바이어귀책액,
+            sellerAccountabilityAmount: claim.셀러귀책액,
+          });
+          setSharedAccountability({ buyer: claim.바이어귀책액, seller: claim.셀러귀책액 });
+        } else {
+          setAccountabilityType('single');
+          const accountabilityMap = {
+            '바이어': 'buyer',
+            '셀러': 'seller',
+          };
+          form.setFieldsValue({
+            accountabilityType: 'single',
+            accountability: accountabilityMap[claim.귀책] || 'buyer',
+          });
+        }
       }
     }
   }, [id, form, navigate]);
@@ -149,31 +165,31 @@ function ClaimAdjustmentEdit() {
     const values = form.getFieldsValue();
     let total = 0;
 
-    // 바이어 조정액
+    // 바이어 조정액 (매출 조정 = 그대로 반영)
     if (enabledAdjustments.buyer && values.buyerAdjustmentQuantity) {
       const buyerAmount = values.buyerAdjustmentQuantity * claimData.도착단가;
       form.setFieldValue('buyerAdjustmentAmount', buyerAmount);
       total += buyerAmount;
     }
 
-    // 셀러 조정액 (물량 방식)
+    // 셀러 조정액 (물량 방식) - 매입 조정 = 부호 반대로 반영
     if (enabledAdjustments.seller && sellerAdjustmentType === 'quantity' && values.sellerAdjustmentQuantity) {
       const sellerAmount = values.sellerAdjustmentQuantity * claimData.상차단가;
       form.setFieldValue('sellerAdjustmentAmount', sellerAmount);
-      total += sellerAmount;
+      total -= sellerAmount;
     }
 
-    // 셀러 조정액 (금액 방식)
+    // 셀러 조정액 (금액 방식) - 매입 조정 = 부호 반대로 반영
     if (enabledAdjustments.seller && sellerAdjustmentType === 'amount' && values.sellerAdjustmentAmount) {
-      total += values.sellerAdjustmentAmount;
+      total -= values.sellerAdjustmentAmount;
     }
 
-    // 드라이버 조정액
+    // 드라이버 조정액 (운송비 조정 = 부호 반대로 반영)
     if (enabledAdjustments.driver && values.driverAdjustmentAmount) {
-      total += values.driverAdjustmentAmount;
+      total -= values.driverAdjustmentAmount;
     }
 
-    // 회계처리 조정액
+    // 회계처리 조정액 (그대로 반영)
     if (enabledAdjustments.accounting && values.accountingAdjustmentAmount) {
       total += values.accountingAdjustmentAmount;
     }
@@ -238,9 +254,23 @@ function ClaimAdjustmentEdit() {
         }
 
         // 최종 손실 < 0일 때 귀책 선택 필수
-        if (finalLoss < 0 && !values.accountability) {
-          message.error('손실의 귀책 사유를 선택해주세요.');
-          return;
+        if (finalLoss < 0) {
+          if (!values.accountabilityType) {
+            message.error('귀책 유형을 선택해주세요.');
+            return;
+          }
+          if (values.accountabilityType === 'single' && !values.accountability) {
+            message.error('귀책 대상을 선택해주세요.');
+            return;
+          }
+          if (values.accountabilityType === 'shared') {
+            const buyerAmount = values.buyerAccountabilityAmount || 0;
+            const sellerAmount = values.sellerAccountabilityAmount || 0;
+            if (buyerAmount + sellerAmount !== finalLoss) {
+              message.error('공동 귀책 금액의 합계가 최종 손실과 일치하지 않습니다.');
+              return;
+            }
+          }
         }
       }
 
@@ -628,17 +658,109 @@ function ClaimAdjustmentEdit() {
                     </div>
                     <div style={{ marginBottom: 8 }}>이 손실의 귀책은 누구에게 있나요?</div>
                     <Form.Item
-                      name="accountability"
-                      rules={[{ required: true, message: '손실의 귀책 사유를 선택해주세요.' }]}
+                      name="accountabilityType"
+                      rules={[{ required: true, message: '필수' }]}
                     >
-                      <Radio.Group>
+                      <Radio.Group onChange={(e) => {
+                        setAccountabilityType(e.target.value);
+                        if (e.target.value === 'single') {
+                          setSharedAccountability({ buyer: 0, seller: 0 });
+                        }
+                      }}>
                         <Space direction="vertical">
-                          <Radio value="buyer">바이어 귀책</Radio>
-                          <Radio value="seller">셀러 귀책</Radio>
-                          <Radio value="shared">공동 귀책 (50:50)</Radio>
+                          <Radio value="single">단일 귀책</Radio>
+                          <Radio value="shared">공동 귀책 (비율 입력)</Radio>
                         </Space>
                       </Radio.Group>
                     </Form.Item>
+
+                    {accountabilityType === 'single' && (
+                      <Form.Item
+                        name="accountability"
+                        rules={[{ required: true, message: '귀책 대상을 선택해주세요.' }]}
+                      >
+                        <Radio.Group>
+                          <Space direction="vertical">
+                            <Radio value="buyer">바이어 귀책</Radio>
+                            <Radio value="seller">셀러 귀책</Radio>
+                          </Space>
+                        </Radio.Group>
+                      </Form.Item>
+                    )}
+
+                    {accountabilityType === 'shared' && (
+                      <div style={{ marginTop: 16 }}>
+                        <div style={{ marginBottom: 12, fontWeight: 500 }}>공동 귀책 배분 (합계: {formatCurrency(finalLoss)})</div>
+                        <Row gutter={16}>
+                          <Col span={12}>
+                            <Form.Item
+                              name="buyerAccountabilityAmount"
+                              label="바이어 귀책 금액"
+                              rules={[
+                                { required: true, message: '필수' },
+                                {
+                                  validator: (_, value) => {
+                                    const buyerAmount = value || 0;
+                                    const sellerAmount = form.getFieldValue('sellerAccountabilityAmount') || 0;
+                                    if (buyerAmount + sellerAmount !== finalLoss) {
+                                      return Promise.reject('바이어 + 셀러 귀책 금액의 합계가 최종 손실과 일치해야 합니다.');
+                                    }
+                                    return Promise.resolve();
+                                  }
+                                }
+                              ]}
+                            >
+                              <InputNumber
+                                style={{ width: '100%' }}
+                                addonAfter="원"
+                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={value => value.replace(/[^\d-]/g, '')}
+                                onChange={(value) => {
+                                  setSharedAccountability(prev => ({ ...prev, buyer: value || 0 }));
+                                  form.validateFields(['sellerAccountabilityAmount']);
+                                }}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col span={12}>
+                            <Form.Item
+                              name="sellerAccountabilityAmount"
+                              label="셀러 귀책 금액"
+                              rules={[
+                                { required: true, message: '필수' },
+                                {
+                                  validator: (_, value) => {
+                                    const sellerAmount = value || 0;
+                                    const buyerAmount = form.getFieldValue('buyerAccountabilityAmount') || 0;
+                                    if (buyerAmount + sellerAmount !== finalLoss) {
+                                      return Promise.reject('바이어 + 셀러 귀책 금액의 합계가 최종 손실과 일치해야 합니다.');
+                                    }
+                                    return Promise.resolve();
+                                  }
+                                }
+                              ]}
+                            >
+                              <InputNumber
+                                style={{ width: '100%' }}
+                                addonAfter="원"
+                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={value => value.replace(/[^\d-]/g, '')}
+                                onChange={(value) => {
+                                  setSharedAccountability(prev => ({ ...prev, seller: value || 0 }));
+                                  form.validateFields(['buyerAccountabilityAmount']);
+                                }}
+                              />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <div style={{ color: '#8c8c8c', fontSize: 12 }}>
+                          합계: {formatCurrency(sharedAccountability.buyer + sharedAccountability.seller)}
+                          {(sharedAccountability.buyer + sharedAccountability.seller) === finalLoss && (
+                            <span style={{ color: '#52c41a', marginLeft: 8 }}>✓ 정합성 확인됨</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 }
                 style={{ marginBottom: 16 }}
