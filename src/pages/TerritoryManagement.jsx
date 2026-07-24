@@ -1,141 +1,25 @@
 import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, Select, message, Tag, Space } from 'antd';
+import { Table, Button, Input, Select, message, Tag, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { territories as initialTerritories, regions as initialRegions } from '../data/mockData';
 
 function TerritoryManagement() {
   const [territories, setTerritories] = useState(initialTerritories);
   const [regions, setRegions] = useState(initialRegions);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(''); // 'territory' | 'region'
-  const [editingItem, setEditingItem] = useState(null);
-  const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState('territory');
   const [selectedTerritoryFilter, setSelectedTerritoryFilter] = useState('all');
 
-  // 사업권역 컬럼 정의
-  const territoryColumns = [
-    {
-      title: '권역명',
-      dataIndex: 'name',
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '표시순서',
-      dataIndex: 'displayOrder',
-      key: 'displayOrder',
-      width: 120,
-    },
-    {
-      title: '소속 지역 수',
-      dataIndex: 'regionCount',
-      key: 'regionCount',
-      width: 120,
-      render: (count) => <span>{count}개</span>,
-    },
-    {
-      title: '상태',
-      dataIndex: 'status',
-      key: 'status',
-      width: 100,
-      render: (status) => (
-        <Tag color={status === 'active' ? 'green' : 'default'}>
-          {status === 'active' ? '활성' : '비활성'}
-        </Tag>
-      ),
-    },
-    {
-      title: '수정',
-      key: 'action',
-      width: 100,
-      render: (_, record) => (
-        <Button type="link" onClick={() => handleEditTerritory(record)}>
-          수정
-        </Button>
-      ),
-    },
-  ];
+  // 사업권역 인라인 편집 state
+  const [editingTerritoryId, setEditingTerritoryId] = useState(null);
+  const [isAddingTerritory, setIsAddingTerritory] = useState(false);
+  const [newTerritoryData, setNewTerritoryData] = useState({ name: '', displayOrder: '', status: 'active' });
+  const [editingTerritoryData, setEditingTerritoryData] = useState({});
 
-  // 상세지역 컬럼 정의
-  const regionColumns = [
-    {
-      title: '사업권역',
-      dataIndex: 'territoryName',
-      key: 'territoryName',
-      width: 150,
-    },
-    {
-      title: '상세지역',
-      dataIndex: 'name',
-      key: 'name',
-      width: 200,
-    },
-    {
-      title: '표시순서',
-      dataIndex: 'displayOrder',
-      key: 'displayOrder',
-      width: 120,
-    },
-    {
-      title: '상태',
-      dataIndex: 'status',
-      key: 'status',
-      width: 100,
-      render: (status) => (
-        <Tag color={status === 'active' ? 'green' : 'default'}>
-          {status === 'active' ? '활성' : '비활성'}
-        </Tag>
-      ),
-    },
-    {
-      title: '수정',
-      key: 'action',
-      width: 100,
-      render: (_, record) => (
-        <Button type="link" onClick={() => handleEditRegion(record)}>
-          수정
-        </Button>
-      ),
-    },
-  ];
-
-  // 사업권역 추가 핸들러
-  const handleAddTerritory = () => {
-    setModalType('territory');
-    setEditingItem(null);
-    form.resetFields();
-    setIsModalOpen(true);
-  };
-
-  // 사업권역 수정 핸들러
-  const handleEditTerritory = (record) => {
-    setModalType('territory');
-    setEditingItem(record);
-    form.setFieldsValue(record);
-    setIsModalOpen(true);
-  };
-
-  // 상세지역 추가 핸들러
-  const handleAddRegion = () => {
-    setModalType('region');
-    setEditingItem(null);
-    form.resetFields();
-    setIsModalOpen(true);
-  };
-
-  // 상세지역 수정 핸들러
-  const handleEditRegion = (record) => {
-    setModalType('region');
-    setEditingItem(record);
-    form.setFieldsValue({
-      territoryId: record.territoryId,
-      name: record.name,
-      displayOrder: record.displayOrder,
-      status: record.status,
-    });
-    setIsModalOpen(true);
-  };
+  // 상세지역 인라인 편집 state
+  const [editingRegionId, setEditingRegionId] = useState(null);
+  const [isAddingRegion, setIsAddingRegion] = useState(false);
+  const [newRegionData, setNewRegionData] = useState({ territoryId: '', name: '', displayOrder: '', status: 'active' });
+  const [editingRegionData, setEditingRegionData] = useState({});
 
   // 표시순서 재정렬 함수 (사업권역)
   const reorderTerritories = (updatedList, targetId, newOrder) => {
@@ -146,7 +30,6 @@ function TerritoryManagement() {
     let reordered = [...updatedList];
 
     if (newOrder < oldOrder) {
-      // 순서를 앞으로 이동: 사이에 있는 항목들을 +1
       reordered = reordered.map(t => {
         if (t.id === targetId) {
           return { ...t, displayOrder: newOrder };
@@ -157,7 +40,6 @@ function TerritoryManagement() {
         return t;
       });
     } else {
-      // 순서를 뒤로 이동: 사이에 있는 항목들을 -1
       reordered = reordered.map(t => {
         if (t.id === targetId) {
           return { ...t, displayOrder: newOrder };
@@ -182,7 +64,6 @@ function TerritoryManagement() {
     let reordered = [...updatedList];
 
     if (newOrder < oldOrder) {
-      // 순서를 앞으로 이동: 사이에 있는 항목들을 +1
       reordered = reordered.map(r => {
         if (r.territoryId !== territoryId) return r;
         if (r.id === targetId) {
@@ -194,7 +75,6 @@ function TerritoryManagement() {
         return r;
       });
     } else {
-      // 순서를 뒤로 이동: 사이에 있는 항목들을 -1
       reordered = reordered.map(r => {
         if (r.territoryId !== territoryId) return r;
         if (r.id === targetId) {
@@ -210,120 +90,547 @@ function TerritoryManagement() {
     return reordered;
   };
 
-  // 폼 제출 핸들러
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
+  // 사업권역 추가 핸들러
+  const handleAddTerritory = () => {
+    if (isAddingTerritory || editingTerritoryId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
+    setIsAddingTerritory(true);
+  };
 
-      if (modalType === 'territory') {
-        if (editingItem) {
-          // 수정
-          const activeRegionCount = regions.filter(
-            r => r.territoryId === editingItem.id && r.status === 'active'
-          ).length;
+  // 사업권역 수정 핸들러
+  const handleEditTerritory = (record) => {
+    if (isAddingTerritory || editingTerritoryId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setEditingTerritoryId(record.id);
+    setEditingTerritoryData({
+      name: record.name,
+      displayOrder: record.displayOrder,
+      status: record.status,
+    });
+  };
 
-          if (values.status === 'inactive' && activeRegionCount > 0) {
-            message.error(`이 권역에 속한 지역이 ${activeRegionCount}개 있어 비활성화할 수 없습니다. 먼저 지역을 비활성화하거나 다른 권역으로 이동해주세요.`);
-            return;
-          }
-
-          // 표시순서가 변경된 경우 재정렬
-          let updatedTerritories = territories.map(t =>
-            t.id === editingItem.id ? { ...t, ...values } : t
-          );
-
-          if (values.displayOrder !== editingItem.displayOrder) {
-            updatedTerritories = reorderTerritories(updatedTerritories, editingItem.id, values.displayOrder);
-          }
-
-          setTerritories(updatedTerritories);
-          message.success('사업권역 정보가 수정되었습니다.');
-        } else {
-          // 추가
-          const newId = Math.max(...territories.map(t => t.id)) + 1;
-          const newDisplayOrder = Math.max(...territories.map(t => t.displayOrder)) + 1;
-          setTerritories([...territories, {
-            id: newId,
-            ...values,
-            displayOrder: newDisplayOrder,
-            regionCount: 0,
-            status: 'active',
-          }]);
-          message.success(`사업권역 '${values.name}'이 등록되었습니다.`);
-        }
-      } else {
-        // 상세지역
-        if (editingItem) {
-          // 수정
-          let updatedRegions = regions.map(r =>
-            r.id === editingItem.id ? {
-              ...r,
-              ...values,
-              territoryName: territories.find(t => t.id === values.territoryId)?.name || r.territoryName
-            } : r
-          );
-
-          // 표시순서가 변경된 경우 재정렬
-          if (values.displayOrder !== editingItem.displayOrder) {
-            updatedRegions = reorderRegions(updatedRegions, editingItem.id, values.displayOrder, values.territoryId);
-          }
-
-          setRegions(updatedRegions);
-          message.success('상세지역 정보가 수정되었습니다.');
-        } else {
-          // 추가
-          const newId = Math.max(...regions.map(r => r.id)) + 1;
-          const territory = territories.find(t => t.id === values.territoryId);
-          const maxOrder = Math.max(
-            0,
-            ...regions.filter(r => r.territoryId === values.territoryId).map(r => r.displayOrder)
-          );
-
-          setRegions([...regions, {
-            id: newId,
-            territoryId: values.territoryId,
-            territoryName: territory.name,
-            name: values.name,
-            displayOrder: maxOrder + 1,
-            status: 'active',
-          }]);
-
-          // 권역의 지역 수 업데이트
-          setTerritories(territories.map(t =>
-            t.id === values.territoryId ? { ...t, regionCount: t.regionCount + 1 } : t
-          ));
-
-          message.success(`상세지역 '${values.name}'이 등록되었습니다.`);
-        }
+  // 사업권역 저장 핸들러
+  const handleSaveTerritory = (record) => {
+    if (record.id === 'new') {
+      // 신규 추가
+      if (!newTerritoryData.name) {
+        message.error('권역명을 입력해주세요.');
+        return;
+      }
+      if (!newTerritoryData.displayOrder) {
+        message.error('표시순서를 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(newTerritoryData.name)) {
+        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+        return;
       }
 
-      setIsModalOpen(false);
-      form.resetFields();
-    } catch (error) {
-      console.error('Validation failed:', error);
+      const newId = Math.max(...territories.map(t => t.id)) + 1;
+
+      // 표시순서 재정렬
+      let updatedTerritories = [...territories, {
+        id: newId,
+        name: newTerritoryData.name,
+        displayOrder: parseInt(newTerritoryData.displayOrder),
+        regionCount: 0,
+        status: 'active',
+      }];
+
+      updatedTerritories = reorderTerritories(updatedTerritories, newId, parseInt(newTerritoryData.displayOrder));
+
+      setTerritories(updatedTerritories);
+      setIsAddingTerritory(false);
+      setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
+      message.success(`사업권역 '${newTerritoryData.name}'이 등록되었습니다.`);
+    } else {
+      // 기존 항목 수정
+      if (!editingTerritoryData.name) {
+        message.error('권역명을 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(editingTerritoryData.name)) {
+        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+        return;
+      }
+
+      const activeRegionCount = regions.filter(
+        r => r.territoryId === record.id && r.status === 'active'
+      ).length;
+
+      if (editingTerritoryData.status === 'inactive' && activeRegionCount > 0) {
+        message.error(`이 권역에 속한 지역이 ${activeRegionCount}개 있어 비활성화할 수 없습니다. 먼저 지역을 비활성화하거나 다른 권역으로 이동해주세요.`);
+        return;
+      }
+
+      let updatedTerritories = territories.map(t =>
+        t.id === record.id ? { ...t, ...editingTerritoryData } : t
+      );
+
+      if (editingTerritoryData.displayOrder !== record.displayOrder) {
+        updatedTerritories = reorderTerritories(updatedTerritories, record.id, parseInt(editingTerritoryData.displayOrder));
+      }
+
+      setTerritories(updatedTerritories);
+      setEditingTerritoryId(null);
+      setEditingTerritoryData({});
+      message.success('사업권역 정보가 수정되었습니다.');
     }
   };
+
+  // 사업권역 취소 핸들러
+  const handleCancelTerritory = (record) => {
+    if (record.id === 'new') {
+      setIsAddingTerritory(false);
+      setNewTerritoryData({ name: '', displayOrder: '', status: 'active' });
+    } else {
+      setEditingTerritoryId(null);
+      setEditingTerritoryData({});
+    }
+  };
+
+  // 상세지역 추가 핸들러
+  const handleAddRegion = () => {
+    if (isAddingRegion || editingRegionId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setNewRegionData({ territoryId: '', name: '', displayOrder: '', status: 'active' });
+    setIsAddingRegion(true);
+  };
+
+  // 상세지역 수정 핸들러
+  const handleEditRegion = (record) => {
+    if (isAddingRegion || editingRegionId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setEditingRegionId(record.id);
+    setEditingRegionData({
+      territoryId: record.territoryId,
+      name: record.name,
+      displayOrder: record.displayOrder,
+      status: record.status,
+    });
+  };
+
+  // 상세지역 저장 핸들러
+  const handleSaveRegion = (record) => {
+    if (record.id === 'new') {
+      // 신규 추가
+      if (!newRegionData.territoryId) {
+        message.error('사업권역을 선택해주세요.');
+        return;
+      }
+      if (!newRegionData.name) {
+        message.error('상세지역명을 입력해주세요.');
+        return;
+      }
+      if (!newRegionData.displayOrder) {
+        message.error('표시순서를 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(newRegionData.name)) {
+        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+        return;
+      }
+
+      const newId = Math.max(...regions.map(r => r.id)) + 1;
+      const territory = territories.find(t => t.id === newRegionData.territoryId);
+
+      let updatedRegions = [...regions, {
+        id: newId,
+        territoryId: newRegionData.territoryId,
+        territoryName: territory.name,
+        name: newRegionData.name,
+        displayOrder: parseInt(newRegionData.displayOrder),
+        status: 'active',
+      }];
+
+      // 표시순서 재정렬
+      updatedRegions = reorderRegions(updatedRegions, newId, parseInt(newRegionData.displayOrder), newRegionData.territoryId);
+
+      setRegions(updatedRegions);
+
+      setTerritories(territories.map(t =>
+        t.id === newRegionData.territoryId ? { ...t, regionCount: t.regionCount + 1 } : t
+      ));
+
+      setIsAddingRegion(false);
+      setNewRegionData({ territoryId: '', name: '', displayOrder: '', status: 'active' });
+      message.success(`상세지역 '${newRegionData.name}'이 등록되었습니다.`);
+    } else {
+      // 기존 항목 수정
+      if (!editingRegionData.name) {
+        message.error('상세지역명을 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(editingRegionData.name)) {
+        message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+        return;
+      }
+
+      let updatedRegions = regions.map(r =>
+        r.id === record.id ? {
+          ...r,
+          ...editingRegionData,
+          territoryName: territories.find(t => t.id === editingRegionData.territoryId)?.name || r.territoryName
+        } : r
+      );
+
+      if (editingRegionData.displayOrder !== record.displayOrder) {
+        updatedRegions = reorderRegions(updatedRegions, record.id, parseInt(editingRegionData.displayOrder), editingRegionData.territoryId);
+      }
+
+      setRegions(updatedRegions);
+      setEditingRegionId(null);
+      setEditingRegionData({});
+      message.success('상세지역 정보가 수정되었습니다.');
+    }
+  };
+
+  // 상세지역 취소 핸들러
+  const handleCancelRegion = (record) => {
+    if (record.id === 'new') {
+      setIsAddingRegion(false);
+      setNewRegionData({ territoryId: '', name: '', displayOrder: '', status: 'active' });
+    } else {
+      setEditingRegionId(null);
+      setEditingRegionData({});
+    }
+  };
+
+  // 사업권역 컬럼 정의 (인라인 편집 지원)
+  const territoryColumns = [
+    {
+      title: '권역명',
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
+      render: (text, record) => {
+        if (record.id === 'new') {
+          return (
+            <Input
+              value={newTerritoryData.name}
+              onChange={(e) => setNewTerritoryData({ ...newTerritoryData, name: e.target.value })}
+              placeholder="권역명 입력"
+              maxLength={20}
+            />
+          );
+        }
+        if (record.id === editingTerritoryId) {
+          return (
+            <Input
+              value={editingTerritoryData.name}
+              onChange={(e) => setEditingTerritoryData({ ...editingTerritoryData, name: e.target.value })}
+              maxLength={20}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '표시순서',
+      dataIndex: 'displayOrder',
+      key: 'displayOrder',
+      width: 120,
+      render: (text, record) => {
+        if (record.id === 'new') {
+          return (
+            <Input
+              type="number"
+              value={newTerritoryData.displayOrder}
+              onChange={(e) => setNewTerritoryData({ ...newTerritoryData, displayOrder: parseInt(e.target.value) || '' })}
+              placeholder="순서"
+              min={1}
+              style={{ width: 80 }}
+            />
+          );
+        }
+        if (record.id === editingTerritoryId) {
+          return (
+            <Input
+              type="number"
+              value={editingTerritoryData.displayOrder}
+              onChange={(e) => setEditingTerritoryData({ ...editingTerritoryData, displayOrder: parseInt(e.target.value) || 0 })}
+              min={1}
+              style={{ width: 80 }}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '소속 지역 수',
+      dataIndex: 'regionCount',
+      key: 'regionCount',
+      width: 120,
+      render: (count) => <span>{count}개</span>,
+    },
+    {
+      title: '상태',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status, record) => {
+        if (record.id === 'new') {
+          return <Tag color="green">활성</Tag>;
+        }
+        if (record.id === editingTerritoryId) {
+          return (
+            <Select
+              value={editingTerritoryData.status}
+              onChange={(value) => setEditingTerritoryData({ ...editingTerritoryData, status: value })}
+              style={{ width: 80 }}
+            >
+              <Select.Option value="active">활성</Select.Option>
+              <Select.Option value="inactive">비활성</Select.Option>
+            </Select>
+          );
+        }
+        return (
+          <Tag color={status === 'active' ? 'green' : 'default'}>
+            {status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: '액션',
+      key: 'action',
+      width: 150,
+      render: (_, record) => {
+        if (record.id === 'new' || record.id === editingTerritoryId) {
+          return (
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSaveTerritory(record)}
+              >
+                저장
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleCancelTerritory(record)}
+              >
+                취소
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Button
+            type="link"
+            onClick={() => handleEditTerritory(record)}
+          >
+            수정
+          </Button>
+        );
+      },
+    },
+  ];
+
+  // 상세지역 컬럼 정의 (인라인 편집 지원)
+  const regionColumns = [
+    {
+      title: '사업권역',
+      dataIndex: 'territoryName',
+      key: 'territoryName',
+      width: 150,
+      render: (text, record) => {
+        if (record.id === 'new') {
+          return (
+            <Select
+              value={newRegionData.territoryId}
+              onChange={(value) => setNewRegionData({ ...newRegionData, territoryId: value })}
+              placeholder="권역 선택"
+              style={{ width: '100%' }}
+            >
+              {territories.filter(t => t.status === 'active').map(t => (
+                <Select.Option key={t.id} value={t.id}>
+                  {t.name}
+                </Select.Option>
+              ))}
+            </Select>
+          );
+        }
+        if (record.id === editingRegionId) {
+          return (
+            <Select
+              value={editingRegionData.territoryId}
+              onChange={(value) => setEditingRegionData({ ...editingRegionData, territoryId: value })}
+              style={{ width: '100%' }}
+            >
+              {territories.filter(t => t.status === 'active').map(t => (
+                <Select.Option key={t.id} value={t.id}>
+                  {t.name}
+                </Select.Option>
+              ))}
+            </Select>
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '상세지역',
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
+      render: (text, record) => {
+        if (record.id === 'new') {
+          return (
+            <Input
+              value={newRegionData.name}
+              onChange={(e) => setNewRegionData({ ...newRegionData, name: e.target.value })}
+              placeholder="지역명 입력"
+              maxLength={20}
+            />
+          );
+        }
+        if (record.id === editingRegionId) {
+          return (
+            <Input
+              value={editingRegionData.name}
+              onChange={(e) => setEditingRegionData({ ...editingRegionData, name: e.target.value })}
+              maxLength={20}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '표시순서',
+      dataIndex: 'displayOrder',
+      key: 'displayOrder',
+      width: 120,
+      render: (text, record) => {
+        if (record.id === 'new') {
+          return (
+            <Input
+              type="number"
+              value={newRegionData.displayOrder}
+              onChange={(e) => setNewRegionData({ ...newRegionData, displayOrder: parseInt(e.target.value) || '' })}
+              placeholder="순서"
+              min={1}
+              style={{ width: 80 }}
+            />
+          );
+        }
+        if (record.id === editingRegionId) {
+          return (
+            <Input
+              type="number"
+              value={editingRegionData.displayOrder}
+              onChange={(e) => setEditingRegionData({ ...editingRegionData, displayOrder: parseInt(e.target.value) || 0 })}
+              min={1}
+              style={{ width: 80 }}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '상태',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status, record) => {
+        if (record.id === 'new') {
+          return <Tag color="green">활성</Tag>;
+        }
+        if (record.id === editingRegionId) {
+          return (
+            <Select
+              value={editingRegionData.status}
+              onChange={(value) => setEditingRegionData({ ...editingRegionData, status: value })}
+              style={{ width: 80 }}
+            >
+              <Select.Option value="active">활성</Select.Option>
+              <Select.Option value="inactive">비활성</Select.Option>
+            </Select>
+          );
+        }
+        return (
+          <Tag color={status === 'active' ? 'green' : 'default'}>
+            {status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: '액션',
+      key: 'action',
+      width: 150,
+      render: (_, record) => {
+        if (record.id === 'new' || record.id === editingRegionId) {
+          return (
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSaveRegion(record)}
+              >
+                저장
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleCancelRegion(record)}
+              >
+                취소
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Button
+            type="link"
+            onClick={() => handleEditRegion(record)}
+          >
+            수정
+          </Button>
+        );
+      },
+    },
+  ];
 
   // 필터링 및 정렬된 상세지역 목록
   const filteredRegions = (selectedTerritoryFilter === 'all'
     ? regions
     : regions.filter(r => r.territoryId === parseInt(selectedTerritoryFilter))
   ).sort((a, b) => {
-    // 1차: 사업권역 ID로 정렬
     if (a.territoryId !== b.territoryId) {
       return a.territoryId - b.territoryId;
     }
-    // 2차: 표시순서로 정렬
     return a.displayOrder - b.displayOrder;
   });
 
   // 사업권역별 색상 맵 생성
   const getTerritoryColor = (territoryId) => {
-    const colors = ['#ffffff', '#f5f5f5']; // 흰색과 회색 번갈아가며
+    const colors = ['#ffffff', '#f5f5f5'];
     const uniqueTerritoryIds = [...new Set(filteredRegions.map(r => r.territoryId))].sort();
     const index = uniqueTerritoryIds.indexOf(territoryId);
     return colors[index % 2];
   };
+
+  // 테이블 dataSource에 임시 행 추가
+  const territoryDataSource = isAddingTerritory
+    ? [...territories, { id: 'new', ...newTerritoryData, regionCount: 0 }]
+    : territories;
+
+  const regionDataSource = isAddingRegion
+    ? [...filteredRegions, { id: 'new', ...newRegionData }]
+    : filteredRegions;
 
   return (
     <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
@@ -363,7 +670,7 @@ function TerritoryManagement() {
           </div>
           <Table
             columns={territoryColumns}
-            dataSource={territories}
+            dataSource={territoryDataSource}
             rowKey="id"
             pagination={{ pageSize: 10 }}
           />
@@ -395,130 +702,17 @@ function TerritoryManagement() {
           </div>
           <Table
             columns={regionColumns}
-            dataSource={filteredRegions}
+            dataSource={regionDataSource}
             rowKey="id"
-            pagination={{
-              defaultPageSize: 10,
-              pageSizeOptions: ['10', '20', '50', '100'],
-              showSizeChanger: true,
-              showTotal: (total) => `전체 ${total}건`,
-            }}
+            pagination={false}
             rowClassName={(record) => {
+              if (record.id === 'new') return '';
               const backgroundColor = getTerritoryColor(record.territoryId);
               return backgroundColor === '#f5f5f5' ? 'bg-gray-50' : '';
             }}
           />
         </div>
       )}
-
-      <Modal
-        title={
-          modalType === 'territory'
-            ? (editingItem ? '사업권역 수정' : '새 사업권역 추가')
-            : (editingItem ? '상세지역 수정' : '새 지역 추가')
-        }
-        open={isModalOpen}
-        onOk={handleSubmit}
-        onCancel={() => {
-          setIsModalOpen(false);
-          form.resetFields();
-        }}
-        okText={editingItem ? '저장' : '추가'}
-        cancelText="취소"
-        width={500}
-      >
-        <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
-          {modalType === 'territory' ? (
-            <>
-              <Form.Item
-                label="권역명"
-                name="name"
-                rules={[
-                  { required: true, message: '권역명을 입력해주세요' },
-                  { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                  { pattern: /^[가-힣()\/\s]+$/, message: '한글, (), / 만 입력할 수 있습니다' }
-                ]}
-              >
-                <Input placeholder="예: 수도권" />
-              </Form.Item>
-
-              {editingItem && (
-                <>
-                  <Form.Item
-                    label="표시순서"
-                    name="displayOrder"
-                    rules={[{ required: true, message: '표시순서를 입력해주세요' }]}
-                  >
-                    <Input type="number" min={0} />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="상태"
-                    name="status"
-                    rules={[{ required: true }]}
-                  >
-                    <Select>
-                      <Select.Option value="active">활성</Select.Option>
-                      <Select.Option value="inactive">비활성</Select.Option>
-                    </Select>
-                  </Form.Item>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <Form.Item
-                label="사업권역"
-                name="territoryId"
-                rules={[{ required: true, message: '사업권역을 선택해주세요' }]}
-              >
-                <Select placeholder="권역 선택">
-                  {territories.filter(t => t.status === 'active').map(t => (
-                    <Select.Option key={t.id} value={t.id}>
-                      {t.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-              <Form.Item
-                label="상세지역명"
-                name="name"
-                rules={[
-                  { required: true, message: '상세지역명을 입력해주세요' },
-                  { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                  { pattern: /^[가-힣()\/\s]+$/, message: '한글, (), / 만 입력할 수 있습니다' }
-                ]}
-              >
-                <Input placeholder="예: 인천" />
-              </Form.Item>
-
-              {editingItem && (
-                <>
-                  <Form.Item
-                    label="표시순서"
-                    name="displayOrder"
-                    rules={[{ required: true, message: '표시순서를 입력해주세요' }]}
-                  >
-                    <Input type="number" min={0} />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="상태"
-                    name="status"
-                    rules={[{ required: true }]}
-                  >
-                    <Select>
-                      <Select.Option value="active">활성</Select.Option>
-                      <Select.Option value="inactive">비활성</Select.Option>
-                    </Select>
-                  </Form.Item>
-                </>
-              )}
-            </>
-          )}
-        </Form>
-      </Modal>
     </div>
   );
 }
