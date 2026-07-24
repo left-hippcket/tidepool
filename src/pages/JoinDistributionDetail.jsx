@@ -750,11 +750,11 @@ function JoinDistributionDetail() {
             </div>
 
             {/* 차트 */}
-            <div className="mt-6">
-              <h3 className="text-base font-semibold text-gray-500 mb-4">매입액/매출액 추이</h3>
-              <div className="flex items-end justify-between gap-2 h-64 border-l-2 border-b-2 border-gray-400 pl-2 pb-2 relative">
-                <div className="absolute -left-16 top-0 bottom-12 flex items-center">
-                  <span className="text-sm text-gray-500 transform -rotate-90 whitespace-nowrap">금액 (백만원)</span>
+            <div style={{ marginTop: 24 }}>
+              <Title level={5} style={{ color: '#8c8c8c', marginBottom: 16 }}>매입액/매출액 추이</Title>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, height: 256, borderLeft: '2px solid #8c8c8c', borderBottom: '2px solid #8c8c8c', paddingLeft: 8, paddingBottom: 8, position: 'relative' }}>
+                <div style={{ position: 'absolute', left: -64, top: 0, bottom: 48, display: 'flex', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 14, color: '#8c8c8c', transform: 'rotate(-90deg)', whiteSpace: 'nowrap' }}>금액 (백만원)</Text>
                 </div>
                 {joinSalesDetails[id].periods.map((p, idx) => {
                   const maxAmount = Math.max(...joinSalesDetails[id].periods.map(period => Math.max(period.purchase, period.sales)));
@@ -762,46 +762,56 @@ function JoinDistributionDetail() {
                   const salesHeight = (p.sales / maxAmount) * 100;
 
                   return (
-                    <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full">
-                      <div className="w-full flex gap-1 items-end justify-center h-full">
-                        <div className="flex-1 flex flex-col items-center justify-end h-full">
-                          <div className="text-xs text-gray-500 font-medium mb-1">
+                    <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, height: '100%' }}>
+                      <div style={{ width: '100%', display: 'flex', gap: 4, alignItems: 'flex-end', justifyContent: 'center', height: '100%' }}>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
+                          <Text style={{ fontSize: 12, color: '#8c8c8c', fontWeight: 500, marginBottom: 4 }}>
                             {(p.purchase / 10000000).toFixed(0)}
-                          </div>
+                          </Text>
                           <div
-                            className="w-full bg-gradient-to-t from-gray-500 to-gray-400 rounded-t shadow-sm"
-                            style={{ height: `${purchaseHeight}%`, minHeight: '4px' }}
+                            style={{
+                              width: '100%',
+                              background: 'linear-gradient(to top, #8c8c8c, #bfbfbf)',
+                              borderRadius: '4px 4px 0 0',
+                              height: `${purchaseHeight}%`,
+                              minHeight: 4
+                            }}
                             title={`매입: ${(p.purchase / 10000000).toFixed(1)}백만원`}
                           />
                         </div>
-                        <div className="flex-1 flex flex-col items-center justify-end h-full">
-                          <div className="text-xs text-gray-500 font-medium mb-1">
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>
+                          <Text style={{ fontSize: 12, color: '#8c8c8c', fontWeight: 500, marginBottom: 4 }}>
                             {(p.sales / 10000000).toFixed(0)}
-                          </div>
+                          </Text>
                           <div
-                            className="w-full bg-gradient-to-t from-gray-600 to-gray-500 rounded-t shadow-sm"
-                            style={{ height: `${salesHeight}%`, minHeight: '4px' }}
+                            style={{
+                              width: '100%',
+                              background: 'linear-gradient(to top, #595959, #8c8c8c)',
+                              borderRadius: '4px 4px 0 0',
+                              height: `${salesHeight}%`,
+                              minHeight: 4
+                            }}
                             title={`매출: ${(p.sales / 10000000).toFixed(1)}백만원`}
                           />
                         </div>
                       </div>
-                      <div className="text-xs text-gray-500 mt-2 transform -rotate-45 origin-top-left whitespace-nowrap">
+                      <Text style={{ fontSize: 12, color: '#8c8c8c', marginTop: 8, transform: 'rotate(-45deg)', transformOrigin: 'top left', whiteSpace: 'nowrap' }}>
                         {p.period}
-                      </div>
+                      </Text>
                     </div>
                   );
                 })}
               </div>
-              <div className="flex justify-center gap-6 mt-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gradient-to-t from-gray-500 to-gray-400 rounded"></div>
-                  <span className="text-sm text-gray-500">매입액</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gradient-to-t from-gray-600 to-gray-500 rounded"></div>
-                  <span className="text-sm text-gray-500">매출액</span>
-                </div>
-              </div>
+              <Flex justify="center" gap="large" style={{ marginTop: 24 }}>
+                <Flex align="center" gap="small">
+                  <div style={{ width: 16, height: 16, background: 'linear-gradient(to top, #8c8c8c, #bfbfbf)', borderRadius: 4 }}></div>
+                  <Text style={{ fontSize: 14, color: '#8c8c8c' }}>매입액</Text>
+                </Flex>
+                <Flex align="center" gap="small">
+                  <div style={{ width: 16, height: 16, background: 'linear-gradient(to top, #595959, #8c8c8c)', borderRadius: 4 }}></div>
+                  <Text style={{ fontSize: 14, color: '#8c8c8c' }}>매출액</Text>
+                </Flex>
+              </Flex>
             </div>
           </Card>
         </div>
@@ -809,32 +819,31 @@ function JoinDistributionDetail() {
 
       {/* 섹션 5: 세일즈 히스토리 (P2) */}
       {joinSalesHistoryMemos[id] && (
-        <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-6 opacity-60">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-500">세일즈 히스토리 (P2 예정)</h2>
-            <button
+        <Card style={{ backgroundColor: '#fafafa', opacity: 0.6 }}>
+          <Flex justify="space-between" align="center" style={{ marginBottom: 24 }}>
+            <Title level={5} style={{ color: '#8c8c8c', margin: 0 }}>세일즈 히스토리 (P2 예정)</Title>
+            <Button
+              type="link"
+              icon={<PlusOutlined />}
               onClick={() => {
                 setIsAddingMemo(true);
                 setMemoContent('');
               }}
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
             >
-              <PlusOutlined />
               메모 추가
-            </button>
-          </div>
+            </Button>
+          </Flex>
 
           {/* 메모 추가 폼 */}
           {isAddingMemo && (
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-4 mb-4">
-              <textarea
+            <Card size="small" style={{ backgroundColor: '#e6f7ff', border: '1px solid #91d5ff', marginBottom: 16 }}>
+              <Input.TextArea
                 value={memoContent}
                 onChange={(e) => setMemoContent(e.target.value)}
                 placeholder="영업 활동 내역을 입력하세요..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={4}
               />
-              <div className="flex gap-2 mt-3">
+              <Space style={{ marginTop: 12 }}>
                 <Button
                   type="primary"
                   size="small"
@@ -857,21 +866,22 @@ function JoinDistributionDetail() {
                 >
                   취소
                 </Button>
-              </div>
-            </div>
+              </Space>
+            </Card>
           )}
 
           {/* 메모 타임라인 */}
-          <div className="space-y-4">
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             {joinSalesHistoryMemos[id].map((memo) => (
-              <div key={memo.id} className="border-l-2 border-blue-400 pl-4 py-2">
-                <div className="flex items-start justify-between mb-2">
+              <div key={memo.id} style={{ borderLeft: '2px solid #1890ff', paddingLeft: 16, paddingTop: 8, paddingBottom: 8 }}>
+                <Flex justify="space-between" align="flex-start" style={{ marginBottom: 8 }}>
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{memo.author}</div>
-                    <div className="text-xs text-gray-500">{memo.date}</div>
+                    <Text style={{ fontSize: 14, fontWeight: 500 }}>{memo.author}</Text>
+                    <br />
+                    <Text style={{ fontSize: 12, color: '#8c8c8c' }}>{memo.date}</Text>
                   </div>
                   {editingMemoId === memo.id ? (
-                    <div className="flex gap-2">
+                    <Space size="small">
                       <Button
                         type="primary"
                         size="small"
@@ -888,16 +898,20 @@ function JoinDistributionDetail() {
                       >
                         취소
                       </Button>
-                    </div>
+                    </Space>
                   ) : (
-                    <div className="flex gap-2">
-                      <button
+                    <Space size="small">
+                      <Button
+                        type="link"
+                        size="small"
                         onClick={() => setEditingMemoId(memo.id)}
-                        className="text-xs text-blue-600 hover:text-blue-700"
                       >
                         수정
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        type="link"
+                        size="small"
+                        danger
                         onClick={() => {
                           Modal.confirm({
                             title: '메모 삭제',
@@ -907,26 +921,24 @@ function JoinDistributionDetail() {
                             },
                           });
                         }}
-                        className="text-xs text-red-600 hover:text-red-700"
                       >
                         삭제
-                      </button>
-                    </div>
+                      </Button>
+                    </Space>
                   )}
-                </div>
+                </Flex>
                 {editingMemoId === memo.id ? (
-                  <textarea
+                  <Input.TextArea
                     defaultValue={memo.content}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                   />
                 ) : (
-                  <div className="text-sm text-gray-700">{memo.content}</div>
+                  <Text style={{ fontSize: 14, color: '#262626' }}>{memo.content}</Text>
                 )}
               </div>
             ))}
-          </div>
-        </div>
+          </Space>
+        </Card>
       )}
       </Space>
     </div>

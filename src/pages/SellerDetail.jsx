@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image, Upload, Space, Card, Flex, Descriptions, Row, Col, Statistic, Typography } from 'antd';
+import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image, Upload, Space, Card, Flex, Descriptions, Row, Col, Statistic, Typography, Table } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { sellerGroups, sellerDetails, managers, territories, regions, productCategories } from '../data/mockData';
 import { Column } from '@ant-design/charts';
