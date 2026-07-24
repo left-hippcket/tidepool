@@ -678,39 +678,75 @@ function JoinDistributionDetail() {
             <Title level={5} style={{ color: '#8c8c8c', marginBottom: 24 }}>거래 세부내역 (P2 예정)</Title>
 
             {/* 테이블 */}
-            <div className="overflow-x-auto mb-6">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-100 border-b border-gray-300">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-500">기간</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-500">매입액</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-500">매출액</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-500">조정손익액</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-500">매입총중량(톤)</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-500">매출총중량(톤)</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-500">출하규격</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-500">출하셀러</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-500">판매바이어</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-500">거래품목</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-300">
-                  {joinSalesDetails[id].periods.map((period, idx) => (
-                    <tr key={idx}>
-                      <td className="px-4 py-3 text-gray-600 font-medium">{period.period}</td>
-                      <td className="px-4 py-3 text-right text-gray-600">{(period.purchase / 10000000).toFixed(1)}백만</td>
-                      <td className="px-4 py-3 text-right text-gray-600">{(period.sales / 10000000).toFixed(1)}백만</td>
-                      <td className="px-4 py-3 text-right text-gray-600 font-medium">{(period.profit / 10000000).toFixed(1)}백만</td>
-                      <td className="px-4 py-3 text-right text-gray-600">{period.purchaseWeight}</td>
-                      <td className="px-4 py-3 text-right text-gray-600">{period.salesWeight}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{period.specs}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{period.sellers}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{period.buyers}</td>
-                      <td className="px-4 py-3 text-gray-500 text-xs">{period.products}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ marginBottom: 24 }}>
+              <Table
+                dataSource={joinSalesDetails[id].periods}
+                rowKey={(record, idx) => idx}
+                pagination={false}
+                size="small"
+                scroll={{ x: 'max-content' }}
+                columns={[
+                  {
+                    title: '기간',
+                    dataIndex: 'period',
+                    key: 'period',
+                    fixed: 'left',
+                  },
+                  {
+                    title: '매입액',
+                    dataIndex: 'purchase',
+                    key: 'purchase',
+                    align: 'right',
+                    render: (val) => `${(val / 10000000).toFixed(1)}백만`
+                  },
+                  {
+                    title: '매출액',
+                    dataIndex: 'sales',
+                    key: 'sales',
+                    align: 'right',
+                    render: (val) => `${(val / 10000000).toFixed(1)}백만`
+                  },
+                  {
+                    title: '조정손익액',
+                    dataIndex: 'profit',
+                    key: 'profit',
+                    align: 'right',
+                    render: (val) => <Text strong>{(val / 10000000).toFixed(1)}백만</Text>
+                  },
+                  {
+                    title: '매입총중량(톤)',
+                    dataIndex: 'purchaseWeight',
+                    key: 'purchaseWeight',
+                    align: 'right',
+                  },
+                  {
+                    title: '매출총중량(톤)',
+                    dataIndex: 'salesWeight',
+                    key: 'salesWeight',
+                    align: 'right',
+                  },
+                  {
+                    title: '출하규격',
+                    dataIndex: 'specs',
+                    key: 'specs',
+                  },
+                  {
+                    title: '출하셀러',
+                    dataIndex: 'sellers',
+                    key: 'sellers',
+                  },
+                  {
+                    title: '판매바이어',
+                    dataIndex: 'buyers',
+                    key: 'buyers',
+                  },
+                  {
+                    title: '거래품목',
+                    dataIndex: 'products',
+                    key: 'products',
+                  },
+                ]}
+              />
             </div>
 
             {/* 차트 */}

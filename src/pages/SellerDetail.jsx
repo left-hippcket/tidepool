@@ -783,65 +783,51 @@ function SellerDetail() {
           ))}
         </div>
 
-        {/* 기간별 실적 표 - 모바일 대응 */}
-        <div className="mb-6 overflow-x-auto">
-          <div className="hidden md:block">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 border-b border-gray-300">
-                <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-500">기간</th>
-                  <th className="px-4 py-3 text-right font-semibold text-gray-500">매입액</th>
-                  <th className="px-4 py-3 text-right font-semibold text-gray-500">조정손익액</th>
-                  <th className="px-4 py-3 text-right font-semibold text-gray-500">매입총중량(톤)</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-500">출하규격</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-500">출하바이어</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-300">
-                {currentData.map((row, idx) => (
-                  <tr key={idx}>
-                    <td className="px-4 py-3 font-medium text-gray-600">{row.period}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{(row.purchase / 100000000).toFixed(1)}억</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{(row.profit / 10000).toFixed(0)}만</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{row.weight}</td>
-                    <td className="px-4 py-3 text-gray-500">{row.specs}</td>
-                    <td className="px-4 py-3 text-gray-500">{row.buyers}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 모바일 카드 뷰 */}
-          <div className="md:hidden space-y-3">
-            {currentData.map((row, idx) => (
-              <div key={idx} className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                <div className="font-semibold text-gray-600 mb-3">{row.period}</div>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <div className="text-gray-500 text-xs mb-0.5">매입액</div>
-                    <div className="font-medium text-gray-600">{(row.purchase / 100000000).toFixed(1)}억</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500 text-xs mb-0.5">조정손익액</div>
-                    <div className="font-medium text-gray-600">{(row.profit / 10000).toFixed(0)}만</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500 text-xs mb-0.5">매입총중량</div>
-                    <div className="font-medium text-gray-600">{row.weight}톤</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500 text-xs mb-0.5">출하규격</div>
-                    <div className="font-medium text-gray-600 text-xs">{row.specs}</div>
-                  </div>
-                  <div className="col-span-2">
-                    <div className="text-gray-500 text-xs mb-0.5">출하바이어</div>
-                    <div className="font-medium text-gray-600 text-xs">{row.buyers}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* 기간별 실적 표 */}
+        <div style={{ marginBottom: 24 }}>
+          <Table
+            dataSource={currentData}
+            rowKey={(record, idx) => idx}
+            pagination={false}
+            size="small"
+            columns={[
+              {
+                title: '기간',
+                dataIndex: 'period',
+                key: 'period',
+              },
+              {
+                title: '매입액',
+                dataIndex: 'purchase',
+                key: 'purchase',
+                align: 'right',
+                render: (val) => `${(val / 100000000).toFixed(1)}억`
+              },
+              {
+                title: '조정손익액',
+                dataIndex: 'profit',
+                key: 'profit',
+                align: 'right',
+                render: (val) => `${(val / 10000).toFixed(0)}만`
+              },
+              {
+                title: '매입총중량(톤)',
+                dataIndex: 'weight',
+                key: 'weight',
+                align: 'right',
+              },
+              {
+                title: '출하규격',
+                dataIndex: 'specs',
+                key: 'specs',
+              },
+              {
+                title: '출하바이어',
+                dataIndex: 'buyers',
+                key: 'buyers',
+              },
+            ]}
+          />
         </div>
 
         {/* 매입액 막대차트 */}
