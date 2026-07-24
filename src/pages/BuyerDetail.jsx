@@ -337,17 +337,23 @@ function BuyerDetail() {
 
             <Form.Item name="territory" label="사업권역" rules={[{ required: true }]}>
               <Select>
-                {territories.filter(t => t.status === 'active').map(t => (
-                  <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-                ))}
+                {territories
+                  .filter(t => t.status === 'active')
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map(t => (
+                    <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
+                  ))}
               </Select>
             </Form.Item>
 
             <Form.Item name="region" label="상세지역" rules={[{ required: true }]}>
               <Select>
-                {regions.filter(r => r.status === 'active').map(r => (
-                  <Select.Option key={r.id} value={r.name}>{r.name}</Select.Option>
-                ))}
+                {regions
+                  .filter(r => r.status === 'active')
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map(r => (
+                    <Select.Option key={r.id} value={r.name}>{r.name}</Select.Option>
+                  ))}
               </Select>
             </Form.Item>
 

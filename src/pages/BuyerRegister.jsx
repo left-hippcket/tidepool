@@ -68,7 +68,9 @@ function BuyerRegister() {
   const handleTerritoryChange = (value) => {
     setSelectedTerritory(value);
     if (value) {
-      const filtered = regions.filter(r => r.territoryName === value && r.status === 'active');
+      const filtered = regions
+        .filter(r => r.territoryName === value && r.status === 'active')
+        .sort((a, b) => a.displayOrder - b.displayOrder);
       setAvailableRegions(filtered);
     } else {
       setAvailableRegions([]);
@@ -298,9 +300,12 @@ function BuyerRegister() {
                 placeholder="사업권역 선택"
                 onChange={handleTerritoryChange}
               >
-                {territories.filter(t => t.status === 'active').map(t => (
-                  <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-                ))}
+                {territories
+                  .filter(t => t.status === 'active')
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map(t => (
+                    <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
+                  ))}
               </Select>
             </Form.Item>
 

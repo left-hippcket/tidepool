@@ -7,7 +7,7 @@ import {
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
-import { joinGroups, managers, territories, businessRegistry } from '../data/mockData';
+import { joinGroups, managers, territories, regions, businessRegistry } from '../data/mockData';
 
 function JoinDistributionRegister() {
   const navigate = useNavigate();
@@ -15,6 +15,8 @@ function JoinDistributionRegister() {
   const [form] = Form.useForm();
   const [registrationType, setRegistrationType] = useState('new'); // 'new' | 'existing'
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedTerritory, setSelectedTerritory] = useState(null);
+  const [availableRegions, setAvailableRegions] = useState([]);
 
   // URL 쿼리 파라미터 처리
   useEffect(() => {
@@ -234,10 +236,27 @@ function JoinDistributionRegister() {
               label="사업권역"
               rules={[{ required: true, message: '사업권역을 선택해주세요.' }]}
             >
-              <Select placeholder="사업권역 선택">
-                {territories.filter(t => t.status === 'active').map(t => (
-                  <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-                ))}
+              <Select
+                placeholder="사업권역 선택"
+                onChange={(value) => {
+                  setSelectedTerritory(value);
+                  if (value) {
+                    const filtered = regions
+                      .filter(r => r.territoryName === value && r.status === 'active')
+                      .sort((a, b) => a.displayOrder - b.displayOrder);
+                    setAvailableRegions(filtered);
+                  } else {
+                    setAvailableRegions([]);
+                  }
+                  form.setFieldsValue({ region: undefined });
+                }}
+              >
+                {territories
+                  .filter(t => t.status === 'active')
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map(t => (
+                    <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
+                  ))}
               </Select>
             </Form.Item>
 
@@ -246,10 +265,13 @@ function JoinDistributionRegister() {
               label="상세지역"
               rules={[{ required: true, message: '상세지역을 선택해주세요.' }]}
             >
-              <Select placeholder="상세지역 선택">
-                <Select.Option value="서울">서울</Select.Option>
-                <Select.Option value="경기">경기</Select.Option>
-                <Select.Option value="인천">인천</Select.Option>
+              <Select
+                placeholder="상세지역 선택"
+                disabled={!selectedTerritory}
+              >
+                {availableRegions.map(r => (
+                  <Select.Option key={r.id} value={r.name}>{r.name}</Select.Option>
+                ))}
               </Select>
             </Form.Item>
 

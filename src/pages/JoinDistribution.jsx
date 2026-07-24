@@ -63,9 +63,11 @@ function JoinDistribution() {
               onChange={setSelectedTerritory}
             >
               <Select.Option value="전체">전체</Select.Option>
-              {territories.map(t => (
-                <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-              ))}
+              {territories
+                .sort((a, b) => a.displayOrder - b.displayOrder)
+                .map(t => (
+                  <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
+                ))}
             </Select>
           </div>
 

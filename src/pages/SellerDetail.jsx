@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Input, Select, InputNumber, message, Modal, Tag, Image, Upload, Space } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, SaveOutlined, CloseOutlined, PlusOutlined, FileImageOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons';
-import { sellerGroups, sellerDetails, managers, territories, productCategories } from '../data/mockData';
+import { sellerGroups, sellerDetails, managers, territories, regions, productCategories } from '../data/mockData';
 import { Column } from '@ant-design/charts';
 
 function SellerDetail() {
@@ -275,18 +275,22 @@ function SellerDetail() {
               </Form.Item>
               <Form.Item label="사업권역" name="territory" rules={[{ required: true }]}>
                 <Select>
-                  {territories.filter(t => t.status === 'active').map(t => (
-                    <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-                  ))}
+                  {territories
+                    .filter(t => t.status === 'active')
+                    .sort((a, b) => a.displayOrder - b.displayOrder)
+                    .map(t => (
+                      <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
               <Form.Item label="상세지역" name="region" rules={[{ required: true }]}>
                 <Select>
-                  <Select.Option value="인천">인천</Select.Option>
-                  <Select.Option value="완도/진도">완도/진도</Select.Option>
-                  <Select.Option value="통영">통영</Select.Option>
-                  <Select.Option value="거제">거제</Select.Option>
-                  <Select.Option value="고흥">고흥</Select.Option>
+                  {regions
+                    .filter(r => r.status === 'active')
+                    .sort((a, b) => a.displayOrder - b.displayOrder)
+                    .map(r => (
+                      <Select.Option key={r.id} value={r.name}>{r.name}</Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
               <Form.Item label="상차 수수료율(%)" name="commissionRate" rules={[{ required: true }]}>
