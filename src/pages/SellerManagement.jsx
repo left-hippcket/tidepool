@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Select } from 'antd';
+import { Button, Select, Card, Space, Flex, Typography, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { sellerGroups, managers, territories } from '../data/mockData';
+
+const { Title, Text } = Typography;
 
 function SellerManagement() {
   const navigate = useNavigate();
@@ -37,16 +39,17 @@ function SellerManagement() {
   const sortedData = filteredData;
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">셀러 관리</h2>
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>셀러 관리</Title>
 
       {/* 필터 영역 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">소싱담당자:</span>
+      <Card>
+        <Space wrap size="middle">
+            <Space size="small">
+              <Text>소싱담당자:</Text>
               <Select
-                className="w-32"
+                style={{ width: 128 }}
                 value={selectedManager}
                 onChange={setSelectedManager}
               >
@@ -55,12 +58,12 @@ function SellerManagement() {
                   <Select.Option key={m} value={m}>{m}</Select.Option>
                 ))}
               </Select>
-            </div>
+            </Space>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">주요품목분류:</span>
+            <Space size="small">
+              <Text>주요품목분류:</Text>
               <Select
-                className="w-32"
+                style={{ width: 128 }}
                 value={selectedCategory}
                 onChange={setSelectedCategory}
               >
@@ -69,12 +72,12 @@ function SellerManagement() {
                 <Select.Option value="뜬고기">뜬고기</Select.Option>
                 <Select.Option value="갑각류">갑각류</Select.Option>
               </Select>
-            </div>
+            </Space>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">사업권역:</span>
+            <Space size="small">
+              <Text>사업권역:</Text>
               <Select
-                className="w-32"
+                style={{ width: 128 }}
                 value={selectedTerritory}
                 onChange={setSelectedTerritory}
               >
@@ -85,12 +88,12 @@ function SellerManagement() {
                     <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
                   ))}
               </Select>
-            </div>
+            </Space>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">상세지역:</span>
+            <Space size="small">
+              <Text>상세지역:</Text>
               <Select
-                className="w-32"
+                style={{ width: 128 }}
                 value={selectedRegion}
                 onChange={setSelectedRegion}
               >
@@ -101,12 +104,12 @@ function SellerManagement() {
                 <Select.Option value="거제">거제</Select.Option>
                 <Select.Option value="고흥">고흥</Select.Option>
               </Select>
-            </div>
+            </Space>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">상태:</span>
+            <Space size="small">
+              <Text>상태:</Text>
               <Select
-                className="w-28"
+                style={{ width: 112 }}
                 value={selectedStatus}
                 onChange={setSelectedStatus}
               >
@@ -114,143 +117,87 @@ function SellerManagement() {
                 <Select.Option value="활성">활성</Select.Option>
                 <Select.Option value="비활성">비활성</Select.Option>
               </Select>
-            </div>
-        </div>
-      </div>
+            </Space>
+        </Space>
+      </Card>
 
       {/* 상단 버튼 영역 */}
-      <div className="flex justify-between items-center mb-4">
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">
-          총 {sortedData.length}개 그룹
-        </span>
+      <Flex justify="space-between" align="center">
+        <Tag color="blue">총 {sortedData.length}개 그룹</Tag>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleRegister}>
           셀러 등록
         </Button>
-      </div>
+      </Flex>
 
-      {/* 테이블 - 데스크톱 */}
-      <div className="hidden md:block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">셀러그룹명</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">사업자수</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">소싱담당자</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">주요품목분류</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">사업권역</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">상세지역</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-400">매입액(누적)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-400">매입액(최근 3개월)</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-400">매입액(최근 1개월)</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-700">최근거래일</th>
-                <th className="px-4 py-3 text-center font-semibold text-gray-700">사업자등록증</th>
-                <th className="px-4 py-3 text-center font-semibold text-gray-700">상세</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {sortedData.map((seller) => (
-                <tr key={seller.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => handleViewDetail(seller)}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      {seller.name}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-gray-900">{seller.businessCount}개</td>
-                  <td className="px-4 py-3 text-gray-900">{seller.manager}</td>
-                  <td className="px-4 py-3 text-gray-900">{seller.mainCategory}</td>
-                  <td className="px-4 py-3 text-gray-900">{seller.territory}</td>
-                  <td className="px-4 py-3 text-gray-900">{seller.region}</td>
-                  <td className="px-4 py-3 text-right text-gray-400">{(seller.totalPurchase / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-400">{(seller.purchase3M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-gray-400">{(seller.purchase1M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-gray-900">{seller.lastTradeDate}</td>
-                  <td className="px-4 py-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={seller.hasCertificate}
-                      disabled
-                      className="rounded border-gray-300"
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => handleViewDetail(seller)}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      상세
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 모바일 카드 리스트 */}
-      <div className="md:hidden space-y-3">
-        {sortedData.map((seller) => (
-          <div key={seller.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex justify-between items-start mb-3">
-              <button
-                onClick={() => handleViewDetail(seller)}
-                className="text-lg font-semibold text-blue-600 hover:text-blue-700"
-              >
-                {seller.name}
-              </button>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                seller.status === 'active'
-                  ? 'bg-green-50 text-green-700 border border-green-200'
-                  : 'bg-gray-50 text-gray-700 border border-gray-200'
-              }`}>
-                {seller.status === 'active' ? '활성' : '비활성'}
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">사업자수</div>
-                <div className="font-medium text-gray-900">{seller.businessCount}개</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">소싱담당자</div>
-                <div className="font-medium text-gray-900">{seller.manager}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">주요품목분류</div>
-                <div className="font-medium text-gray-900">{seller.mainCategory}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">사업권역</div>
-                <div className="font-medium text-gray-900">{seller.territory}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 text-xs mb-0.5">상세지역</div>
-                <div className="font-medium text-gray-900">{seller.region}</div>
-              </div>
-              <div>
-                <div className="text-gray-400 text-xs mb-0.5">매입액(누적)</div>
-                <div className="font-medium text-gray-400">{(seller.totalPurchase / 100000000).toFixed(1)}억</div>
-              </div>
-              <div>
-                <div className="text-gray-400 text-xs mb-0.5">최근 3개월</div>
-                <div className="font-medium text-gray-400">{(seller.purchase3M / 100000000).toFixed(1)}억</div>
-              </div>
-              <div>
-                <div className="text-gray-400 text-xs mb-0.5">최근 1개월</div>
-                <div className="font-medium text-gray-400">{(seller.purchase1M / 100000000).toFixed(1)}억</div>
-              </div>
-              <div className="col-span-2">
-                <div className="text-gray-500 text-xs mb-0.5">최근거래일</div>
-                <div className="font-medium text-gray-900">{seller.lastTradeDate}</div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* 테이블 */}
+      <Card>
+        <Table
+          dataSource={sortedData}
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+          onRow={(record) => ({
+            onClick: () => handleViewDetail(record),
+            style: { cursor: 'pointer' }
+          })}
+          columns={[
+            {
+              title: '셀러그룹명',
+              dataIndex: 'name',
+              key: 'name',
+              render: (text, record) => (
+                <Button type="link" onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}>
+                  {text}
+                </Button>
+              ),
+            },
+            { title: '사업자수', dataIndex: 'businessCount', key: 'businessCount', render: (val) => `${val}개` },
+            { title: '소싱담당자', dataIndex: 'manager', key: 'manager' },
+            { title: '주요품목분류', dataIndex: 'mainCategory', key: 'mainCategory' },
+            { title: '사업권역', dataIndex: 'territory', key: 'territory' },
+            { title: '상세지역', dataIndex: 'region', key: 'region' },
+            {
+              title: <Text type="secondary">매입액(누적)</Text>,
+              dataIndex: 'totalPurchase',
+              key: 'totalPurchase',
+              align: 'right',
+              render: (val) => <Text type="secondary">{(val / 100000000).toFixed(1)}억</Text>
+            },
+            {
+              title: <Text type="secondary">매입액(최근 3개월)</Text>,
+              dataIndex: 'purchase3M',
+              key: 'purchase3M',
+              align: 'right',
+              render: (val) => <Text type="secondary">{(val / 100000000).toFixed(1)}억</Text>
+            },
+            {
+              title: <Text type="secondary">매입액(최근 1개월)</Text>,
+              dataIndex: 'purchase1M',
+              key: 'purchase1M',
+              align: 'right',
+              render: (val) => <Text type="secondary">{(val / 100000000).toFixed(1)}억</Text>
+            },
+            { title: '최근거래일', dataIndex: 'lastTradeDate', key: 'lastTradeDate' },
+            {
+              title: '사업자등록증',
+              dataIndex: 'hasCertificate',
+              key: 'hasCertificate',
+              align: 'center',
+              render: (val) => <input type="checkbox" checked={val} disabled />
+            },
+            {
+              title: '상세',
+              key: 'action',
+              align: 'center',
+              render: (_, record) => (
+                <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}>
+                  상세
+                </Button>
+              ),
+            },
+          ]}
+        />
+      </Card>
+      </Space>
     </div>
   );
 }
