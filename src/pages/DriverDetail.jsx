@@ -2,8 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, Button, Tag, Form, Input, Select, Space, message, Modal,
-  Upload, Timeline, InputNumber, DatePicker, Table, Statistic, Image
+  Upload, Timeline, InputNumber, DatePicker, Table, Statistic, Image, Typography, Flex, Row, Col, Descriptions
 } from 'antd';
+
+const { Title, Text } = Typography;
 import {
   ArrowLeftOutlined, EditOutlined, UploadOutlined, PlusOutlined,
   MinusCircleOutlined, FileImageOutlined
@@ -32,7 +34,7 @@ function DriverDetail() {
   const [periodFilter, setPeriodFilter] = useState('최근 3개월');
 
   if (!driverData) {
-    return <div className="p-6">드라이버를 찾을 수 없습니다.</div>;
+    return <div style={{ padding: 24 }}>드라이버를 찾을 수 없습니다.</div>;
   }
 
   const { basicInfo, settlementInfo } = driverData;
@@ -218,17 +220,18 @@ function DriverDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] p-4 md:p-6">
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
       {/* 헤더 */}
-      <div className="mb-6">
-        <button
+      <div>
+        <Button
           onClick={() => navigate('/driver')}
-          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors mb-4"
+          icon={<ArrowLeftOutlined />}
+          style={{ marginBottom: 16 }}
         >
-          <ArrowLeftOutlined />
           목록으로
-        </button>
-        <h2 className="text-2xl font-bold text-gray-900">드라이버 상세</h2>
+        </Button>
+        <Title level={2}>드라이버 상세</Title>
       </div>
 
       {/* 드라이버 기본 정보 */}
@@ -244,12 +247,11 @@ function DriverDetail() {
             <Button icon={<EditOutlined />} onClick={handleBasicEdit}>수정</Button>
           )
         }
-        className="mb-4"
         style={{ opacity: basicInfo.status === 'inactive' ? 0.6 : 1 }}
       >
         {editingBasic ? (
           <Form form={form} layout="vertical">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Row gutter={16}>
               <Form.Item
                 name="name"
                 label="드라이버명"
@@ -320,41 +322,23 @@ function DriverDetail() {
                   ]}
                 />
               </Form.Item>
-            </div>
+            </Row>
           </Form>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <span className="text-sm font-medium text-gray-500">드라이버명</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.name}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">전화번호</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.phone || '-'}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">차종</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.vehicleType || '-'}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">보유통수</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.tankCount ? `${basicInfo.tankCount}통` : '-'}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">Driver Level</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.driverLevel || '-'}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">상태</span>
-              <p className="text-base text-gray-900 mt-1">
-                {basicInfo.status === 'active' ? (
-                  <Tag color="green">활성</Tag>
-                ) : (
-                  <Tag color="default">비활성</Tag>
-                )}
-              </p>
-            </div>
-          </div>
+          <Descriptions bordered column={{ xs: 1, md: 2 }} size="middle">
+            <Descriptions.Item label="드라이버명">{basicInfo.name}</Descriptions.Item>
+            <Descriptions.Item label="전화번호">{basicInfo.phone || '-'}</Descriptions.Item>
+            <Descriptions.Item label="차종">{basicInfo.vehicleType || '-'}</Descriptions.Item>
+            <Descriptions.Item label="보유통수">{basicInfo.tankCount ? `${basicInfo.tankCount}통` : '-'}</Descriptions.Item>
+            <Descriptions.Item label="Driver Level">{basicInfo.driverLevel || '-'}</Descriptions.Item>
+            <Descriptions.Item label="상태">
+              {basicInfo.status === 'active' ? (
+                <Tag color="green">활성</Tag>
+              ) : (
+                <Tag color="default">비활성</Tag>
+              )}
+            </Descriptions.Item>
+          </Descriptions>
         )}
       </Card>
 
@@ -373,11 +357,10 @@ function DriverDetail() {
             </Button>
           )
         }
-        className="mb-4"
       >
         {editingSettlement ? (
           <Form form={settlementForm} layout="vertical">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Row gutter={16}>
               <Form.Item
                 name="businessNumber"
                 label="사업자등록번호"
@@ -429,10 +412,10 @@ function DriverDetail() {
                   ]}
                 />
               </Form.Item>
-            </div>
+            </Row>
 
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">은행계좌정보</label>
+            <div style={{ marginTop: 16 }}>
+              <Text strong style={{ display: 'block', marginBottom: 8 }}>은행계좌정보</Text>
               <Form.List name="bankAccounts">
                 {(fields, { add, remove }) => (
                   <>
@@ -488,42 +471,22 @@ function DriverDetail() {
             </Form.Item>
           </Form>
         ) : settlementInfo ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <span className="text-sm font-medium text-gray-500">사업자등록번호</span>
-              <p className="text-base text-gray-900 mt-1">{settlementInfo.businessNumber}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">ticker</span>
-              <p className="text-base text-gray-900 mt-1">{basicInfo.ticker}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">사업자등록상호</span>
-              <p className="text-base text-gray-900 mt-1">{settlementInfo.businessName}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">대표자</span>
-              <p className="text-base text-gray-900 mt-1">{settlementInfo.representative}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">사업자등록주소</span>
-              <p className="text-base text-gray-900 mt-1">{settlementInfo.businessAddress}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">사업자 과세유형</span>
-              <p className="text-base text-gray-900 mt-1">
-                {settlementInfo.taxType === '과세' ? (
-                  <Tag color="#1890FF">과세</Tag>
-                ) : settlementInfo.taxType === '면세' ? (
-                  <Tag color="#52C41A">면세</Tag>
-                ) : (
-                  '-'
-                )}
-              </p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">사업자등록증</span>
-              <p className="text-base text-gray-900 mt-1">
+          <Descriptions bordered column={{ xs: 1, md: 2 }} size="middle">
+            <Descriptions.Item label="사업자등록번호">{settlementInfo.businessNumber}</Descriptions.Item>
+            <Descriptions.Item label="ticker">{basicInfo.ticker}</Descriptions.Item>
+            <Descriptions.Item label="사업자등록상호">{settlementInfo.businessName}</Descriptions.Item>
+            <Descriptions.Item label="대표자">{settlementInfo.representative}</Descriptions.Item>
+            <Descriptions.Item label="사업자등록주소" span={2}>{settlementInfo.businessAddress}</Descriptions.Item>
+            <Descriptions.Item label="사업자 과세유형">
+              {settlementInfo.taxType === '과세' ? (
+                <Tag color="#1890FF">과세</Tag>
+              ) : settlementInfo.taxType === '면세' ? (
+                <Tag color="#52C41A">면세</Tag>
+              ) : (
+                '-'
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label="사업자등록증">
                 {settlementInfo.hasCertificate ? (
                   <Image.PreviewGroup>
                     <Image
@@ -550,26 +513,22 @@ function DriverDetail() {
                     </Button>
                   </Image.PreviewGroup>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500 border border-gray-300">
-                    사업자등록증 미첨부
-                  </span>
+                  <Tag>사업자등록증 미첨부</Tag>
                 )}
-              </p>
-            </div>
-            <div className="md:col-span-2">
-              <span className="text-sm font-medium text-gray-500">은행계좌정보</span>
-              <div className="mt-2 space-y-2">
+            </Descriptions.Item>
+            <Descriptions.Item label="은행계좌정보" span={2}>
+              <Space direction="vertical" size="small">
                 {settlementInfo.bankAccounts.map((acc, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <span className="text-sm text-gray-900">{acc.bank} {acc.accountNumber} ({acc.holder})</span>
+                  <Space key={idx} size="small">
+                    <Text>{acc.bank} {acc.accountNumber} ({acc.holder})</Text>
                     {acc.isPrimary && <Tag color="gold">주사용</Tag>}
-                  </div>
+                  </Space>
                 ))}
-              </div>
-            </div>
-          </div>
+              </Space>
+            </Descriptions.Item>
+          </Descriptions>
         ) : (
-          <p className="text-gray-500">정산사업자 정보가 등록되지 않았습니다.</p>
+          <Text type="secondary">정산사업자 정보가 등록되지 않았습니다.</Text>
         )}
       </Card>
 
@@ -577,8 +536,7 @@ function DriverDetail() {
       <Card
         title="이슈 히스토리 (P2 예정)"
         extra={<Button icon={<PlusOutlined />} onClick={handleClaimAdd}>이력 추가</Button>}
-        className="opacity-60"
-        style={{ backgroundColor: '#F9FAFB', borderColor: '#D1D5DB' }}
+        style={{ opacity: 0.6, backgroundColor: '#F9FAFB', borderColor: '#D1D5DB' }}
         headStyle={{ color: '#6B7280' }}
       >
         {claims.length > 0 ? (
@@ -774,6 +732,7 @@ function DriverDetail() {
           </Form.Item>
         </Form>
       </Modal>
+      </Space>
     </div>
   );
 }
