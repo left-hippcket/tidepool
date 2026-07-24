@@ -137,6 +137,79 @@ function TerritoryManagement() {
     setIsModalOpen(true);
   };
 
+  // 표시순서 재정렬 함수 (사업권역)
+  const reorderTerritories = (updatedList, targetId, newOrder) => {
+    const oldOrder = updatedList.find(t => t.id === targetId)?.displayOrder;
+
+    if (oldOrder === newOrder) return updatedList;
+
+    let reordered = [...updatedList];
+
+    if (newOrder < oldOrder) {
+      // 순서를 앞으로 이동: 사이에 있는 항목들을 +1
+      reordered = reordered.map(t => {
+        if (t.id === targetId) {
+          return { ...t, displayOrder: newOrder };
+        }
+        if (t.displayOrder >= newOrder && t.displayOrder < oldOrder) {
+          return { ...t, displayOrder: t.displayOrder + 1 };
+        }
+        return t;
+      });
+    } else {
+      // 순서를 뒤로 이동: 사이에 있는 항목들을 -1
+      reordered = reordered.map(t => {
+        if (t.id === targetId) {
+          return { ...t, displayOrder: newOrder };
+        }
+        if (t.displayOrder > oldOrder && t.displayOrder <= newOrder) {
+          return { ...t, displayOrder: t.displayOrder - 1 };
+        }
+        return t;
+      });
+    }
+
+    return reordered;
+  };
+
+  // 표시순서 재정렬 함수 (상세지역)
+  const reorderRegions = (updatedList, targetId, newOrder, territoryId) => {
+    const sameTerritoryRegions = updatedList.filter(r => r.territoryId === territoryId);
+    const oldOrder = sameTerritoryRegions.find(r => r.id === targetId)?.displayOrder;
+
+    if (oldOrder === newOrder) return updatedList;
+
+    let reordered = [...updatedList];
+
+    if (newOrder < oldOrder) {
+      // 순서를 앞으로 이동: 사이에 있는 항목들을 +1
+      reordered = reordered.map(r => {
+        if (r.territoryId !== territoryId) return r;
+        if (r.id === targetId) {
+          return { ...r, displayOrder: newOrder };
+        }
+        if (r.displayOrder >= newOrder && r.displayOrder < oldOrder) {
+          return { ...r, displayOrder: r.displayOrder + 1 };
+        }
+        return r;
+      });
+    } else {
+      // 순서를 뒤로 이동: 사이에 있는 항목들을 -1
+      reordered = reordered.map(r => {
+        if (r.territoryId !== territoryId) return r;
+        if (r.id === targetId) {
+          return { ...r, displayOrder: newOrder };
+        }
+        if (r.displayOrder > oldOrder && r.displayOrder <= newOrder) {
+          return { ...r, displayOrder: r.displayOrder - 1 };
+        }
+        return r;
+      });
+    }
+
+    return reordered;
+  };
+
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
@@ -154,9 +227,16 @@ function TerritoryManagement() {
             return;
           }
 
-          setTerritories(territories.map(t =>
+          // 표시순서가 변경된 경우 재정렬
+          let updatedTerritories = territories.map(t =>
             t.id === editingItem.id ? { ...t, ...values } : t
-          ));
+          );
+
+          if (values.displayOrder !== editingItem.displayOrder) {
+            updatedTerritories = reorderTerritories(updatedTerritories, editingItem.id, values.displayOrder);
+          }
+
+          setTerritories(updatedTerritories);
           message.success('사업권역 정보가 수정되었습니다.');
         } else {
           // 추가
@@ -175,13 +255,20 @@ function TerritoryManagement() {
         // 상세지역
         if (editingItem) {
           // 수정
-          setRegions(regions.map(r =>
+          let updatedRegions = regions.map(r =>
             r.id === editingItem.id ? {
               ...r,
               ...values,
               territoryName: territories.find(t => t.id === values.territoryId)?.name || r.territoryName
             } : r
-          ));
+          );
+
+          // 표시순서가 변경된 경우 재정렬
+          if (values.displayOrder !== editingItem.displayOrder) {
+            updatedRegions = reorderRegions(updatedRegions, editingItem.id, values.displayOrder, values.territoryId);
+          }
+
+          setRegions(updatedRegions);
           message.success('상세지역 정보가 수정되었습니다.');
         } else {
           // 추가
