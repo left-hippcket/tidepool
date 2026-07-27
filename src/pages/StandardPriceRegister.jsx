@@ -11,8 +11,8 @@ function StandardPriceRegister() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [allPriceData, setAllPriceData] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
+  const [selectedProduct, setSelectedProduct] = useState(2); // 넙치
   const [selectedOrigin, setSelectedOrigin] = useState(null);
 
   // 기존 가격 데이터 로드
@@ -32,6 +32,23 @@ function StandardPriceRegister() {
     };
     loadData();
   }, []);
+
+  // 초기 로드 시 넙치-완도 자동 설정
+  useEffect(() => {
+    if (selectedProduct === 2 && allPriceData.length > 0) {
+      // 완도 원산지 찾기
+      const wandoOrigin = origins.find(o => o.productId === 2 && o.name === '완도' && o.status === 'active');
+      if (wandoOrigin) {
+        setSelectedOrigin(wandoOrigin.id);
+        form.setFieldsValue({
+          categoryId: 1,
+          productId: 2,
+          originId: wandoOrigin.id,
+        });
+        onOriginChange(wandoOrigin.id);
+      }
+    }
+  }, [allPriceData]);
 
   const onCategoryChange = (value) => {
     setSelectedCategory(value);
@@ -111,32 +128,42 @@ function StandardPriceRegister() {
         <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>표준가격 등록</h2>
       </div>
 
-      {/* 등록 폼 */}
-      <Card>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          initialValues={{ applyDate: dayjs(), source: '피시파더' }}
-        >
-          {/* 기본 정보 섹션 */}
-          <div style={{ marginBottom: 32 }}>
-            <h3 style={{ marginBottom: 16, fontSize: 16, fontWeight: 600, color: '#333' }}>기본 정보</h3>
-
+      {/* 등록 상품 선택 필터 */}
+      <Card title="🔍 등록 상품 선택" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Form
+            form={form}
+            layout="inline"
+            initialValues={{
+              applyDate: dayjs(),
+              source: '피시파더',
+              categoryId: 1,
+              productId: 2,
+            }}
+            style={{ width: '100%' }}
+          >
             <Form.Item
               name="applyDate"
-              label="적용일자"
               rules={[{ required: true, message: '적용일자를 선택해주세요' }]}
+              style={{ flex: 1 }}
             >
-              <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
+              <DatePicker placeholder="적용일자" style={{ width: '100%' }} format="YYYY-MM-DD" />
+            </Form.Item>
+
+            <Form.Item
+              name="source"
+              rules={[{ required: true, message: '가격출처를 입력해주세요' }]}
+              style={{ flex: 1 }}
+            >
+              <Input placeholder="가격출처" />
             </Form.Item>
 
             <Form.Item
               name="categoryId"
-              label="품목분류"
               rules={[{ required: true, message: '품목분류를 선택해주세요' }]}
+              style={{ flex: 1 }}
             >
-              <Select placeholder="품목분류 선택" onChange={onCategoryChange}>
+              <Select placeholder="품목분류" onChange={onCategoryChange}>
                 {productCategories.map(cat => (
                   <Option key={cat.id} value={cat.id}>{cat.name}</Option>
                 ))}
@@ -145,11 +172,11 @@ function StandardPriceRegister() {
 
             <Form.Item
               name="productId"
-              label="품목"
               rules={[{ required: true, message: '품목을 선택해주세요' }]}
+              style={{ flex: 1 }}
             >
               <Select
-                placeholder="품목 선택"
+                placeholder="품목"
                 onChange={onProductChange}
                 disabled={!selectedCategory}
               >
@@ -163,11 +190,11 @@ function StandardPriceRegister() {
 
             <Form.Item
               name="originId"
-              label="원산지"
               rules={[{ required: true, message: '원산지를 선택해주세요' }]}
+              style={{ flex: 1 }}
             >
               <Select
-                placeholder="원산지 선택"
+                placeholder="원산지"
                 onChange={onOriginChange}
                 disabled={!selectedProduct}
               >
@@ -178,7 +205,17 @@ function StandardPriceRegister() {
                   ))}
               </Select>
             </Form.Item>
-          </div>
+          </Form>
+        </div>
+      </Card>
+
+      {/* 등록 폼 */}
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+        >
 
           {/* 규격별 가격 섹션 */}
           {selectedOrigin && (
@@ -221,15 +258,6 @@ function StandardPriceRegister() {
               </Form.List>
             </div>
           )}
-
-          {/* 가격출처 섹션 */}
-          <Form.Item
-            name="source"
-            label="가격출처"
-            rules={[{ required: true, message: '가격출처를 입력해주세요' }]}
-          >
-            <Input placeholder="예: 피시파더" />
-          </Form.Item>
 
           {/* 하단 버튼 */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>

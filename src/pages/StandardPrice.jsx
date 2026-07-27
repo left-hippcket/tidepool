@@ -329,8 +329,13 @@ function StandardPrice() {
 
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      const suffix = showLatestOnly ? '_최신' : '';
-      link.download = `표준가격${suffix}_${new Date().toISOString().split('T')[0]}.csv`;
+
+      // 파일명 생성: 품목_원산지_날짜.csv
+      const today = new Date().toISOString().split('T')[0];
+      const productPart = selectedProduct || '전체';
+      const originPart = selectedOrigin || '전체';
+      link.download = `${productPart}_${originPart}_${today}.csv`;
+
       link.href = url;
       link.click();
       URL.revokeObjectURL(url);
@@ -539,7 +544,7 @@ function StandardPrice() {
       </div>
 
       <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <Tabs.TabPane tab="표준가격 관리" key="1">
+        <Tabs.TabPane tab="표준가격 조회/등록" key="1">
           {editMode && (
             <Alert
               message="수정 모드"
@@ -638,7 +643,7 @@ function StandardPrice() {
             style={editMode ? { backgroundColor: '#f9fafb' } : {}}
           />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="원산지별 가격 비교" key="2">
+        <Tabs.TabPane tab="표준가격 추세 비교" key="2">
           <StandardPriceComparison activeTab={activeTab} />
         </Tabs.TabPane>
       </Tabs>
