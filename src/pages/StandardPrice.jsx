@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs, Space, InputNumber, Alert } from 'antd';
-import { PlusOutlined, EditOutlined, MinusCircleOutlined, SaveOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs, Space, InputNumber, Alert, Card, Row, Col, Checkbox } from 'antd';
+
+const { RangePicker } = DatePicker;
+import { PlusOutlined, EditOutlined, MinusCircleOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import StandardPriceComparison from './StandardPriceComparison';
@@ -15,6 +17,15 @@ function StandardPrice() {
   const [editMode, setEditMode] = useState(false);
   const [editingDataSource, setEditingDataSource] = useState([]);
   const [originalDataSource, setOriginalDataSource] = useState([]);
+
+  // 필터 상태 - 디폴트 값 설정
+  const [selectedCategory, setSelectedCategory] = useState('누운고기');
+  const [selectedProduct, setSelectedProduct] = useState('넙치');
+  const [selectedOrigin, setSelectedOrigin] = useState('완도');
+  const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
+  const [showLatestOnly, setShowLatestOnly] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const [pageSize, setPageSize] = useState(50);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -211,6 +222,125 @@ function StandardPrice() {
     return origins.map(name => ({ text: name, value: name }));
   }, [dataSource]);
 
+  // Cascading 필터 옵션
+  const availableProducts = React.useMemo(() => {
+    if (!selectedCategory) return [...new Set(dataSource.map(d => d.productName))];
+    return [...new Set(dataSource.filter(d => d.categoryName === selectedCategory).map(d => d.productName))];
+  }, [dataSource, selectedCategory]);
+
+  const availableOrigins = React.useMemo(() => {
+    let filtered = dataSource;
+    if (selectedCategory) filtered = filtered.filter(d => d.categoryName === selectedCategory);
+    if (selectedProduct) filtered = filtered.filter(d => d.productName === selectedProduct);
+    return [...new Set(filtered.map(d => d.originName))];
+  }, [dataSource, selectedCategory, selectedProduct]);
+
+  // 최신 가격 추출 함수 - 품목-원산지별 가장 최신 날짜의 모든 데이터
+  const getLatestPrices = (data) => {
+    // 1. 품목-원산지별로 가장 최신 날짜 찾기
+    const latestDates = {};
+    data.forEach(item => {
+      const key = `${item.productName}-${item.originName}`;
+      if (!latestDates[key] || new Date(item.applyDate) > new Date(latestDates[key])) {
+        latestDates[key] = item.applyDate;
+      }
+    });
+
+    // 2. 가장 최신 날짜의 데이터만 필터링
+    return data.filter(item => {
+      const key = `${item.productName}-${item.originName}`;
+      return item.applyDate === latestDates[key];
+    });
+  };
+
+  // 규격을 숫자로 변환하는 함수 (정렬용)
+  const parseSpec = (spec) => {
+    if (!spec) return 0;
+    const match = spec.match(/[\d.]+/);
+    if (!match) return 0;
+    const value = parseFloat(match[0]);
+    // kg 단위면 g로 변환
+    if (spec.includes('kg')) return value * 1000;
+    return value;
+  };
+
+  // 필터 적용된 데이터
+  const displayData = React.useMemo(() => {
+    let filtered = dataSource;
+    if (selectedCategory) {
+      filtered = filtered.filter(item => item.categoryName === selectedCategory);
+    }
+    if (selectedProduct) {
+      filtered = filtered.filter(item => item.productName === selectedProduct);
+    }
+    if (selectedOrigin) {
+      filtered = filtered.filter(item => item.originName === selectedOrigin);
+    }
+    if (dateRange && dateRange.length === 2) {
+      const [start, end] = dateRange;
+      filtered = filtered.filter(item => {
+        const itemDate = dayjs(item.applyDate);
+        return itemDate.isSameOrAfter(start, 'day') && itemDate.isSameOrBefore(end, 'day');
+      });
+    }
+
+    const result = showLatestOnly ? getLatestPrices(filtered) : filtered;
+
+    // 정렬: 적용일자 내림차순 → 품목분류 오름차순 → 품목 오름차순 → 원산지 오름차순 → 규격 오름차순
+    return result.sort((a, b) => {
+      // 1. 적용일자 내림차순
+      const dateCompare = b.applyDate.localeCompare(a.applyDate);
+      if (dateCompare !== 0) return dateCompare;
+
+      // 2. 품목분류 오름차순
+      const categoryCompare = (a.categoryName || '').localeCompare(b.categoryName || '');
+      if (categoryCompare !== 0) return categoryCompare;
+
+      // 3. 품목 오름차순
+      const productCompare = (a.productName || '').localeCompare(b.productName || '');
+      if (productCompare !== 0) return productCompare;
+
+      // 4. 원산지 오름차순
+      const originCompare = (a.originName || '').localeCompare(b.originName || '');
+      if (originCompare !== 0) return originCompare;
+
+      // 5. 규격 오름차순 (숫자 변환)
+      return parseSpec(a.spec) - parseSpec(b.spec);
+    });
+  }, [dataSource, selectedCategory, selectedProduct, selectedOrigin, dateRange, showLatestOnly]);
+
+  // CSV 다운로드 함수
+  const handleCSVDownload = () => {
+    setDownloading(true);
+    try {
+      const headers = ['적용일자', '품목분류', '품목', '원산지', '규격', '표준가격', '출처'];
+      const rows = displayData.map(item => [
+        item.applyDate,
+        item.categoryName,
+        item.productName,
+        item.originName,
+        item.spec,
+        item.price,
+        item.source
+      ].join(','));
+
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const suffix = showLatestOnly ? '_최신' : '';
+      link.download = `표준가격${suffix}_${new Date().toISOString().split('T')[0]}.csv`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      message.success(`CSV 다운로드 완료 (${displayData.length}건)`);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const handleFieldChange = (index, field, value) => {
     const newData = [...editingDataSource];
     newData[index] = {
@@ -226,8 +356,6 @@ function StandardPrice() {
       dataIndex: 'applyDate',
       key: 'applyDate',
       width: 140,
-      defaultSortOrder: 'descend',
-      sorter: (a, b) => a.applyDate.localeCompare(b.applyDate),
       render: (text, record, index) => {
         if (editMode) {
           return (
@@ -246,24 +374,18 @@ function StandardPrice() {
       dataIndex: 'categoryName',
       key: 'categoryName',
       width: 100,
-      filters: categoryFilters,
-      onFilter: (value, record) => record.categoryName === value,
     },
     {
       title: '품목',
       dataIndex: 'productName',
       key: 'productName',
       width: 100,
-      filters: productFilters,
-      onFilter: (value, record) => record.productName === value,
     },
     {
       title: '원산지',
       dataIndex: 'originName',
       key: 'originName',
       width: 100,
-      filters: originFilters,
-      onFilter: (value, record) => record.originName === value,
     },
     {
       title: '규격',
@@ -335,14 +457,20 @@ function StandardPrice() {
   };
 
   const handleEnterEditMode = () => {
-    setOriginalDataSource([...dataSource]);
-    setEditingDataSource([...dataSource]);
+    setOriginalDataSource([...displayData]);
+    setEditingDataSource([...displayData]);
     setEditMode(true);
     message.info('수정 모드입니다. 여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요.');
   };
 
   const handleSaveAll = () => {
-    setDataSource(editingDataSource);
+    // 편집된 데이터를 원본 dataSource에 병합
+    const updatedDataSource = dataSource.map(item => {
+      const editedItem = editingDataSource.find(e => e.key === item.key || e.id === item.id);
+      return editedItem || item;
+    });
+
+    setDataSource(updatedDataSource);
     setEditMode(false);
     setEditingDataSource([]);
     setOriginalDataSource([]);
@@ -421,16 +549,97 @@ function StandardPrice() {
               style={{ marginBottom: 16 }}
             />
           )}
+
+          {!editMode && (
+            <Card title="🔍 조회 필터" style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <Select
+                  value={selectedCategory}
+                  onChange={(value) => {
+                    setSelectedCategory(value);
+                    setSelectedProduct(null);
+                    setSelectedOrigin(null);
+                  }}
+                  placeholder="품목분류"
+                  allowClear
+                  style={{ flex: 1 }}
+                >
+                  {categoryFilters.map(c => (
+                    <Option key={c.value} value={c.value}>{c.text}</Option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedProduct}
+                  onChange={(value) => {
+                    setSelectedProduct(value);
+                    setSelectedOrigin(null);
+                  }}
+                  placeholder="품목"
+                  allowClear
+                  style={{ flex: 1 }}
+                >
+                  {availableProducts.map(p => (
+                    <Option key={p} value={p}>{p}</Option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedOrigin}
+                  onChange={setSelectedOrigin}
+                  placeholder="원산지"
+                  allowClear
+                  style={{ flex: 1 }}
+                >
+                  {availableOrigins.map(o => (
+                    <Option key={o} value={o}>{o}</Option>
+                  ))}
+                </Select>
+
+                <RangePicker
+                  value={dateRange}
+                  onChange={setDateRange}
+                  placeholder={['시작일', '종료일']}
+                  style={{ flex: 2 }}
+                />
+
+                <Checkbox
+                  checked={showLatestOnly}
+                  onChange={(e) => setShowLatestOnly(e.target.checked)}
+                  style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  품목별 최신 가격만
+                </Checkbox>
+
+                <Button
+                  type="primary"
+                  icon={<DownloadOutlined />}
+                  onClick={handleCSVDownload}
+                  loading={downloading}
+                  style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  CSV 다운로드 ({displayData.length}건)
+                </Button>
+              </div>
+            </Card>
+          )}
+
           <Table
             columns={columns}
-            dataSource={editMode ? editingDataSource : dataSource}
-            pagination={{ pageSize: 20 }}
+            dataSource={editMode ? editingDataSource : displayData}
+            pagination={{
+              pageSize: pageSize,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              showSizeChanger: true,
+              showTotal: (total) => `총 ${total}건`,
+              onShowSizeChange: (current, size) => setPageSize(size)
+            }}
             scroll={{ x: 1000 }}
             style={editMode ? { backgroundColor: '#f9fafb' } : {}}
           />
         </Tabs.TabPane>
         <Tabs.TabPane tab="원산지별 가격 비교" key="2">
-          <StandardPriceComparison />
+          <StandardPriceComparison activeTab={activeTab} />
         </Tabs.TabPane>
       </Tabs>
     </div>

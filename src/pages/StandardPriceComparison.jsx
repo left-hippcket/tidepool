@@ -7,12 +7,12 @@ import { productCategories, products, origins, specifications } from '../data/mo
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-function StandardPriceComparison() {
+function StandardPriceComparison({ activeTab }) {
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
+  const [selectedProduct, setSelectedProduct] = useState(2); // 넙치
   const [selectedOrigins, setSelectedOrigins] = useState([]);
-  const [selectedSpec, setSelectedSpec] = useState(null);
+  const [selectedSpecs, setSelectedSpecs] = useState(['1.5kg']);
   const [chartData, setChartData] = useState([]);
   const [availableOrigins, setAvailableOrigins] = useState([]);
   const [availableSpecs, setAvailableSpecs] = useState([]);
@@ -37,10 +37,46 @@ function StandardPriceComparison() {
     loadData();
   }, []);
 
+  // 초기 로드 시 넙치의 규격과 원산지 자동 설정
+  useEffect(() => {
+    if (selectedProduct === 2) {
+      // 넙치의 규격
+      const productSpecs = specifications.filter(s =>
+        s.productId === 2 && s.status === 'active'
+      );
+      setAvailableSpecs(productSpecs);
+
+      // 넙치의 원산지
+      const productOrigins = origins.filter(o =>
+        o.productId === 2 && o.status === 'active'
+      );
+      setAvailableOrigins(productOrigins);
+      setSelectedOrigins(productOrigins.map(o => o.name));
+    }
+  }, []);
+
+  // 탭 활성화 시 차트 리사이즈
+  useEffect(() => {
+    if (activeTab === '2') {
+      // 탭 전환 애니메이션이 완료될 때까지 대기
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab]);
+
+  // 초기 로드 시 자동 조회
+  useEffect(() => {
+    if (activeTab === '2' && chartData.length === 0 && allPriceData.length > 0 && selectedOrigins.length > 0) {
+      handleQuery();
+    }
+  }, [activeTab, allPriceData, selectedOrigins]);
+
   const onCategoryChange = (value) => {
     setSelectedCategory(value);
     setSelectedProduct(null);
-    setSelectedSpec(null);
+    setSelectedSpecs([]);
     setSelectedOrigins([]);
     setAvailableOrigins([]);
     setAvailableSpecs([]);
@@ -63,9 +99,9 @@ function StandardPriceComparison() {
 
     // 자동으로 첫 번째 규격 선택
     if (productSpecs.length > 0) {
-      setSelectedSpec(productSpecs[0].name);
+      setSelectedSpecs([productSpecs[0].name]);
     } else {
-      setSelectedSpec(null);
+      setSelectedSpecs([]);
     }
 
     // 자동으로 모든 원산지 선택
@@ -111,7 +147,7 @@ function StandardPriceComparison() {
       return;
     }
 
-    if (!selectedSpec) {
+    if (selectedSpecs.length === 0) {
       message.error('규격을 선택해주세요.');
       return;
     }
@@ -131,18 +167,18 @@ function StandardPriceComparison() {
       return;
     }
 
-    // 실제 데이터에서 필터링
+    // 실제 데이터에서 필터링 - 규격과 원산지 조합
     const filteredData = allPriceData
       .filter(item =>
         item.productId === selectedProduct &&
-        item.spec === selectedSpec &&
+        selectedSpecs.includes(item.spec) &&
         selectedOrigins.includes(item.originName) &&
         dayjs(item.applyDate).isAfter(dateRange[0].subtract(1, 'day')) &&
         dayjs(item.applyDate).isBefore(dateRange[1].add(1, 'day'))
       )
       .map(item => ({
         date: item.applyDate,
-        origin: item.originName,
+        series: `${item.spec} - ${item.originName}`, // 규격-원산지 조합
         price: item.price,
       }));
 
@@ -160,18 +196,13 @@ function StandardPriceComparison() {
     data: chartData,
     xField: 'date',
     yField: 'price',
-    seriesField: 'origin',
+    seriesField: 'series',
     smooth: true,
+    autoFit: true,
     lineStyle: {
-      lineWidth: 3,
+      lineWidth: 2,
     },
-    colorField: 'origin',
-    scale: {
-      color: {
-        domain: ['완도', '제주', '통영'],
-        range: ['#1890ff', '#52c41a', '#faad14'],
-      },
-    },
+    colorField: 'series',
     animation: {
       appear: {
         animation: 'path-in',
@@ -190,8 +221,8 @@ function StandardPriceComparison() {
     tooltip: {
       items: [
         {
-          field: 'origin',
-          name: '원산지',
+          field: 'series',
+          name: '규격-원산지',
         },
         {
           field: 'price',
@@ -206,20 +237,18 @@ function StandardPriceComparison() {
   };
 
   return (
-    <div>
-      <h2 style={{ marginBottom: 24 }}>원산지별 표준가격 비교</h2>
-
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* 품목 선택 */}
-        <Card title="품목 선택" size="small">
-          <Space direction="vertical" style={{ width: '100%' }} size="middle">
-            <div>
-              <div style={{ marginBottom: 8, fontWeight: 500 }}>품목분류</div>
+    <div style={{ width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+        {/* 조회 필터 */}
+        <Card title="🔍 조회 필터" style={{ width: '100%' }}>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            {/* 첫 번째 줄: 품목분류, 품목, 규격, 기간 */}
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <Select
                 value={selectedCategory}
                 onChange={onCategoryChange}
-                style={{ width: '100%' }}
-                placeholder="품목분류 선택"
+                placeholder="품목분류"
+                style={{ flex: 1 }}
               >
                 {productCategories.map(category => (
                   <Option key={category.id} value={category.id}>
@@ -227,16 +256,13 @@ function StandardPriceComparison() {
                   </Option>
                 ))}
               </Select>
-            </div>
 
-            <div>
-              <div style={{ marginBottom: 8, fontWeight: 500 }}>품목</div>
               <Select
                 value={selectedProduct}
                 onChange={onProductChange}
-                style={{ width: '100%' }}
-                placeholder="품목 선택"
+                placeholder="품목"
                 disabled={!selectedCategory}
+                style={{ flex: 1 }}
               >
                 {selectedCategory && products
                   .filter(p => p.categoryId === selectedCategory)
@@ -246,16 +272,14 @@ function StandardPriceComparison() {
                     </Option>
                   ))}
               </Select>
-            </div>
 
-            <div>
-              <div style={{ marginBottom: 8, fontWeight: 500 }}>규격</div>
               <Select
-                value={selectedSpec}
-                onChange={setSelectedSpec}
-                style={{ width: '100%' }}
-                placeholder="규격 선택"
+                mode="multiple"
+                value={selectedSpecs}
+                onChange={setSelectedSpecs}
+                placeholder="규격"
                 disabled={!selectedProduct}
+                style={{ flex: 1 }}
               >
                 {availableSpecs.map(spec => (
                   <Option key={spec.id} value={spec.name}>
@@ -263,64 +287,57 @@ function StandardPriceComparison() {
                   </Option>
                 ))}
               </Select>
+
+              <RangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder={['시작일', '종료일']}
+                style={{ flex: 2 }}
+              />
+
+              <Button size="small" onClick={() => handlePeriodClick('3months')}>최근 3개월</Button>
+              <Button size="small" onClick={() => handlePeriodClick('6months')}>최근 6개월</Button>
+              <Button size="small" onClick={() => handlePeriodClick('1year')}>최근 1년</Button>
+
+              <Button type="primary" onClick={handleQuery} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+                조회
+              </Button>
+            </div>
+
+            {/* 두 번째 줄: 원산지 */}
+            <div>
+              <div style={{ marginBottom: 8, fontWeight: 500 }}>원산지</div>
+              <Checkbox.Group
+                options={availableOrigins.map(o => ({ label: o.name, value: o.name }))}
+                value={selectedOrigins}
+                onChange={handleOriginChange}
+                disabled={!selectedProduct}
+              />
             </div>
           </Space>
         </Card>
 
-        {/* 기간 설정 */}
-        <Card title="기간 설정" size="small">
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Space wrap>
-              <Button onClick={() => handlePeriodClick('1month')}>최근 1개월</Button>
-              <Button onClick={() => handlePeriodClick('3months')}>최근 3개월</Button>
-              <Button onClick={() => handlePeriodClick('6months')}>최근 6개월</Button>
-              <Button onClick={() => handlePeriodClick('1year')}>최근 1년</Button>
-            </Space>
-            <RangePicker
-              value={dateRange}
-              onChange={setDateRange}
-              format="YYYY-MM-DD"
-              style={{ width: '100%' }}
-            />
-          </Space>
-        </Card>
-
-        {/* 원산지 설정 */}
-        <Card title="원산지 설정" size="small">
-          <Checkbox.Group
-            options={availableOrigins.map(o => ({ label: o.name, value: o.name }))}
-            value={selectedOrigins}
-            onChange={handleOriginChange}
-            disabled={!selectedProduct}
-          />
-          <div style={{ marginTop: 8, color: '#999', fontSize: 12 }}>
-            * 최소 1개 이상 선택 필수 (품목 선택 시 자동으로 모두 선택됨)
-          </div>
-        </Card>
-
-        {/* 조회 버튼 */}
-        <Button type="primary" size="large" block onClick={handleQuery}>
-          조회
-        </Button>
-
         {/* 차트 영역 */}
         {chartData.length > 0 && (
           <Card
-            title={`${products.find(p => p.id === selectedProduct)?.name || ''} ${selectedSpec} - 원산지별 가격 추이`}
+            title={`${products.find(p => p.id === selectedProduct)?.name || ''} - 규격별·원산지별 가격 추이`}
             size="small"
+            style={{ width: '100%' }}
           >
-            <Line {...config} height={400} />
+            <div style={{ width: '100%', height: 400 }}>
+              <Line {...config} />
+            </div>
           </Card>
         )}
 
         {chartData.length === 0 && (
-          <Card size="small">
+          <Card size="small" style={{ width: '100%' }}>
             <div style={{ padding: '80px 20px', textAlign: 'center', color: '#999' }}>
               조회 버튼을 클릭하여 차트를 생성해주세요.
             </div>
           </Card>
         )}
-      </Space>
+      </div>
     </div>
   );
 }
