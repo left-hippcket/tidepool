@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import StandardPriceComparison from './StandardPriceComparison';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-import { FMSelectSimple } from '../components/ui/FMSelectSimpleSimple';
+import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMInput } from '../components/ui/FMInput';
 import { FMButton } from '../components/ui/FMButton';
 

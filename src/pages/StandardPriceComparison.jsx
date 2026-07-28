@@ -3,7 +3,7 @@ import { Line } from '@ant-design/charts';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-import { FMSelectSimple } from '../components/ui/FMSelectSimpleSimple';
+import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMMultiSelect } from '../components/ui/FMMultiSelect';
 import { FMButton } from '../components/ui/FMButton';
 
