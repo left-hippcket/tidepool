@@ -576,7 +576,7 @@ function ProductManagement() {
           </div>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 2fr 1fr 1fr' }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: '0.8fr 2.5fr 1fr 1fr' }}>
         {/* Column 1: Categories */}
         <div>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
