@@ -535,32 +535,48 @@ function ProductManagement() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">상품 관리</h1>
-        <div className="flex gap-2">
-          {editMode ? (
-            <>
-              <FMButton variant="secondary" onClick={handleCancelEditMode}>
-                취소
-              </FMButton>
-              <FMButton variant="primary" onClick={handleSaveEditMode}>
-                저장
-              </FMButton>
-            </>
-          ) : (
-            <>
-              <FMButton variant="secondary" onClick={handleCSVDownload}>
-                CSV 다운로드
-              </FMButton>
-              <FMButton variant="primary" onClick={handleEnterEditMode}>
-                수정 모드
-              </FMButton>
-            </>
-          )}
+      <div className="flex flex-col gap-6 w-full">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">상품 관리</h2>
+          <div className="flex flex-wrap gap-2">
+            {editMode ? (
+              <>
+                <FMButton
+                  variant="primary"
+                  icon={<SaveOutlined className="h-4 w-4" />}
+                  onClick={handleSaveEditMode}
+                >
+                  저장
+                </FMButton>
+                <FMButton
+                  variant="secondary"
+                  onClick={handleCancelEditMode}
+                >
+                  취소
+                </FMButton>
+              </>
+            ) : (
+              <>
+                <FMButton
+                  variant="secondary"
+                  icon={<EditOutlined className="h-4 w-4" />}
+                  onClick={handleEnterEditMode}
+                >
+                  수정 모드
+                </FMButton>
+                <FMButton
+                  variant="indigo"
+                  icon={<DownloadOutlined className="h-4 w-4" />}
+                  onClick={handleCSVDownload}
+                >
+                  CSV 다운로드
+                </FMButton>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-4 gap-4">
+        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 2fr 1fr 1fr' }}>
         {/* Column 1: Categories */}
         <div>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -763,32 +779,33 @@ function ProductManagement() {
                       }`}
                     >
                       {editMode ? (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
                           <FMInput
                             value={product.name}
                             onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
                             placeholder="품목명"
                             maxLength={20}
+                            className="flex-1"
                           />
-                          <div className="grid grid-cols-2 gap-2">
-                            <FMSelect
-                              value={product.orderUnit}
-                              onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
-                              options={[
-                                { value: '통', label: '통' },
-                                { value: '박스', label: '박스' },
-                                { value: 'kg', label: 'kg' }
-                              ]}
-                            />
-                            <FMInput
-                              type="number"
-                              value={product.unitWeight}
-                              onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
-                              placeholder="중량"
-                              step="0.1"
-                              min="0.1"
-                            />
-                          </div>
+                          <FMSelect
+                            value={product.orderUnit}
+                            onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
+                            options={[
+                              { value: '통', label: '통' },
+                              { value: '박스', label: '박스' },
+                              { value: 'kg', label: 'kg' }
+                            ]}
+                            className="w-24"
+                          />
+                          <FMInput
+                            type="number"
+                            value={product.unitWeight}
+                            onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
+                            placeholder="중량"
+                            step="0.1"
+                            min="0.1"
+                            className="w-20"
+                          />
                           <FMSelect
                             value={product.status}
                             onChange={(value) => handleProductFieldChange(product.id, 'status', value)}
@@ -796,6 +813,7 @@ function ProductManagement() {
                               { value: 'active', label: '활성' },
                               { value: 'inactive', label: '비활성' }
                             ]}
+                            className="w-32"
                           />
                         </div>
                       ) : (
