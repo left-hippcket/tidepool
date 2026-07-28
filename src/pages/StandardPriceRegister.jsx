@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, DatePicker, Select, InputNumber, Space, Card, message } from 'antd';
-import { PlusOutlined, MinusCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-
-const { Option } = Select;
+import { FMSelect } from '../components/ui/FMSelect';
+import { FMButton } from '../components/ui/FMButton';
 
 function StandardPriceRegister() {
   const navigate = useNavigate();
-  const [form] = Form.useForm();
   const [allPriceData, setAllPriceData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
   const [selectedProduct, setSelectedProduct] = useState(2); // 넙치
   const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const [applyDate, setApplyDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [source, setSource] = useState('피시파더');
+  const [priceItems, setPriceItems] = useState([]);
 
   // 기존 가격 데이터 로드
   useEffect(() => {
@@ -36,48 +38,33 @@ function StandardPriceRegister() {
   // 초기 로드 시 넙치-완도 자동 설정
   useEffect(() => {
     if (selectedProduct === 2 && allPriceData.length > 0) {
-      // 완도 원산지 찾기
       const wandoOrigin = origins.find(o => o.productId === 2 && o.name === '완도' && o.status === 'active');
       if (wandoOrigin) {
         setSelectedOrigin(wandoOrigin.id);
-        form.setFieldsValue({
-          categoryId: 1,
-          productId: 2,
-          originId: wandoOrigin.id,
-        });
         onOriginChange(wandoOrigin.id);
       }
     }
   }, [allPriceData]);
 
   const onCategoryChange = (value) => {
-    setSelectedCategory(value);
+    setSelectedCategory(parseInt(value));
     setSelectedProduct(null);
     setSelectedOrigin(null);
-    form.setFieldsValue({
-      productId: undefined,
-      originId: undefined,
-      priceItems: [],
-    });
+    setPriceItems([]);
   };
 
   const onProductChange = (value) => {
-    setSelectedProduct(value);
+    setSelectedProduct(parseInt(value));
     setSelectedOrigin(null);
-    form.setFieldsValue({
-      originId: undefined,
-      priceItems: [],
-    });
+    setPriceItems([]);
   };
 
   const onOriginChange = (originId) => {
     setSelectedOrigin(originId);
     const origin = origins.find(o => o.id === originId);
 
-    // 해당 품목의 기존 규격 자동 로드
     const productSpecs = specifications.filter(s => s.productId === selectedProduct && s.status === 'active');
 
-    // 최근 가격 가져오기 (같은 품목 + 원산지 조합)
     const getRecentPrice = (specName) => {
       const recentRecord = allPriceData
         .filter(item =>
@@ -90,186 +77,168 @@ function StandardPriceRegister() {
       return recentRecord?.price;
     };
 
-    const priceItems = productSpecs.map(spec => ({
+    const items = productSpecs.map(spec => ({
       specId: spec.id,
       specName: spec.name,
-      price: getRecentPrice(spec.name),
+      price: getRecentPrice(spec.name) || '',
     }));
 
-    form.setFieldsValue({
-      priceItems: priceItems,
-    });
+    setPriceItems(items);
   };
 
-  const handleSubmit = (values) => {
-    const priceItems = values.priceItems || [];
-    const validItems = priceItems.filter(item => item.price !== undefined && item.price !== null);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const validItems = priceItems.filter(item => item.price !== undefined && item.price !== null && item.price !== '');
 
     if (validItems.length === 0) {
-      message.warning('최소 1개 이상의 규격에 가격을 입력해주세요.');
+      toast('최소 1개 이상의 규격에 가격을 입력해주세요.');
       return;
     }
 
-    // 실제로는 여기서 서버에 데이터를 저장해야 합니다
-    // 현재는 localStorage에 저장하거나 메시지만 표시
-    message.success(`${validItems.length}개의 표준가격이 등록되었습니다.`);
-
-    // 목록 페이지로 이동
+    toast.success(`${validItems.length}개의 표준가격이 등록되었습니다.`);
     navigate('/standard-price');
+  };
+
+  const handlePriceChange = (index, value) => {
+    const newItems = [...priceItems];
+    newItems[index].price = value;
+    setPriceItems(newItems);
   };
 
   return (
     <div>
       {/* 상단 헤더 */}
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/standard-price')}>
+      <div className="mb-6 flex items-center gap-4">
+        <FMButton
+          onClick={() => navigate('/standard-price')}
+          variant="secondary"
+          icon={<ArrowLeftOutlined className="h-4 w-4" />}
+        >
           목록으로
-        </Button>
-        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>표준가격 등록</h2>
+        </FMButton>
+        <h2 className="text-2xl font-bold text-gray-900">표준가격 등록</h2>
       </div>
 
       {/* 등록 상품 선택 필터 */}
-      <Card title="🔍 등록 상품 선택" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <Form
-            form={form}
-            layout="inline"
-            initialValues={{
-              applyDate: dayjs(),
-              source: '피시파더',
-              categoryId: 1,
-              productId: 2,
-            }}
-            style={{ width: '100%' }}
-          >
-            <Form.Item
-              name="applyDate"
-              rules={[{ required: true, message: '적용일자를 선택해주세요' }]}
-              style={{ flex: 1 }}
-            >
-              <DatePicker placeholder="적용일자" style={{ width: '100%' }} format="YYYY-MM-DD" />
-            </Form.Item>
+      <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
+        <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 등록 상품 선택</h3>
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">적용일자</label>
+            <input
+              type="date"
+              value={applyDate}
+              onChange={(e) => setApplyDate(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+              required
+            />
+          </div>
 
-            <Form.Item
-              name="source"
-              rules={[{ required: true, message: '가격출처를 입력해주세요' }]}
-              style={{ flex: 1 }}
-            >
-              <Input placeholder="가격출처" />
-            </Form.Item>
+          <div className="flex-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">가격출처</label>
+            <input
+              type="text"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              placeholder="가격출처"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+              required
+            />
+          </div>
 
-            <Form.Item
-              name="categoryId"
-              rules={[{ required: true, message: '품목분류를 선택해주세요' }]}
-              style={{ flex: 1 }}
-            >
-              <Select placeholder="품목분류" onChange={onCategoryChange}>
-                {productCategories.map(cat => (
-                  <Option key={cat.id} value={cat.id}>{cat.name}</Option>
-                ))}
-              </Select>
-            </Form.Item>
+          <div className="flex-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">품목분류</label>
+            <FMSelect
+              value={selectedCategory}
+              onChange={(value) => onCategoryChange(value)}
+              options={productCategories.map(cat => ({ value: cat.id, label: cat.name }))}
+              placeholder="품목분류"
+            />
+          </div>
 
-            <Form.Item
-              name="productId"
-              rules={[{ required: true, message: '품목을 선택해주세요' }]}
-              style={{ flex: 1 }}
-            >
-              <Select
-                placeholder="품목"
-                onChange={onProductChange}
-                disabled={!selectedCategory}
-              >
-                {selectedCategory && products
-                  .filter(p => p.categoryId === selectedCategory)
-                  .map(p => (
-                    <Option key={p.id} value={p.id}>{p.name}</Option>
-                  ))}
-              </Select>
-            </Form.Item>
+          <div className="flex-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">품목</label>
+            <FMSelect
+              value={selectedProduct || ''}
+              onChange={(value) => onProductChange(value)}
+              options={[
+                { value: '', label: '선택' },
+                ...(selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : [])
+              ]}
+              placeholder="품목"
+            />
+          </div>
 
-            <Form.Item
-              name="originId"
-              rules={[{ required: true, message: '원산지를 선택해주세요' }]}
-              style={{ flex: 1 }}
-            >
-              <Select
-                placeholder="원산지"
-                onChange={onOriginChange}
-                disabled={!selectedProduct}
-              >
-                {selectedProduct && origins
-                  .filter(o => o.productId === selectedProduct && o.status === 'active')
-                  .map(o => (
-                    <Option key={o.id} value={o.id}>{o.name}</Option>
-                  ))}
-              </Select>
-            </Form.Item>
-          </Form>
+          <div className="flex-1">
+            <label className="mb-1 block text-sm font-medium text-gray-700">원산지</label>
+            <FMSelect
+              value={selectedOrigin || ''}
+              onChange={(value) => onOriginChange(parseInt(value))}
+              options={[
+                { value: '', label: '선택' },
+                ...(selectedProduct ? origins.filter(o => o.productId === selectedProduct && o.status === 'active').map(o => ({ value: o.id, label: o.name })) : [])
+              ]}
+              placeholder="원산지"
+            />
+          </div>
         </div>
-      </Card>
+      </div>
 
       {/* 등록 폼 */}
-      <Card>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
-
-          {/* 규격별 가격 섹션 */}
+      <form onSubmit={handleSubmit}>
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
           {selectedOrigin && (
-            <div style={{ marginBottom: 32 }}>
-              <h3 style={{ marginBottom: 16, fontSize: 16, fontWeight: 600, color: '#333' }}>규격별 가격</h3>
-              <div style={{ marginBottom: 12, color: '#666', fontSize: 13 }}>
+            <div className="mb-8">
+              <h3 className="mb-2 text-base font-semibold text-gray-900">규격별 가격</h3>
+              <div className="mb-4 text-sm text-gray-600">
                 최근 가격이 자동 입력됩니다. 수정 가능하며, 빈 칸은 업데이트되지 않습니다.
               </div>
 
-              <Form.List name="priceItems">
-                {(fields) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'specName']}
-                          style={{ marginBottom: 0, width: 150 }}
-                        >
-                          <Input disabled style={{ backgroundColor: '#f5f5f5' }} />
-                        </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'price']}
-                          style={{ marginBottom: 0, width: 200 }}
-                        >
-                          <InputNumber
-                            style={{ width: '100%' }}
-                            placeholder="가격 입력 (선택)"
-                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={value => value.replace(/,/g, '')}
-                            addonAfter="원"
-                            step={500}
-                          />
-                        </Form.Item>
-                      </Space>
-                    ))}
-                  </>
-                )}
-              </Form.List>
+              <div className="flex flex-col gap-2">
+                {priceItems.map((item, index) => (
+                  <div key={item.specId} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={item.specName}
+                      disabled
+                      className="w-40 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600"
+                    />
+                    <div className="flex-1 flex gap-2 items-center">
+                      <input
+                        type="number"
+                        value={item.price}
+                        onChange={(e) => handlePriceChange(index, e.target.value)}
+                        placeholder="가격 입력 (선택)"
+                        step={500}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+                      />
+                      <span className="text-sm text-gray-600">원</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {/* 하단 버튼 */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 32, paddingTop: 24, borderTop: '1px solid #f0f0f0' }}>
-            <Button onClick={() => navigate('/standard-price')}>
+          <div className="flex flex-wrap justify-end gap-2 border-t border-gray-200 pt-6">
+            <FMButton
+              type="button"
+              onClick={() => navigate('/standard-price')}
+              variant="secondary"
+            >
               취소
-            </Button>
-            <Button type="primary" htmlType="submit">
+            </FMButton>
+            <FMButton
+              type="submit"
+              variant="primary"
+            >
               등록
-            </Button>
+            </FMButton>
           </div>
-        </Form>
-      </Card>
+        </div>
+      </form>
     </div>
   );
 }

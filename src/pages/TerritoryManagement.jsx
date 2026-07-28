@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Input, Select, message, Tag, Space, Card, Flex, Typography, Row, Col, Alert } from 'antd';
 import { PlusOutlined, EditOutlined, HolderOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
+import toast from 'react-hot-toast';
+import { FMButton } from '../components/ui/FMButton';
+import { FMInput } from '../components/ui/FMInput';
+import { FMSelect } from '../components/ui/FMSelect';
 import {
   DndContext,
   closestCenter,
@@ -17,8 +20,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-const { Text } = Typography;
 import { territories as initialTerritories, regions as initialRegions } from '../data/mockData';
 
 // Sortable Item Component
@@ -78,7 +79,7 @@ function TerritoryManagement() {
     setEditingTerritories([...territories]);
     setEditingRegions([...regions]);
     setEditMode(true);
-    message.info('수정 모드입니다. 여러 항목을 수정한 후 상단의 저장 버튼을 클릭하세요.');
+    toast('수정 모드입니다. 여러 항목을 수정한 후 상단의 저장 버튼을 클릭하세요.');
   };
 
   // 수정 모드 취소
@@ -95,7 +96,7 @@ function TerritoryManagement() {
         setEditingRegions([]);
         setOriginalTerritories([]);
         setOriginalRegions([]);
-        message.info('변경사항이 취소되었습니다.');
+        toast('변경사항이 취소되었습니다.');
       }
     } else {
       setEditMode(false);
@@ -111,11 +112,11 @@ function TerritoryManagement() {
     // 권역명 유효성 검사
     for (const territory of editingTerritories) {
       if (!territory.name || !territory.name.trim()) {
-        message.error('권역명을 입력해주세요.');
+        toast.error('권역명을 입력해주세요.');
         return;
       }
       if (!/^[가-힣()\/\s]+$/.test(territory.name)) {
-        message.error(`'${territory.name}': 한글, 괄호, 슬래시만 입력 가능합니다.`);
+        toast.error(`'${territory.name}': 한글, 괄호, 슬래시만 입력 가능합니다.`);
         return;
       }
     }
@@ -127,7 +128,7 @@ function TerritoryManagement() {
         idx !== i && t.name.trim() === territory.name.trim()
       );
       if (duplicate) {
-        message.error(`'${territory.name}' 권역명이 중복되었습니다.`);
+        toast.error(`'${territory.name}' 권역명이 중복되었습니다.`);
         return;
       }
     }
@@ -135,11 +136,11 @@ function TerritoryManagement() {
     // 지역명 유효성 검사
     for (const region of editingRegions) {
       if (!region.name || !region.name.trim()) {
-        message.error('지역명을 입력해주세요.');
+        toast.error('지역명을 입력해주세요.');
         return;
       }
       if (!/^[가-힣()\/\s]+$/.test(region.name)) {
-        message.error(`'${region.name}': 한글, 괄호, 슬래시만 입력 가능합니다.`);
+        toast.error(`'${region.name}': 한글, 괄호, 슬래시만 입력 가능합니다.`);
         return;
       }
     }
@@ -151,7 +152,7 @@ function TerritoryManagement() {
         idx !== i && r.name.trim() === region.name.trim()
       );
       if (duplicate) {
-        message.error(`'${region.name}' 지역명이 중복되었습니다.`);
+        toast.error(`'${region.name}' 지역명이 중복되었습니다.`);
         return;
       }
     }
@@ -164,7 +165,7 @@ function TerritoryManagement() {
         ).length;
 
         if (activeRegionCount > 0) {
-          message.error(`'${territory.name}' 권역에 속한 사용중인 지역이 ${activeRegionCount}개 있어 비활성화할 수 없습니다. 먼저 지역을 미사용으로 바꾸거나 다른 권역으로 이동해주세요.`);
+          toast.error(`'${territory.name}' 권역에 속한 사용중인 지역이 ${activeRegionCount}개 있어 비활성화할 수 없습니다. 먼저 지역을 미사용으로 바꾸거나 다른 권역으로 이동해주세요.`);
           return;
         }
       }
@@ -177,7 +178,7 @@ function TerritoryManagement() {
         // 실제로는 거래처 수를 확인해야 하지만, 여기서는 예시로 랜덤 값 사용
         const clientCount = Math.floor(Math.random() * 5);
         if (clientCount > 0) {
-          message.warning(`'${region.name}' 지역에 소속된 거래처가 ${clientCount}개 있습니다. 필요시 해당 거래처의 지역을 변경하세요.`);
+          toast(`'${region.name}' 지역에 소속된 거래처가 ${clientCount}개 있습니다. 필요시 해당 거래처의 지역을 변경하세요.`);
         }
       }
     }
@@ -199,7 +200,7 @@ function TerritoryManagement() {
     setEditingRegions([]);
     setOriginalTerritories([]);
     setOriginalRegions([]);
-    message.success('모든 변경사항이 저장되었습니다.');
+    toast.success('모든 변경사항이 저장되었습니다.');
   };
 
   // CSV 다운로드
@@ -257,9 +258,9 @@ function TerritoryManagement() {
       link.click();
       document.body.removeChild(link);
 
-      message.success('CSV 파일이 다운로드되었습니다.');
+      toast.success('CSV 파일이 다운로드되었습니다.');
     } catch (error) {
-      message.error('CSV 다운로드 중 오류가 발생했습니다.');
+      toast.error('CSV 다운로드 중 오류가 발생했습니다.');
       console.error(error);
     }
   };
@@ -336,7 +337,7 @@ function TerritoryManagement() {
   // 사업권역 추가 핸들러
   const handleAddTerritory = () => {
     if (isAddingTerritory) {
-      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      toast('먼저 진행 중인 작업을 완료해주세요.');
       return;
     }
     setNewTerritoryData({ name: '', status: 'active' });
@@ -353,18 +354,18 @@ function TerritoryManagement() {
   // 사업권역 저장 핸들러 (추가)
   const handleSaveTerritory = () => {
     if (!newTerritoryData.name) {
-      message.error('권역명을 입력해주세요.');
+      toast.error('권역명을 입력해주세요.');
       return;
     }
     if (!/^[가-힣()\/\s]+$/.test(newTerritoryData.name)) {
-      message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+      toast.error('한글, 괄호, 슬래시만 입력 가능합니다.');
       return;
     }
 
     // 권역명 중복 체크 (전체 시스템)
     const isDuplicate = territories.some(t => t.name === newTerritoryData.name.trim());
     if (isDuplicate) {
-      message.error(`'${newTerritoryData.name}' 권역명이 이미 존재합니다.`);
+      toast.error(`'${newTerritoryData.name}' 권역명이 이미 존재합니다.`);
       return;
     }
 
@@ -382,7 +383,7 @@ function TerritoryManagement() {
     setTerritories([...territories, newTerritory]);
     setIsAddingTerritory(false);
     setNewTerritoryData({ name: '', status: 'active' });
-    message.success(`사업권역 '${newTerritoryData.name}'이 등록되었습니다.`);
+    toast.success(`사업권역 '${newTerritoryData.name}'이 등록되었습니다.`);
   };
 
   // 사업권역 추가 취소 핸들러
@@ -394,7 +395,7 @@ function TerritoryManagement() {
   // 상세지역 추가 핸들러
   const handleAddRegion = () => {
     if (isAddingRegion) {
-      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      toast('먼저 진행 중인 작업을 완료해주세요.');
       return;
     }
     setNewRegionData({
@@ -415,22 +416,22 @@ function TerritoryManagement() {
   // 상세지역 저장 핸들러 (추가)
   const handleSaveRegion = () => {
     if (!newRegionData.territoryId) {
-      message.error('사업권역을 선택해주세요.');
+      toast.error('사업권역을 선택해주세요.');
       return;
     }
     if (!newRegionData.name) {
-      message.error('상세지역명을 입력해주세요.');
+      toast.error('상세지역명을 입력해주세요.');
       return;
     }
     if (!/^[가-힣()\/\s]+$/.test(newRegionData.name)) {
-      message.error('한글, 괄호, 슬래시만 입력 가능합니다.');
+      toast.error('한글, 괄호, 슬래시만 입력 가능합니다.');
       return;
     }
 
     // 지역명 중복 체크 (전체 시스템)
     const isDuplicate = regions.some(r => r.name === newRegionData.name.trim());
     if (isDuplicate) {
-      message.error(`'${newRegionData.name}' 지역명이 이미 존재합니다.`);
+      toast.error(`'${newRegionData.name}' 지역명이 이미 존재합니다.`);
       return;
     }
 
@@ -455,7 +456,7 @@ function TerritoryManagement() {
 
     setIsAddingRegion(false);
     setNewRegionData({ territoryId: '', name: '', status: 'active' });
-    message.success(`상세지역 '${newRegionData.name}'이 등록되었습니다.`);
+    toast.success(`상세지역 '${newRegionData.name}'이 등록되었습니다.`);
   };
 
   // 상세지역 추가 취소 핸들러
@@ -485,7 +486,7 @@ function TerritoryManagement() {
         setEditingTerritories(updatedTerritories);
       } else {
         setTerritories(updatedTerritories);
-        message.success('표시순서가 변경되었습니다.');
+        toast.success('표시순서가 변경되었습니다.');
       }
     }
   };
@@ -519,7 +520,7 @@ function TerritoryManagement() {
         setEditingRegions(updatedRegions);
       } else {
         setRegions(updatedRegions);
-        message.success('표시순서가 변경되었습니다.');
+        toast.success('표시순서가 변경되었습니다.');
       }
     }
   };
@@ -538,81 +539,100 @@ function TerritoryManagement() {
     : [];
 
   return (
-    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 className="text-2xl font-bold text-gray-900" style={{ margin: 0 }}>사업권역 관리</h2>
-          <Space>
+    <div className="min-h-screen p-6 bg-gray-50">
+      <div className="flex flex-col gap-6 w-full">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">사업권역 관리</h2>
+          <div className="flex flex-wrap gap-2">
             {editMode ? (
               <>
-                <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveAll}>
+                <FMButton
+                  variant="primary"
+                  icon={<SaveOutlined className="h-4 w-4" />}
+                  onClick={handleSaveAll}
+                >
                   저장
-                </Button>
-                <Button onClick={handleCancelEdit}>
+                </FMButton>
+                <FMButton
+                  variant="secondary"
+                  onClick={handleCancelEdit}
+                >
                   취소
-                </Button>
+                </FMButton>
               </>
             ) : (
               <>
-                <Button icon={<EditOutlined />} onClick={handleEnterEditMode}>
+                <FMButton
+                  variant="secondary"
+                  icon={<EditOutlined className="h-4 w-4" />}
+                  onClick={handleEnterEditMode}
+                >
                   수정 모드
-                </Button>
-                <Button icon={<DownloadOutlined />} onClick={handleDownloadCSV}>
+                </FMButton>
+                <FMButton
+                  variant="indigo"
+                  icon={<DownloadOutlined className="h-4 w-4" />}
+                  onClick={handleDownloadCSV}
+                >
                   CSV 다운로드
-                </Button>
+                </FMButton>
               </>
             )}
-          </Space>
+          </div>
         </div>
 
         {editMode && (
-          <Alert
-            message="수정 모드"
-            description="여러 항목을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다."
-            type="info"
-            showIcon
-            style={{ marginBottom: 16 }}
-          />
+          <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-4">
+            <div className="flex items-center">
+              <svg className="mr-4 h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                <path d="M12 16v-4" strokeWidth="2" strokeLinecap="round" />
+                <path d="M12 8h.01" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <div className="font-medium text-blue-700">
+                여러 항목을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다.
+              </div>
+            </div>
+          </div>
         )}
 
-        <Row gutter={16}>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* 왼쪽: 사업권역 목록 */}
-          <Col xs={24} lg={12}>
-            <Card
-              title={<span style={{ fontSize: 16, fontWeight: 600 }}>사업권역 ({sortedTerritories.length})</span>}
-              extra={
-                !editMode && !isAddingTerritory && (
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<PlusOutlined />}
+          <div>
+            <div className={`rounded-xl border border-gray-200 bg-white p-5 ${editMode ? 'bg-gray-50' : ''}`}>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-gray-900">사업권역 ({sortedTerritories.length})</h3>
+                {!editMode && !isAddingTerritory && (
+                  <FMButton
+                    variant="primary"
+                    icon={<PlusOutlined className="h-4 w-4" />}
                     onClick={handleAddTerritory}
                   >
                     권역 추가
-                  </Button>
-                )
-              }
-              style={editMode ? { backgroundColor: '#f9fafb' } : {}}
-            >
+                  </FMButton>
+                )}
+              </div>
 
               {!editMode && isAddingTerritory && (
-                <Card size="small" style={{ marginBottom: 12, backgroundColor: '#fafafa' }}>
-                  <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <div className="flex flex-col gap-3">
                     <div>
-                      <label>권역명 <span style={{ color: 'red' }}>*</span></label>
-                      <Input
+                      <label className="text-sm font-medium text-gray-700">
+                        권역명 <span className="text-red-500">*</span>
+                      </label>
+                      <FMInput
                         value={newTerritoryData.name}
-                        onChange={(e) => setNewTerritoryData({ ...newTerritoryData, name: e.target.value })}
+                        onChange={(value) => setNewTerritoryData({ ...newTerritoryData, name: value })}
                         placeholder="권역명 입력"
-                        maxLength={20}
+                        className="mt-1"
                       />
                     </div>
-                    <Flex justify="flex-end" gap="small">
-                      <Button size="small" onClick={handleCancelTerritory}>취소</Button>
-                      <Button size="small" type="primary" onClick={handleSaveTerritory}>저장</Button>
-                    </Flex>
-                  </Space>
-                </Card>
+                    <div className="flex justify-end gap-2">
+                      <FMButton variant="secondary" onClick={handleCancelTerritory}>취소</FMButton>
+                      <FMButton variant="primary" onClick={handleSaveTerritory}>저장</FMButton>
+                    </div>
+                  </div>
+                </div>
               )}
 
               <DndContext
@@ -624,122 +644,123 @@ function TerritoryManagement() {
                   items={sortedTerritories.map(t => t.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 600, overflow: 'auto' }}>
+                  <div className="flex flex-col gap-2 max-h-[600px] overflow-auto">
                     {sortedTerritories.map(t => (
                       <SortableItem key={t.id} id={t.id}>
                         {(attributes, listeners) => (
-                          <Card
-                            size="small"
+                          <div
                             onClick={() => !editMode && setSelectedTerritory(t)}
-                            style={{
-                              cursor: editMode ? 'default' : 'pointer',
-                              border: selectedTerritory?.id === t.id ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                              backgroundColor: selectedTerritory?.id === t.id ? '#e6f7ff' : '#fff',
-                              transition: 'all 0.3s'
-                            }}
+                            className={`rounded-lg border p-3 transition-all ${
+                              editMode ? 'cursor-default' : 'cursor-pointer'
+                            } ${
+                              selectedTerritory?.id === t.id
+                                ? 'border-2 border-blue-500 bg-blue-50'
+                                : 'border-gray-200 bg-white hover:bg-gray-50'
+                            }`}
                           >
-                            <Flex justify="space-between" align="center">
-                              <Flex align="center" gap="small" style={{ flex: 1 }}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex flex-1 items-center gap-2">
                                 <HolderOutlined
                                   {...attributes}
                                   {...listeners}
-                                  style={{ cursor: 'grab', fontSize: 16, color: '#999' }}
+                                  className="cursor-grab text-base text-gray-400"
                                 />
-                                <div style={{ flex: 1 }}>
+                                <div className="flex-1">
                                   {editMode ? (
-                                    <Space size="small" style={{ width: '100%' }}>
-                                      <Input
+                                    <div className="flex gap-2 items-center">
+                                      <FMInput
                                         value={t.name}
-                                        onChange={(e) => handleTerritoryFieldChange(t.id, 'name', e.target.value)}
+                                        onChange={(value) => handleTerritoryFieldChange(t.id, 'name', value)}
                                         placeholder="권역명"
-                                        maxLength={20}
-                                        style={{ flex: 1 }}
+                                        className="flex-1"
                                       />
-                                      <Select
+                                      <FMSelect
                                         value={t.status}
                                         onChange={(value) => handleTerritoryFieldChange(t.id, 'status', value)}
-                                        style={{ width: 80 }}
-                                      >
-                                        <Select.Option value="active">활성</Select.Option>
-                                        <Select.Option value="inactive">비활성</Select.Option>
-                                      </Select>
-                                    </Space>
+                                        options={[
+                                          { value: 'active', label: '활성' },
+                                          { value: 'inactive', label: '비활성' }
+                                        ]}
+                                        className="w-20"
+                                      />
+                                    </div>
                                   ) : (
-                                    <>
-                                      <Text style={{ fontWeight: 500 }}>{t.name}</Text>
-                                      <Tag color={t.status === 'active' ? 'green' : 'default'} style={{ marginLeft: 8 }}>
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-medium text-gray-900">{t.name}</span>
+                                      <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                        t.status === 'active'
+                                          ? 'bg-green-100 text-green-700'
+                                          : 'bg-gray-100 text-gray-700'
+                                      }`}>
                                         {t.status === 'active' ? '활성' : '비활성'}
-                                      </Tag>
-                                      <Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+                                      </span>
+                                      <span className="text-xs text-gray-500">
                                         {t.regionCount}개 지역
-                                      </Text>
-                                    </>
+                                      </span>
+                                    </div>
                                   )}
                                 </div>
-                              </Flex>
-                            </Flex>
-                          </Card>
+                              </div>
+                            </div>
+                          </div>
                         )}
                       </SortableItem>
                     ))}
-                  </Space>
+                  </div>
                 </SortableContext>
               </DndContext>
-            </Card>
-          </Col>
+            </div>
+          </div>
 
           {/* 우측: 상세지역 목록 */}
-          <Col xs={24} lg={12}>
-            <Card
-              title={
-                <span style={{ fontSize: 16, fontWeight: 600 }}>
+          <div>
+            <div className={`rounded-xl border border-gray-200 bg-white p-5 ${editMode ? 'bg-gray-50' : ''}`}>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-gray-900">
                   {selectedTerritory ? `${selectedTerritory.name} - 상세지역 (${selectedRegions.length})` : '상세지역'}
-                </span>
-              }
-              extra={
-                !editMode && selectedTerritory && !isAddingRegion && (
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<PlusOutlined />}
+                </h3>
+                {!editMode && selectedTerritory && !isAddingRegion && (
+                  <FMButton
+                    variant="primary"
+                    icon={<PlusOutlined className="h-4 w-4" />}
                     onClick={handleAddRegion}
                     disabled={selectedTerritory?.status === 'inactive'}
                   >
                     지역 추가
-                  </Button>
-                )
-              }
-              style={editMode ? { backgroundColor: '#f9fafb' } : {}}
-            >
+                  </FMButton>
+                )}
+              </div>
 
               {!selectedTerritory ? (
-                <div style={{ textAlign: 'center', padding: '80px 0', color: '#8c8c8c' }}>
-                  <Text>왼쪽에서 사업권역을 선택해주세요.</Text>
+                <div className="text-center py-20 text-gray-400">
+                  <span>왼쪽에서 사업권역을 선택해주세요.</span>
                 </div>
               ) : (
                 <>
                   {!editMode && isAddingRegion && (
-                    <Card size="small" style={{ marginBottom: 12, backgroundColor: '#fafafa' }}>
-                      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                      <div className="flex flex-col gap-3">
                         <div>
-                          <label>지역명 <span style={{ color: 'red' }}>*</span></label>
-                          <Input
+                          <label className="text-sm font-medium text-gray-700">
+                            지역명 <span className="text-red-500">*</span>
+                          </label>
+                          <FMInput
                             value={newRegionData.name}
-                            onChange={(e) => setNewRegionData({ ...newRegionData, name: e.target.value })}
+                            onChange={(value) => setNewRegionData({ ...newRegionData, name: value })}
                             placeholder="지역명 입력"
-                            maxLength={20}
+                            className="mt-1"
                           />
                         </div>
-                        <Flex justify="flex-end" gap="small">
-                          <Button size="small" onClick={handleCancelRegion}>취소</Button>
-                          <Button size="small" type="primary" onClick={handleSaveRegion}>저장</Button>
-                        </Flex>
-                      </Space>
-                    </Card>
+                        <div className="flex justify-end gap-2">
+                          <FMButton variant="secondary" onClick={handleCancelRegion}>취소</FMButton>
+                          <FMButton variant="primary" onClick={handleSaveRegion}>저장</FMButton>
+                        </div>
+                      </div>
+                    </div>
                   )}
 
                   {selectedRegions.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
+                    <div className="text-center py-10 text-gray-400">
                       등록된 지역이 없습니다.
                     </div>
                   ) : (
@@ -752,67 +773,68 @@ function TerritoryManagement() {
                         items={selectedRegions.map(r => r.id)}
                         strategy={verticalListSortingStrategy}
                       >
-                        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                        <div className="flex flex-col gap-2">
                           {selectedRegions.map(r => (
                             <SortableItem key={r.id} id={r.id}>
                               {(attributes, listeners) => (
-                                <Card
-                                  size="small"
-                                  style={{
-                                    backgroundColor: r.status === 'active' ? '#fff' : '#fafafa'
-                                  }}
-                                >
-                                  <Flex justify="space-between" align="center">
-                                    <Flex align="center" gap="small" style={{ flex: 1 }}>
+                                <div className={`rounded-lg border border-gray-200 p-3 ${
+                                  r.status === 'active' ? 'bg-white' : 'bg-gray-50'
+                                }`}>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex flex-1 items-center gap-2">
                                       <HolderOutlined
                                         {...attributes}
                                         {...listeners}
-                                        style={{ cursor: 'grab', fontSize: 16, color: '#999' }}
+                                        className="cursor-grab text-base text-gray-400"
                                       />
-                                      <div style={{ flex: 1 }}>
+                                      <div className="flex-1">
                                         {editMode ? (
-                                          <Space size="small" style={{ width: '100%' }}>
-                                            <Input
+                                          <div className="flex gap-2 items-center">
+                                            <FMInput
                                               value={r.name}
-                                              onChange={(e) => handleRegionFieldChange(r.id, 'name', e.target.value)}
+                                              onChange={(value) => handleRegionFieldChange(r.id, 'name', value)}
                                               placeholder="지역명"
-                                              maxLength={20}
-                                              style={{ flex: 1 }}
+                                              className="flex-1"
                                             />
-                                            <Select
+                                            <FMSelect
                                               value={r.status}
                                               onChange={(value) => handleRegionFieldChange(r.id, 'status', value)}
-                                              style={{ width: 80 }}
-                                            >
-                                              <Select.Option value="active">활성</Select.Option>
-                                              <Select.Option value="inactive">비활성</Select.Option>
-                                            </Select>
-                                          </Space>
+                                              options={[
+                                                { value: 'active', label: '활성' },
+                                                { value: 'inactive', label: '비활성' }
+                                              ]}
+                                              className="w-20"
+                                            />
+                                          </div>
                                         ) : (
-                                          <>
-                                            <Text style={{ fontWeight: 500 }}>{r.name}</Text>
-                                            <Tag color={r.status === 'active' ? 'green' : 'default'} style={{ marginLeft: 8 }}>
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-medium text-gray-900">{r.name}</span>
+                                            <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                              r.status === 'active'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-gray-100 text-gray-700'
+                                            }`}>
                                               {r.status === 'active' ? '활성' : '비활성'}
-                                            </Tag>
-                                          </>
+                                            </span>
+                                          </div>
                                         )}
                                       </div>
-                                    </Flex>
-                                  </Flex>
-                                </Card>
+                                    </div>
+                                  </div>
+                                </div>
                               )}
                             </SortableItem>
                           ))}
-                        </Space>
+                        </div>
                       </SortableContext>
                     </DndContext>
                   )}
                 </>
               )}
-            </Card>
-          </Col>
-        </Row>
-      </Space>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

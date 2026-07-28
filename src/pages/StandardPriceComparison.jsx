@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, DatePicker, Checkbox, Select, Space, Row, Col, message } from 'antd';
 import { Line } from '@ant-design/charts';
 import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-
-const { RangePicker } = DatePicker;
-const { Option } = Select;
+import { FMSelect } from '../components/ui/FMSelect';
+import { FMMultiSelect } from '../components/ui/FMMultiSelect';
+import { FMButton } from '../components/ui/FMButton';
 
 function StandardPriceComparison({ activeTab }) {
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
@@ -40,13 +40,11 @@ function StandardPriceComparison({ activeTab }) {
   // 초기 로드 시 넙치의 규격과 원산지 자동 설정
   useEffect(() => {
     if (selectedProduct === 2) {
-      // 넙치의 규격
       const productSpecs = specifications.filter(s =>
         s.productId === 2 && s.status === 'active'
       );
       setAvailableSpecs(productSpecs);
 
-      // 넙치의 원산지
       const productOrigins = origins.filter(o =>
         o.productId === 2 && o.status === 'active'
       );
@@ -58,7 +56,6 @@ function StandardPriceComparison({ activeTab }) {
   // 탭 활성화 시 차트 리사이즈
   useEffect(() => {
     if (activeTab === '2') {
-      // 탭 전환 애니메이션이 완료될 때까지 대기
       const timer = setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
       }, 100);
@@ -85,26 +82,22 @@ function StandardPriceComparison({ activeTab }) {
   const onProductChange = (value) => {
     setSelectedProduct(value);
 
-    // 해당 품목의 규격 필터링
     const productSpecs = specifications.filter(s =>
       s.productId === value && s.status === 'active'
     );
     setAvailableSpecs(productSpecs);
 
-    // 해당 품목의 원산지 필터링
     const productOrigins = origins.filter(o =>
       o.productId === value && o.status === 'active'
     );
     setAvailableOrigins(productOrigins);
 
-    // 자동으로 첫 번째 규격 선택
     if (productSpecs.length > 0) {
       setSelectedSpecs([productSpecs[0].name]);
     } else {
       setSelectedSpecs([]);
     }
 
-    // 자동으로 모든 원산지 선택
     setSelectedOrigins(productOrigins.map(o => o.name));
   };
 
@@ -132,42 +125,45 @@ function StandardPriceComparison({ activeTab }) {
     setDateRange([startDate, endDate]);
   };
 
-  const handleOriginChange = (checkedValues) => {
-    setSelectedOrigins(checkedValues);
+  const handleOriginToggle = (originName) => {
+    setSelectedOrigins(prev =>
+      prev.includes(originName)
+        ? prev.filter(o => o !== originName)
+        : [...prev, originName]
+    );
   };
 
   const handleQuery = () => {
     if (!selectedCategory) {
-      message.error('품목분류를 선택해주세요.');
+      toast.error('품목분류를 선택해주세요.');
       return;
     }
 
     if (!selectedProduct) {
-      message.error('품목을 선택해주세요.');
+      toast.error('품목을 선택해주세요.');
       return;
     }
 
     if (selectedSpecs.length === 0) {
-      message.error('규격을 선택해주세요.');
+      toast.error('규격을 선택해주세요.');
       return;
     }
 
     if (selectedOrigins.length === 0) {
-      message.error('원산지를 선택해주세요.');
+      toast.error('원산지를 선택해주세요.');
       return;
     }
 
     if (!dateRange || dateRange.length !== 2) {
-      message.error('기간을 선택해주세요.');
+      toast.error('기간을 선택해주세요.');
       return;
     }
 
     if (dateRange[0].isAfter(dateRange[1])) {
-      message.error('시작일은 종료일보다 이전이어야 합니다.');
+      toast.error('시작일은 종료일보다 이전이어야 합니다.');
       return;
     }
 
-    // 실제 데이터에서 필터링 - 규격과 원산지 조합
     const filteredData = allPriceData
       .filter(item =>
         item.productId === selectedProduct &&
@@ -178,18 +174,18 @@ function StandardPriceComparison({ activeTab }) {
       )
       .map(item => ({
         date: item.applyDate,
-        series: `${item.spec} - ${item.originName}`, // 규격-원산지 조합
+        series: `${item.spec} - ${item.originName}`,
         price: item.price,
       }));
 
     if (filteredData.length === 0) {
-      message.warning('조회된 데이터가 없습니다. 다른 기간이나 원산지를 선택해주세요.');
+      toast('조회된 데이터가 없습니다. 다른 기간이나 원산지를 선택해주세요.');
       setChartData([]);
       return;
     }
 
     setChartData(filteredData);
-    message.success(`차트가 생성되었습니다. (${filteredData.length}건)`);
+    toast.success(`차트가 생성되었습니다. (${filteredData.length}건)`);
   };
 
   const config = {
@@ -237,105 +233,138 @@ function StandardPriceComparison({ activeTab }) {
   };
 
   return (
-    <div style={{ width: '100%' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+    <div className="w-full">
+      <div className="flex flex-col gap-6 w-full">
         {/* 조회 필터 */}
-        <Card title="🔍 조회 필터" style={{ width: '100%' }}>
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            {/* 첫 번째 줄: 품목분류, 품목, 규격, 기간 */}
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <Select
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
+          <div className="flex flex-col gap-4">
+            {/* 첫 번째 줄 */}
+            <div className="flex gap-3 items-center">
+              {/* FMSelect - 품목분류 */}
+              <FMSelect
                 value={selectedCategory}
-                onChange={onCategoryChange}
+                onChange={(value) => onCategoryChange(parseInt(value))}
+                options={[
+                  { value: '', label: '품목분류' },
+                  ...productCategories.map(cat => ({ value: cat.id, label: cat.name }))
+                ]}
                 placeholder="품목분류"
-                style={{ flex: 1 }}
-              >
-                {productCategories.map(category => (
-                  <Option key={category.id} value={category.id}>
-                    {category.name}
-                  </Option>
-                ))}
-              </Select>
-
-              <Select
-                value={selectedProduct}
-                onChange={onProductChange}
-                placeholder="품목"
-                disabled={!selectedCategory}
-                style={{ flex: 1 }}
-              >
-                {selectedCategory && products
-                  .filter(p => p.categoryId === selectedCategory)
-                  .map(product => (
-                    <Option key={product.id} value={product.id}>
-                      {product.name}
-                    </Option>
-                  ))}
-              </Select>
-
-              <Select
-                mode="multiple"
-                value={selectedSpecs}
-                onChange={setSelectedSpecs}
-                placeholder="규격"
-                disabled={!selectedProduct}
-                style={{ flex: 1 }}
-              >
-                {availableSpecs.map(spec => (
-                  <Option key={spec.id} value={spec.name}>
-                    {spec.name}
-                  </Option>
-                ))}
-              </Select>
-
-              <RangePicker
-                value={dateRange}
-                onChange={setDateRange}
-                placeholder={['시작일', '종료일']}
-                style={{ flex: 2 }}
+                className="flex-1"
               />
 
-              <Button size="small" onClick={() => handlePeriodClick('3months')}>최근 3개월</Button>
-              <Button size="small" onClick={() => handlePeriodClick('6months')}>최근 6개월</Button>
-              <Button size="small" onClick={() => handlePeriodClick('1year')}>최근 1년</Button>
+              {/* FMSelect - 품목 */}
+              <FMSelect
+                value={selectedProduct || ''}
+                onChange={(value) => onProductChange(parseInt(value))}
+                options={[
+                  { value: '', label: '품목' },
+                  ...(selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : [])
+                ]}
+                placeholder="품목"
+                className="flex-1"
+              />
 
-              <Button type="primary" onClick={handleQuery} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              {/* FMMultiSelect - 규격 (다중 선택) */}
+              <FMMultiSelect
+                values={selectedSpecs}
+                onChange={setSelectedSpecs}
+                options={availableSpecs.map(spec => ({ value: spec.name, label: spec.name }))}
+                placeholder="규격 검색 & 선택"
+                className="flex-1"
+              />
+
+              {/* 직관적인 기간 선택 UI */}
+              <div className="flex-[2] flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
+                <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
+                <input
+                  type="date"
+                  value={dateRange[0]?.format('YYYY-MM-DD')}
+                  onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
+                  className="flex-1 text-sm outline-none"
+                />
+                <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                <span className="text-xs text-gray-600 whitespace-nowrap">종료일:</span>
+                <input
+                  type="date"
+                  value={dateRange[1]?.format('YYYY-MM-DD')}
+                  onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
+                  className="flex-1 text-sm outline-none"
+                />
+              </div>
+
+              <FMButton
+                onClick={() => handlePeriodClick('3months')}
+                variant="secondary"
+                className="whitespace-nowrap"
+              >
+                최근 3개월
+              </FMButton>
+              <FMButton
+                onClick={() => handlePeriodClick('6months')}
+                variant="secondary"
+                className="whitespace-nowrap"
+              >
+                최근 6개월
+              </FMButton>
+              <FMButton
+                onClick={() => handlePeriodClick('1year')}
+                variant="secondary"
+                className="whitespace-nowrap"
+              >
+                최근 1년
+              </FMButton>
+
+              <FMButton
+                onClick={handleQuery}
+                variant="primary"
+                className="whitespace-nowrap"
+              >
                 조회
-              </Button>
+              </FMButton>
             </div>
 
             {/* 두 번째 줄: 원산지 */}
             <div>
-              <div style={{ marginBottom: 8, fontWeight: 500 }}>원산지</div>
-              <Checkbox.Group
-                options={availableOrigins.map(o => ({ label: o.name, value: o.name }))}
-                value={selectedOrigins}
-                onChange={handleOriginChange}
-                disabled={!selectedProduct}
-              />
+              <div className="mb-2 text-sm font-medium text-gray-700">원산지</div>
+              <div className="flex flex-wrap gap-2">
+                {availableOrigins.map(o => (
+                  <label key={o.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedOrigins.includes(o.name)}
+                      onChange={() => handleOriginToggle(o.name)}
+                      disabled={!selectedProduct}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                    <span className="text-sm text-gray-700">{o.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </Space>
-        </Card>
+          </div>
+        </div>
 
         {/* 차트 영역 */}
         {chartData.length > 0 && (
-          <Card
-            title={`${products.find(p => p.id === selectedProduct)?.name || ''} - 규격별·원산지별 가격 추이`}
-            size="small"
-            style={{ width: '100%' }}
-          >
-            <div style={{ width: '100%', height: 400 }}>
+          <div className="rounded-xl border border-gray-200 bg-white p-5">
+            <h3 className="mb-4 text-base font-semibold text-gray-900">
+              {products.find(p => p.id === selectedProduct)?.name || ''} - 규격별·원산지별 가격 추이
+            </h3>
+            <div className="w-full" style={{ height: 400 }}>
               <Line {...config} />
             </div>
-          </Card>
+          </div>
         )}
 
         {chartData.length === 0 && (
-          <Card size="small" style={{ width: '100%' }}>
-            <div style={{ padding: '80px 20px', textAlign: 'center', color: '#999' }}>
+          <div className="rounded-xl border border-gray-200 bg-white p-20 text-center">
+            <div className="text-gray-400">
               조회 버튼을 클릭하여 차트를 생성해주세요.
             </div>
-          </Card>
+          </div>
         )}
       </div>
     </div>

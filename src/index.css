@@ -1,3 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   background-color: #f9fafb;
+}
+
+/* Select 드롭다운을 아래로 펼치기 */
+select {
+  vertical-align: top;
+}
+
+/* Date input placeholder 스타일 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
 }

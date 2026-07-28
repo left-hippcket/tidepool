@@ -10,6 +10,7 @@ import {
   BookOutlined,
 } from '@ant-design/icons';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import TerritoryManagement from './pages/TerritoryManagement';
 import SellerManagement from './pages/SellerManagement';
 import SellerDetail from './pages/SellerDetail';
@@ -343,6 +344,7 @@ function App() {
           </Routes>
         </Content>
       </Layout>
+      <Toaster position="top-right" />
     </Layout>
   );
 }

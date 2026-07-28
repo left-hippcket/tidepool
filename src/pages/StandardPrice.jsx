@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tabs, Space, InputNumber, Alert, Card, Row, Col, Checkbox } from 'antd';
-
-const { RangePicker } = DatePicker;
-import { PlusOutlined, EditOutlined, MinusCircleOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 import StandardPriceComparison from './StandardPriceComparison';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-
-const { Option } = Select;
+import { FMSelect } from '../components/ui/FMSelect';
+import { FMInput } from '../components/ui/FMInput';
+import { FMButton } from '../components/ui/FMButton';
 
 function StandardPrice() {
   const navigate = useNavigate();
@@ -33,7 +32,6 @@ function StandardPrice() {
   }, []);
 
   const loadInitialData = async () => {
-    // CSV 파일에서 변환한 실제 표준가격 데이터 로드
     try {
       const response = await fetch('/data/standard-price-data.json');
       if (!response.ok) {
@@ -46,7 +44,6 @@ function StandardPrice() {
       console.error('표준가격 데이터 로드 실패:', error);
       // 로드 실패 시 샘플 데이터 사용
       const sampleData = [
-        // 누운고기 - 넙치
         {
           key: '1',
           id: '1',
@@ -77,136 +74,12 @@ function StandardPrice() {
           price: 18000,
           source: '피시파더',
         },
-        // 누운고기 - 우럭
-        {
-          key: '3',
-          id: '3',
-          applyDate: '2026-07-21',
-          categoryId: 1,
-          categoryName: '누운고기',
-          productId: 3,
-          productName: '우럭',
-          originId: 8,
-          originName: '완도',
-          specId: null,
-          spec: '800g',
-          price: 12000,
-          source: '피시파더',
-        },
-        {
-          key: '4',
-          id: '4',
-          applyDate: '2026-07-21',
-          categoryId: 1,
-          categoryName: '누운고기',
-          productId: 3,
-          productName: '우럭',
-          originId: 8,
-          originName: '통영',
-          specId: null,
-          spec: '800g',
-          price: 12500,
-          source: '피시파더',
-        },
-        // 갑각류 - 대하
-        {
-          key: '5',
-          id: '5',
-          applyDate: '2026-07-21',
-          categoryId: 3,
-          categoryName: '갑각류',
-          productId: 9,
-          productName: '대하',
-          originId: null,
-          originName: '서해',
-          specId: null,
-          spec: '500g',
-          price: 25000,
-          source: '피시파더',
-        },
-        {
-          key: '6',
-          id: '6',
-          applyDate: '2026-07-21',
-          categoryId: 3,
-          categoryName: '갑각류',
-          productId: 9,
-          productName: '대하',
-          originId: null,
-          originName: '남해',
-          specId: null,
-          spec: '500g',
-          price: 24000,
-          source: '피시파더',
-        },
-        // 이전 날짜 데이터
-        {
-          key: '7',
-          id: '7',
-          applyDate: '2026-07-20',
-          categoryId: 1,
-          categoryName: '누운고기',
-          productId: 2,
-          productName: '넙치',
-          originId: 7,
-          originName: '통영',
-          specId: 7,
-          spec: '1.2kg',
-          price: 16000,
-          source: '노량진시장',
-        },
-        {
-          key: '8',
-          id: '8',
-          applyDate: '2026-07-20',
-          categoryId: 1,
-          categoryName: '누운고기',
-          productId: 4,
-          productName: '강도다리',
-          originId: null,
-          originName: '완도',
-          specId: null,
-          spec: '1.0kg',
-          price: 14000,
-          source: '노량진시장',
-        },
-        // 다른 날짜
-        {
-          key: '9',
-          id: '9',
-          applyDate: '2026-07-19',
-          categoryId: 1,
-          categoryName: '누운고기',
-          productId: 2,
-          productName: '넙치',
-          originId: 7,
-          originName: '여수',
-          specId: 7,
-          spec: '1.2kg',
-          price: 15500,
-          source: '피시파더',
-        },
-        {
-          key: '10',
-          id: '10',
-          applyDate: '2026-07-19',
-          categoryId: 1,
-          categoryName: '누운고기',
-          productId: 2,
-          productName: '넙치',
-          originId: 7,
-          originName: '고흥',
-          specId: 8,
-          spec: '1.5kg',
-          price: 17500,
-          source: '노량진시장',
-        },
       ];
       setDataSource(sampleData);
     }
   };
 
-  // 필터 옵션 계산 (useMemo로 최적화)
+  // 필터 옵션 계산
   const categoryFilters = React.useMemo(() => {
     const categories = [...new Set(dataSource.map(item => item.categoryName))].filter(Boolean);
     return categories.map(name => ({ text: name, value: name }));
@@ -235,9 +108,8 @@ function StandardPrice() {
     return [...new Set(filtered.map(d => d.originName))];
   }, [dataSource, selectedCategory, selectedProduct]);
 
-  // 최신 가격 추출 함수 - 품목-원산지별 가장 최신 날짜의 모든 데이터
+  // 최신 가격 추출 함수
   const getLatestPrices = (data) => {
-    // 1. 품목-원산지별로 가장 최신 날짜 찾기
     const latestDates = {};
     data.forEach(item => {
       const key = `${item.productName}-${item.originName}`;
@@ -246,20 +118,18 @@ function StandardPrice() {
       }
     });
 
-    // 2. 가장 최신 날짜의 데이터만 필터링
     return data.filter(item => {
       const key = `${item.productName}-${item.originName}`;
       return item.applyDate === latestDates[key];
     });
   };
 
-  // 규격을 숫자로 변환하는 함수 (정렬용)
+  // 규격을 숫자로 변환
   const parseSpec = (spec) => {
     if (!spec) return 0;
     const match = spec.match(/[\d.]+/);
     if (!match) return 0;
     const value = parseFloat(match[0]);
-    // kg 단위면 g로 변환
     if (spec.includes('kg')) return value * 1000;
     return value;
   };
@@ -286,30 +156,20 @@ function StandardPrice() {
 
     const result = showLatestOnly ? getLatestPrices(filtered) : filtered;
 
-    // 정렬: 적용일자 내림차순 → 품목분류 오름차순 → 품목 오름차순 → 원산지 오름차순 → 규격 오름차순
     return result.sort((a, b) => {
-      // 1. 적용일자 내림차순
       const dateCompare = b.applyDate.localeCompare(a.applyDate);
       if (dateCompare !== 0) return dateCompare;
-
-      // 2. 품목분류 오름차순
       const categoryCompare = (a.categoryName || '').localeCompare(b.categoryName || '');
       if (categoryCompare !== 0) return categoryCompare;
-
-      // 3. 품목 오름차순
       const productCompare = (a.productName || '').localeCompare(b.productName || '');
       if (productCompare !== 0) return productCompare;
-
-      // 4. 원산지 오름차순
       const originCompare = (a.originName || '').localeCompare(b.originName || '');
       if (originCompare !== 0) return originCompare;
-
-      // 5. 규격 오름차순 (숫자 변환)
       return parseSpec(a.spec) - parseSpec(b.spec);
     });
   }, [dataSource, selectedCategory, selectedProduct, selectedOrigin, dateRange, showLatestOnly]);
 
-  // CSV 다운로드 함수
+  // CSV 다운로드
   const handleCSVDownload = () => {
     setDownloading(true);
     try {
@@ -330,7 +190,6 @@ function StandardPrice() {
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
 
-      // 파일명 생성: 품목_원산지_날짜.csv
       const today = new Date().toISOString().split('T')[0];
       const productPart = selectedProduct || '전체';
       const originPart = selectedOrigin || '전체';
@@ -340,7 +199,7 @@ function StandardPrice() {
       link.click();
       URL.revokeObjectURL(url);
 
-      message.success(`CSV 다운로드 완료 (${displayData.length}건)`);
+      toast.success(`CSV 다운로드 완료 (${displayData.length}건)`);
     } finally {
       setDownloading(false);
     }
@@ -355,108 +214,6 @@ function StandardPrice() {
     setEditingDataSource(newData);
   };
 
-  const columns = [
-    {
-      title: '적용일자',
-      dataIndex: 'applyDate',
-      key: 'applyDate',
-      width: 140,
-      render: (text, record, index) => {
-        if (editMode) {
-          return (
-            <DatePicker
-              value={dayjs(text)}
-              onChange={(date) => handleFieldChange(index, 'applyDate', date ? date.format('YYYY-MM-DD') : text)}
-              style={{ width: '100%' }}
-            />
-          );
-        }
-        return text;
-      },
-    },
-    {
-      title: '품목분류',
-      dataIndex: 'categoryName',
-      key: 'categoryName',
-      width: 100,
-    },
-    {
-      title: '품목',
-      dataIndex: 'productName',
-      key: 'productName',
-      width: 100,
-    },
-    {
-      title: '원산지',
-      dataIndex: 'originName',
-      key: 'originName',
-      width: 100,
-    },
-    {
-      title: '규격',
-      dataIndex: 'spec',
-      key: 'spec',
-      width: 140,
-      render: (text, record, index) => {
-        if (editMode) {
-          return (
-            <Select
-              value={text}
-              onChange={(value) => handleFieldChange(index, 'spec', value)}
-              style={{ width: '100%' }}
-            >
-              {specifications
-                .filter(s => s.productId === record.productId && s.status === 'active')
-                .map(s => (
-                  <Option key={s.id} value={s.name}>{s.name}</Option>
-                ))
-              }
-            </Select>
-          );
-        }
-        return text;
-      },
-    },
-    {
-      title: '표준가격',
-      dataIndex: 'price',
-      key: 'price',
-      width: 160,
-      render: (text, record, index) => {
-        if (editMode) {
-          return (
-            <InputNumber
-              value={text}
-              onChange={(value) => handleFieldChange(index, 'price', value)}
-              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              addonAfter="원"
-              style={{ width: '100%' }}
-            />
-          );
-        }
-        return `${text.toLocaleString()}원`;
-      },
-    },
-    {
-      title: '가격출처',
-      dataIndex: 'source',
-      key: 'source',
-      width: 140,
-      render: (text, record, index) => {
-        if (editMode) {
-          return (
-            <Input
-              value={text}
-              onChange={(e) => handleFieldChange(index, 'source', e.target.value)}
-              style={{ width: '100%' }}
-            />
-          );
-        }
-        return text;
-      },
-    },
-  ];
-
   const handleRegister = () => {
     navigate('/standard-price/register');
   };
@@ -465,11 +222,10 @@ function StandardPrice() {
     setOriginalDataSource([...displayData]);
     setEditingDataSource([...displayData]);
     setEditMode(true);
-    message.info('수정 모드입니다. 여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요.');
+    toast('수정 모드입니다. 여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요.');
   };
 
   const handleSaveAll = () => {
-    // 편집된 데이터를 원본 dataSource에 병합
     const updatedDataSource = dataSource.map(item => {
       const editedItem = editingDataSource.find(e => e.key === item.key || e.id === item.id);
       return editedItem || item;
@@ -479,22 +235,18 @@ function StandardPrice() {
     setEditMode(false);
     setEditingDataSource([]);
     setOriginalDataSource([]);
-    message.success('모든 변경사항이 저장되었습니다.');
+    toast.success('모든 변경사항이 저장되었습니다.');
   };
 
   const handleCancelEdit = () => {
     const hasChanges = JSON.stringify(editingDataSource) !== JSON.stringify(originalDataSource);
     if (hasChanges) {
-      Modal.confirm({
-        title: '변경사항을 취소하시겠습니까?',
-        content: '저장하지 않은 변경사항은 모두 사라집니다.',
-        onOk() {
-          setEditMode(false);
-          setEditingDataSource([]);
-          setOriginalDataSource([]);
-          message.info('변경사항이 취소되었습니다.');
-        },
-      });
+      if (window.confirm('변경사항을 취소하시겠습니까?\n저장하지 않은 변경사항은 모두 사라집니다.')) {
+        setEditMode(false);
+        setEditingDataSource([]);
+        setOriginalDataSource([]);
+        toast('변경사항이 취소되었습니다.');
+      }
     } else {
       setEditMode(false);
       setEditingDataSource([]);
@@ -502,151 +254,293 @@ function StandardPrice() {
     }
   };
 
-
   return (
     <div>
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 className="text-2xl font-bold text-gray-900" style={{ margin: 0 }}>표준가격 관리</h2>
-        <Space>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">표준가격 관리</h2>
+        <div className="flex flex-wrap gap-2">
           {editMode ? (
             <>
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
+              <FMButton
                 onClick={handleSaveAll}
+                variant="primary"
+                icon={<SaveOutlined className="h-4 w-4" />}
               >
                 저장
-              </Button>
-              <Button
+              </FMButton>
+              <FMButton
                 onClick={handleCancelEdit}
+                variant="secondary"
               >
                 취소
-              </Button>
+              </FMButton>
             </>
           ) : (
             <>
-              <Button
-                icon={<EditOutlined />}
+              <FMButton
                 onClick={handleEnterEditMode}
+                variant="secondary"
+                icon={<EditOutlined className="h-4 w-4" />}
               >
                 수정 모드
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
+              </FMButton>
+              <FMButton
                 onClick={handleRegister}
+                variant="primary"
+                icon={<PlusOutlined className="h-4 w-4" />}
               >
                 표준가격 등록
-              </Button>
+              </FMButton>
             </>
           )}
-        </Space>
+        </div>
       </div>
 
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
-        <Tabs.TabPane tab="표준가격 조회/등록" key="1">
+      {/* 탭 */}
+      <div className="mb-6 border-b border-gray-200">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab('1')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === '1'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            표준가격 조회/등록
+          </button>
+          <button
+            onClick={() => setActiveTab('2')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === '2'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            표준가격 추세 비교
+          </button>
+        </div>
+      </div>
+
+      {activeTab === '1' && (
+        <>
           {editMode && (
-            <Alert
-              message="수정 모드"
-              description="여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다."
-              type="info"
-              showIcon
-              style={{ marginBottom: 16 }}
-            />
+            <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-4">
+              <div className="flex items-center">
+                <svg className="mr-4 h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                  <path d="M12 16v-4" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M12 8h.01" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <div className="font-medium text-blue-700">
+                  여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다.
+                </div>
+              </div>
+            </div>
           )}
 
           {!editMode && (
-            <Card title="🔍 조회 필터" style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <Select
+            <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
+              <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
+              <div className="flex gap-3 items-center">
+                {/* FMSelect - 품목분류 */}
+                <FMSelect
                   value={selectedCategory}
                   onChange={(value) => {
                     setSelectedCategory(value);
                     setSelectedProduct(null);
                     setSelectedOrigin(null);
                   }}
+                  options={[
+                    { value: '', label: '품목분류' },
+                    ...categoryFilters.map(c => ({ value: c.value, label: c.text }))
+                  ]}
                   placeholder="품목분류"
-                  allowClear
-                  style={{ flex: 1 }}
-                >
-                  {categoryFilters.map(c => (
-                    <Option key={c.value} value={c.value}>{c.text}</Option>
-                  ))}
-                </Select>
+                  className="flex-1"
+                />
 
-                <Select
+                {/* FMSelect - 품목 */}
+                <FMSelect
                   value={selectedProduct}
                   onChange={(value) => {
                     setSelectedProduct(value);
                     setSelectedOrigin(null);
                   }}
+                  options={[
+                    { value: '', label: '품목' },
+                    ...availableProducts.map(p => ({ value: p, label: p }))
+                  ]}
                   placeholder="품목"
-                  allowClear
-                  style={{ flex: 1 }}
-                >
-                  {availableProducts.map(p => (
-                    <Option key={p} value={p}>{p}</Option>
-                  ))}
-                </Select>
-
-                <Select
-                  value={selectedOrigin}
-                  onChange={setSelectedOrigin}
-                  placeholder="원산지"
-                  allowClear
-                  style={{ flex: 1 }}
-                >
-                  {availableOrigins.map(o => (
-                    <Option key={o} value={o}>{o}</Option>
-                  ))}
-                </Select>
-
-                <RangePicker
-                  value={dateRange}
-                  onChange={setDateRange}
-                  placeholder={['시작일', '종료일']}
-                  style={{ flex: 2 }}
+                  className="flex-1"
                 />
 
-                <Checkbox
-                  checked={showLatestOnly}
-                  onChange={(e) => setShowLatestOnly(e.target.checked)}
-                  style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-                >
-                  품목별 최신 가격만
-                </Checkbox>
+                {/* FMSelect - 원산지 */}
+                <FMSelect
+                  value={selectedOrigin}
+                  onChange={(value) => setSelectedOrigin(value)}
+                  options={[
+                    { value: '', label: '원산지' },
+                    ...availableOrigins.map(o => ({ value: o, label: o }))
+                  ]}
+                  placeholder="원산지"
+                  className="flex-1"
+                />
 
-                <Button
-                  type="primary"
-                  icon={<DownloadOutlined />}
+                {/* 직관적인 기간 선택 UI - 한 줄로 */}
+                <div className="flex-[2] flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
+                  <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
+                  <input
+                    type="date"
+                    value={dateRange[0]?.format('YYYY-MM-DD')}
+                    onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
+                    className="flex-1 text-sm outline-none"
+                  />
+                  <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                  <span className="text-xs text-gray-600 whitespace-nowrap">종료일:</span>
+                  <input
+                    type="date"
+                    value={dateRange[1]?.format('YYYY-MM-DD')}
+                    onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
+                    className="flex-1 text-sm outline-none"
+                  />
+                </div>
+
+                <label className="flex items-center gap-2 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    checked={showLatestOnly}
+                    onChange={(e) => setShowLatestOnly(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">품목별 최신 가격만</span>
+                </label>
+
+                <FMButton
                   onClick={handleCSVDownload}
-                  loading={downloading}
-                  style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                  disabled={downloading}
+                  variant="indigo"
+                  icon={<DownloadOutlined className="h-4 w-4" />}
+                  className="whitespace-nowrap"
                 >
                   CSV 다운로드 ({displayData.length}건)
-                </Button>
+                </FMButton>
               </div>
-            </Card>
+            </div>
           )}
 
-          <Table
-            columns={columns}
-            dataSource={editMode ? editingDataSource : displayData}
-            pagination={{
-              pageSize: pageSize,
-              pageSizeOptions: ['10', '20', '50', '100'],
-              showSizeChanger: true,
-              showTotal: (total) => `총 ${total}건`,
-              onShowSizeChange: (current, size) => setPageSize(size)
-            }}
-            scroll={{ x: 1000 }}
-            style={editMode ? { backgroundColor: '#f9fafb' } : {}}
-          />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="표준가격 추세 비교" key="2">
-          <StandardPriceComparison activeTab={activeTab} />
-        </Tabs.TabPane>
-      </Tabs>
+          {/* 테이블 */}
+          <div className="w-full overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-50">
+                <tr className="border-b border-gray-200">
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>적용일자</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 100 }}>품목분류</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 100 }}>품목</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 100 }}>원산지</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>규격</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 160 }}>표준가격</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>가격출처</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(editMode ? editingDataSource : displayData).slice(0, pageSize).map((row, index) => (
+                  <tr key={row.id || row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {editMode ? (
+                        <input
+                          type="date"
+                          value={row.applyDate}
+                          onChange={(e) => handleFieldChange(index, 'applyDate', e.target.value)}
+                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                        />
+                      ) : (
+                        row.applyDate
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.categoryName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.productName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.originName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {editMode ? (
+                        <div className="w-full min-w-[120px]">
+                          <FMSelect
+                            value={row.spec}
+                            onChange={(value) => handleFieldChange(index, 'spec', value)}
+                            options={(() => {
+                              const specs = specifications
+                                .filter(s => s.productId === row.productId && s.status === 'active')
+                                .map(s => ({ value: s.name, label: s.name }));
+
+                              // 현재 선택된 값이 options에 없으면 추가
+                              if (row.spec && !specs.find(s => s.value === row.spec)) {
+                                specs.unshift({ value: row.spec, label: row.spec });
+                              }
+
+                              return specs;
+                            })()}
+                            placeholder="규격"
+                          />
+                        </div>
+                      ) : (
+                        row.spec
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {editMode ? (
+                        <div className="w-full min-w-[140px]">
+                          <FMInput
+                            type="text"
+                            value={row.price?.toString() || ''}
+                            onChange={(value) => handleFieldChange(index, 'price', parseInt(value) || 0)}
+                            isCurrency={true}
+                          />
+                        </div>
+                      ) : (
+                        `${row.price.toLocaleString()}원`
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {editMode ? (
+                        <div className="w-full min-w-[120px]">
+                          <FMInput
+                            type="text"
+                            value={row.source}
+                            onChange={(value) => handleFieldChange(index, 'source', value)}
+                            placeholder="출처"
+                          />
+                        </div>
+                      ) : (
+                        row.source
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 페이지네이션 */}
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-gray-600">총 {displayData.length}건</div>
+            <div className="flex gap-2">
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(parseInt(e.target.value))}
+                className="rounded border border-gray-300 px-2 py-1 text-sm"
+              >
+                <option value={10}>10개씩</option>
+                <option value={20}>20개씩</option>
+                <option value={50}>50개씩</option>
+                <option value={100}>100개씩</option>
+              </select>
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeTab === '2' && <StandardPriceComparison activeTab={activeTab} />}
     </div>
   );
 }
