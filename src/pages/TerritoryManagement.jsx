@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Select, message, Tag, Space, Card, Flex, Typography, Row, Col, Alert } from 'antd';
-import { PlusOutlined, EditOutlined, HolderOutlined, SaveOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, HolderOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
 import {
   DndContext,
   closestCenter,
@@ -116,6 +116,69 @@ function TerritoryManagement() {
     setOriginalTerritories([]);
     setOriginalRegions([]);
     message.success('모든 변경사항이 저장되었습니다.');
+  };
+
+  // CSV 다운로드
+  const handleDownloadCSV = () => {
+    try {
+      // CSV 헤더
+      const headers = ['구분', '사업권역', '상세지역', '표시순서', '상태'];
+
+      // 사업권역 데이터
+      const territoryRows = territories
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .map(t => [
+          '사업권역',
+          t.name,
+          '-',
+          t.displayOrder,
+          t.status === 'active' ? '활성' : '비활성'
+        ]);
+
+      // 상세지역 데이터
+      const regionRows = regions
+        .sort((a, b) => {
+          if (a.territoryId !== b.territoryId) {
+            const territoryA = territories.find(t => t.id === a.territoryId);
+            const territoryB = territories.find(t => t.id === b.territoryId);
+            return (territoryA?.displayOrder || 0) - (territoryB?.displayOrder || 0);
+          }
+          return a.displayOrder - b.displayOrder;
+        })
+        .map(r => [
+          '상세지역',
+          r.territoryName,
+          r.name,
+          r.displayOrder,
+          r.status === 'active' ? '활성' : '비활성'
+        ]);
+
+      // CSV 내용 생성
+      const csvContent = [
+        headers.join(','),
+        ...territoryRows.map(row => row.join(',')),
+        ...regionRows.map(row => row.join(','))
+      ].join('\n');
+
+      // BOM 추가 (한글 깨짐 방지)
+      const bom = '﻿';
+      const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+      // 다운로드
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `사업권역_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      message.success('CSV 파일이 다운로드되었습니다.');
+    } catch (error) {
+      message.error('CSV 다운로드 중 오류가 발생했습니다.');
+      console.error(error);
+    }
   };
 
   // 표시순서 재정렬 함수 (사업권역)
@@ -393,9 +456,14 @@ function TerritoryManagement() {
                 </Button>
               </>
             ) : (
-              <Button icon={<EditOutlined />} onClick={handleEnterEditMode}>
-                수정 모드
-              </Button>
+              <>
+                <Button icon={<EditOutlined />} onClick={handleEnterEditMode}>
+                  수정 모드
+                </Button>
+                <Button icon={<DownloadOutlined />} onClick={handleDownloadCSV}>
+                  CSV 다운로드
+                </Button>
+              </>
             )}
           </Space>
         </div>
