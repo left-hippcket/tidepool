@@ -122,42 +122,41 @@ function TerritoryManagement() {
   const handleDownloadCSV = () => {
     try {
       // CSV 헤더
-      const headers = ['구분', '사업권역', '상세지역', '표시순서', '상태'];
+      const headers = ['사업권역', '상세지역', '상태'];
 
-      // 사업권역 데이터
-      const territoryRows = territories
-        .sort((a, b) => a.displayOrder - b.displayOrder)
-        .map(t => [
-          '사업권역',
-          t.name,
-          '-',
-          t.displayOrder,
-          t.status === 'active' ? '활성' : '비활성'
-        ]);
+      // 사업권역별로 그룹화하여 데이터 생성
+      const sortedTerritories = [...territories].sort((a, b) => a.displayOrder - b.displayOrder);
+      const rows = [];
 
-      // 상세지역 데이터
-      const regionRows = regions
-        .sort((a, b) => {
-          if (a.territoryId !== b.territoryId) {
-            const territoryA = territories.find(t => t.id === a.territoryId);
-            const territoryB = territories.find(t => t.id === b.territoryId);
-            return (territoryA?.displayOrder || 0) - (territoryB?.displayOrder || 0);
-          }
-          return a.displayOrder - b.displayOrder;
-        })
-        .map(r => [
-          '상세지역',
-          r.territoryName,
-          r.name,
-          r.displayOrder,
-          r.status === 'active' ? '활성' : '비활성'
-        ]);
+      sortedTerritories.forEach(territory => {
+        // 해당 권역의 상세지역들 가져오기
+        const territoryRegions = regions
+          .filter(r => r.territoryId === territory.id)
+          .sort((a, b) => a.displayOrder - b.displayOrder);
+
+        if (territoryRegions.length === 0) {
+          // 상세지역이 없는 경우 두 번째 열 공란
+          rows.push([
+            territory.name,
+            '',
+            territory.status === 'active' ? '활성' : '비활성'
+          ]);
+        } else {
+          // 상세지역이 있는 경우 각 지역마다 행 추가
+          territoryRegions.forEach(region => {
+            rows.push([
+              territory.name,
+              region.name,
+              region.status === 'active' ? '활성' : '비활성'
+            ]);
+          });
+        }
+      });
 
       // CSV 내용 생성
       const csvContent = [
         headers.join(','),
-        ...territoryRows.map(row => row.join(',')),
-        ...regionRows.map(row => row.join(','))
+        ...rows.map(row => row.join(','))
       ].join('\n');
 
       // BOM 추가 (한글 깨짐 방지)
