@@ -108,8 +108,92 @@ function TerritoryManagement() {
 
   // 전체 저장
   const handleSaveAll = () => {
-    setTerritories(editingTerritories);
-    setRegions(editingRegions);
+    // 권역명 유효성 검사
+    for (const territory of editingTerritories) {
+      if (!territory.name || !territory.name.trim()) {
+        message.error('권역명을 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(territory.name)) {
+        message.error(`'${territory.name}': 한글, 괄호, 슬래시만 입력 가능합니다.`);
+        return;
+      }
+    }
+
+    // 권역명 중복 체크
+    for (let i = 0; i < editingTerritories.length; i++) {
+      const territory = editingTerritories[i];
+      const duplicate = editingTerritories.find((t, idx) =>
+        idx !== i && t.name.trim() === territory.name.trim()
+      );
+      if (duplicate) {
+        message.error(`'${territory.name}' 권역명이 중복되었습니다.`);
+        return;
+      }
+    }
+
+    // 지역명 유효성 검사
+    for (const region of editingRegions) {
+      if (!region.name || !region.name.trim()) {
+        message.error('지역명을 입력해주세요.');
+        return;
+      }
+      if (!/^[가-힣()\/\s]+$/.test(region.name)) {
+        message.error(`'${region.name}': 한글, 괄호, 슬래시만 입력 가능합니다.`);
+        return;
+      }
+    }
+
+    // 지역명 중복 체크
+    for (let i = 0; i < editingRegions.length; i++) {
+      const region = editingRegions[i];
+      const duplicate = editingRegions.find((r, idx) =>
+        idx !== i && r.name.trim() === region.name.trim()
+      );
+      if (duplicate) {
+        message.error(`'${region.name}' 지역명이 중복되었습니다.`);
+        return;
+      }
+    }
+
+    // 권역 비활성화 제약 체크
+    for (const territory of editingTerritories) {
+      if (territory.status === 'inactive') {
+        const activeRegionCount = editingRegions.filter(
+          r => r.territoryId === territory.id && r.status === 'active'
+        ).length;
+
+        if (activeRegionCount > 0) {
+          message.error(`'${territory.name}' 권역에 속한 사용중인 지역이 ${activeRegionCount}개 있어 비활성화할 수 없습니다. 먼저 지역을 미사용으로 바꾸거나 다른 권역으로 이동해주세요.`);
+          return;
+        }
+      }
+    }
+
+    // 지역 비활성화 시 경고 (저장은 허용)
+    for (const region of editingRegions) {
+      const originalRegion = originalRegions.find(r => r.id === region.id);
+      if (originalRegion && originalRegion.status === 'active' && region.status === 'inactive') {
+        // 실제로는 거래처 수를 확인해야 하지만, 여기서는 예시로 랜덤 값 사용
+        const clientCount = Math.floor(Math.random() * 5);
+        if (clientCount > 0) {
+          message.warning(`'${region.name}' 지역에 소속된 거래처가 ${clientCount}개 있습니다. 필요시 해당 거래처의 지역을 변경하세요.`);
+        }
+      }
+    }
+
+    // trim 적용
+    const trimmedTerritories = editingTerritories.map(t => ({
+      ...t,
+      name: t.name.trim()
+    }));
+    const trimmedRegions = editingRegions.map(r => ({
+      ...r,
+      name: r.name.trim()
+    }));
+
+    setTerritories(trimmedTerritories);
+    setRegions(trimmedRegions);
     setEditMode(false);
     setEditingTerritories([]);
     setEditingRegions([]);
@@ -277,12 +361,19 @@ function TerritoryManagement() {
       return;
     }
 
+    // 권역명 중복 체크 (전체 시스템)
+    const isDuplicate = territories.some(t => t.name === newTerritoryData.name.trim());
+    if (isDuplicate) {
+      message.error(`'${newTerritoryData.name}' 권역명이 이미 존재합니다.`);
+      return;
+    }
+
     const newId = Math.max(...territories.map(t => t.id)) + 1;
     const maxDisplayOrder = Math.max(...territories.map(t => t.displayOrder), 0);
 
     const newTerritory = {
       id: newId,
-      name: newTerritoryData.name,
+      name: newTerritoryData.name.trim(),
       displayOrder: maxDisplayOrder + 1,
       regionCount: 0,
       status: newTerritoryData.status,
@@ -336,6 +427,13 @@ function TerritoryManagement() {
       return;
     }
 
+    // 지역명 중복 체크 (전체 시스템)
+    const isDuplicate = regions.some(r => r.name === newRegionData.name.trim());
+    if (isDuplicate) {
+      message.error(`'${newRegionData.name}' 지역명이 이미 존재합니다.`);
+      return;
+    }
+
     const newId = Math.max(...regions.map(r => r.id)) + 1;
     const territory = territories.find(t => t.id === newRegionData.territoryId);
     const currentRegions = regions.filter(r => r.territoryId === newRegionData.territoryId);
@@ -345,7 +443,7 @@ function TerritoryManagement() {
       id: newId,
       territoryId: newRegionData.territoryId,
       territoryName: territory.name,
-      name: newRegionData.name,
+      name: newRegionData.name.trim(),
       displayOrder: maxDisplayOrder + 1,
       status: 'active',
     };
