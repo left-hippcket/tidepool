@@ -576,7 +576,7 @@ function ProductManagement() {
           </div>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: '0.8fr 2.5fr 1fr 1fr' }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: '0.6fr 3.5fr 1fr 1fr' }}>
         {/* Column 1: Categories */}
         <div>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -779,33 +779,33 @@ function ProductManagement() {
                       }`}
                     >
                       {editMode ? (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
                           <FMInput
                             value={product.name}
                             onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
                             placeholder="품목명"
                             maxLength={20}
+                            className="flex-1"
                           />
-                          <div className="grid grid-cols-2 gap-2">
-                            <FMSelect
-                              value={product.orderUnit}
-                              onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
-                              options={[
-                                { value: '통', label: '통' },
-                                { value: '박스', label: '박스' },
-                                { value: 'kg', label: 'kg' }
-                              ]}
-                              placeholder="주문단위"
-                            />
-                            <FMInput
-                              type="number"
-                              value={product.unitWeight}
-                              onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
-                              placeholder="중량(kg)"
-                              step="0.1"
-                              min="0.1"
-                            />
-                          </div>
+                          <FMSelect
+                            value={product.orderUnit}
+                            onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
+                            options={[
+                              { value: '통', label: '통' },
+                              { value: '박스', label: '박스' },
+                              { value: 'kg', label: 'kg' }
+                            ]}
+                            className="w-28"
+                          />
+                          <FMInput
+                            type="number"
+                            value={product.unitWeight}
+                            onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
+                            placeholder="중량"
+                            step="0.1"
+                            min="0.1"
+                            className="w-24"
+                          />
                           <FMSelect
                             value={product.status}
                             onChange={(value) => handleProductFieldChange(product.id, 'status', value)}
@@ -813,6 +813,7 @@ function ProductManagement() {
                               { value: 'active', label: '활성' },
                               { value: 'inactive', label: '비활성' }
                             ]}
+                            className="w-32"
                           />
                         </div>
                       ) : (
@@ -915,12 +916,13 @@ function ProductManagement() {
                         }`}
                       >
                         {editMode ? (
-                          <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
                             <FMInput
                               value={origin.name}
                               onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
                               placeholder="원산지명"
                               maxLength={20}
+                              className="flex-1"
                             />
                             <FMSelect
                               value={origin.status}
@@ -929,6 +931,7 @@ function ProductManagement() {
                                 { value: 'active', label: '활성' },
                                 { value: 'inactive', label: '비활성' }
                               ]}
+                              className="w-32"
                             />
                           </div>
                         ) : (
@@ -1021,12 +1024,13 @@ function ProductManagement() {
                         }`}
                       >
                         {editMode ? (
-                          <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
                             <FMInput
                               value={spec.name}
                               onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
                               placeholder="규격명"
                               maxLength={20}
+                              className="flex-1"
                             />
                             <FMSelect
                               value={spec.status}
@@ -1035,6 +1039,7 @@ function ProductManagement() {
                                 { value: 'active', label: '활성' },
                                 { value: 'inactive', label: '비활성' }
                               ]}
+                              className="w-32"
                             />
                           </div>
                         ) : (
