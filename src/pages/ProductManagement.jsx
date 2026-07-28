@@ -318,55 +318,39 @@ function ProductManagement() {
       return;
     }
 
-    // Handle comma-separated input
-    const originNames = newOriginData.name
-      .split(',')
-      .map(name => name.trim())
-      .filter(name => name.length > 0);
+    const originName = newOriginData.name.trim();
 
-    if (originNames.length === 0) {
-      toast.error('원산지명을 입력해주세요.');
+    if (originName.length > 20) {
+      toast.error('최대 20자까지 입력 가능합니다.');
       return;
     }
 
-    // Validate each name
-    for (const name of originNames) {
-      if (name.length > 20) {
-        toast.error(`'${name}'은 최대 20자까지 입력 가능합니다.`);
-        return;
-      }
-      // Check for duplicates
-      if (origins.some(o => o.productId === selectedProduct.id && o.name === name)) {
-        toast.error(`'${name}'은 이미 존재하는 원산지명입니다.`);
-        return;
-      }
+    // Check for duplicates
+    if (origins.some(o => o.productId === selectedProduct.id && o.name === originName)) {
+      toast.error('이미 존재하는 원산지명입니다.');
+      return;
     }
 
-    let newId = origins.length > 0 ? Math.max(...origins.map(o => o.id)) + 1 : 1;
-    const newOrigins = originNames.map(name => ({
-      id: newId++,
+    const newId = origins.length > 0 ? Math.max(...origins.map(o => o.id)) + 1 : 1;
+    const newOrigin = {
+      id: newId,
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      name: name,
+      name: originName,
       status: 'active',
       createdAt: new Date().toISOString().split('T')[0],
-    }));
+    };
 
-    setOrigins([...origins, ...newOrigins]);
+    setOrigins([...origins, newOrigin]);
 
     // Update product origin count
     setProducts(products.map(p =>
-      p.id === selectedProduct.id ? { ...p, originCount: p.originCount + originNames.length } : p
+      p.id === selectedProduct.id ? { ...p, originCount: p.originCount + 1 } : p
     ));
 
     setIsAddingOrigin(false);
     setNewOriginData({ productId: '', name: '' });
-
-    if (originNames.length === 1) {
-      toast.success(`원산지 '${originNames[0]}'이 등록되었습니다.`);
-    } else {
-      toast.success(`${originNames.length}개의 원산지가 등록되었습니다.`);
-    }
+    toast.success(`원산지 '${originName}'이 등록되었습니다.`);
   };
 
   const handleCancelOrigin = () => {
@@ -400,55 +384,39 @@ function ProductManagement() {
       return;
     }
 
-    // Handle comma-separated input
-    const specNames = newSpecData.name
-      .split(',')
-      .map(name => name.trim())
-      .filter(name => name.length > 0);
+    const specName = newSpecData.name.trim();
 
-    if (specNames.length === 0) {
-      toast.error('규격명을 입력해주세요.');
+    if (specName.length > 20) {
+      toast.error('최대 20자까지 입력 가능합니다.');
       return;
     }
 
-    // Validate each name
-    for (const name of specNames) {
-      if (name.length > 20) {
-        toast.error(`'${name}'은 최대 20자까지 입력 가능합니다.`);
-        return;
-      }
-      // Check for duplicates
-      if (specs.some(s => s.productId === selectedProduct.id && s.name === name)) {
-        toast.error(`'${name}'은 이미 존재하는 규격명입니다.`);
-        return;
-      }
+    // Check for duplicates
+    if (specs.some(s => s.productId === selectedProduct.id && s.name === specName)) {
+      toast.error('이미 존재하는 규격명입니다.');
+      return;
     }
 
-    let newId = specs.length > 0 ? Math.max(...specs.map(s => s.id)) + 1 : 1;
-    const newSpecs = specNames.map(name => ({
-      id: newId++,
+    const newId = specs.length > 0 ? Math.max(...specs.map(s => s.id)) + 1 : 1;
+    const newSpec = {
+      id: newId,
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      name: name,
+      name: specName,
       status: 'active',
       createdAt: new Date().toISOString().split('T')[0],
-    }));
+    };
 
-    setSpecs([...specs, ...newSpecs]);
+    setSpecs([...specs, newSpec]);
 
     // Update product spec count
     setProducts(products.map(p =>
-      p.id === selectedProduct.id ? { ...p, specCount: p.specCount + specNames.length } : p
+      p.id === selectedProduct.id ? { ...p, specCount: p.specCount + 1 } : p
     ));
 
     setIsAddingSpec(false);
     setNewSpecData({ productId: '', name: '' });
-
-    if (specNames.length === 1) {
-      toast.success(`규격 '${specNames[0]}'이 등록되었습니다.`);
-    } else {
-      toast.success(`${specNames.length}개의 규격이 등록되었습니다.`);
-    }
+    toast.success(`규격 '${specName}'이 등록되었습니다.`);
   };
 
   const handleCancelSpec = () => {
@@ -466,36 +434,62 @@ function ProductManagement() {
   const handleCSVDownload = () => {
     // Prepare CSV data
     const csvRows = [];
-    csvRows.push(['품목분류', '품목명', '주문단위', '주문단위당중량(kg)', '원산지', '규격', '상태']);
+    csvRows.push(['품목분류', '품목', '원산지', '규격', '주문단위', '주문단위별중량(kg)']);
 
     products.forEach(product => {
       const category = categories.find(c => c.id === product.categoryId);
-      const productOrigins = origins.filter(o => o.productId === product.id);
-      const productSpecs = specs.filter(s => s.productId === product.id);
+      const productOrigins = origins.filter(o => o.productId === product.id && o.status === 'active');
+      const productSpecs = specs.filter(s => s.productId === product.id && s.status === 'active');
 
+      // 원산지 X 규격 조합 생성
       if (productOrigins.length === 0 && productSpecs.length === 0) {
+        // 원산지도 규격도 없는 경우
         csvRows.push([
           category?.name || '',
           product.name,
+          '',
+          '',
           product.orderUnit,
-          product.unitWeight,
-          '',
-          '',
-          product.status === 'active' ? '활성' : '비활성'
+          product.unitWeight
         ]);
-      } else {
-        const maxRows = Math.max(productOrigins.length, productSpecs.length);
-        for (let i = 0; i < maxRows; i++) {
+      } else if (productOrigins.length === 0) {
+        // 원산지는 없고 규격만 있는 경우
+        productSpecs.forEach(spec => {
           csvRows.push([
-            i === 0 ? category?.name || '' : '',
-            i === 0 ? product.name : '',
-            i === 0 ? product.orderUnit : '',
-            i === 0 ? product.unitWeight : '',
-            productOrigins[i]?.name || '',
-            productSpecs[i]?.name || '',
-            i === 0 ? (product.status === 'active' ? '활성' : '비활성') : ''
+            category?.name || '',
+            product.name,
+            '',
+            spec.name,
+            product.orderUnit,
+            product.unitWeight
           ]);
-        }
+        });
+      } else if (productSpecs.length === 0) {
+        // 규격은 없고 원산지만 있는 경우
+        productOrigins.forEach(origin => {
+          csvRows.push([
+            category?.name || '',
+            product.name,
+            origin.name,
+            '',
+            product.orderUnit,
+            product.unitWeight
+          ]);
+        });
+      } else {
+        // 원산지와 규격 모두 있는 경우 - 모든 조합 생성
+        productOrigins.forEach(origin => {
+          productSpecs.forEach(spec => {
+            csvRows.push([
+              category?.name || '',
+              product.name,
+              origin.name,
+              spec.name,
+              product.orderUnit,
+              product.unitWeight
+            ]);
+          });
+        });
       }
     });
 
@@ -510,7 +504,7 @@ function ProductManagement() {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `상품관리_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `상품마스터_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -569,14 +563,14 @@ function ProductManagement() {
                   icon={<DownloadOutlined className="h-4 w-4" />}
                   onClick={handleCSVDownload}
                 >
-                  CSV 다운로드
+                  상품마스터 다운로드
                 </FMButton>
               </>
             )}
           </div>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: '0.6fr 3.5fr 1fr 1fr' }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(250px, 1fr) minmax(250px, 1.8fr) minmax(210px, 1fr) minmax(210px, 1fr)' }}>
         {/* Column 1: Categories */}
         <div>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -635,12 +629,13 @@ function ProductManagement() {
                   }`}
                 >
                   {editMode ? (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-1">
                       <FMInput
                         value={category.name}
                         onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
                         placeholder="분류명"
                         maxLength={20}
+                        className="flex-1"
                       />
                       <FMSelect
                         value={category.status}
@@ -649,22 +644,22 @@ function ProductManagement() {
                           { value: 'active', label: '활성' },
                           { value: 'inactive', label: '비활성' }
                         ]}
+                        isSearchable={false}
+                        style={{ width: '110px', flexShrink: 0 }}
                       />
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{category.name}</span>
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                            category.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {category.status === 'active' ? '활성' : '비활성'}
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-900">{category.name}</span>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                          category.status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {category.status === 'active' ? '활성' : '비활성'}
+                      </span>
                       <span className="text-xs text-gray-500">{category.itemCount}개 품목</span>
                     </div>
                   )}
@@ -679,7 +674,7 @@ function ProductManagement() {
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
-                {selectedCategory ? `${selectedCategory.name} - 품목 (${filteredProducts.length})` : '품목'}
+                품목 ({filteredProducts.length})
               </h2>
               {!editMode && selectedCategory && !isAddingProduct && (
                 <FMButton variant="primary" onClick={handleAddProduct}>
@@ -779,7 +774,7 @@ function ProductManagement() {
                       }`}
                     >
                       {editMode ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <FMInput
                             value={product.name}
                             onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
@@ -795,7 +790,8 @@ function ProductManagement() {
                               { value: '박스', label: '박스' },
                               { value: 'kg', label: 'kg' }
                             ]}
-                            className="w-28"
+                            isSearchable={false}
+                            style={{ width: '80px', flexShrink: 0 }}
                           />
                           <FMInput
                             type="number"
@@ -804,7 +800,7 @@ function ProductManagement() {
                             placeholder="중량"
                             step="0.1"
                             min="0.1"
-                            className="w-24"
+                            style={{ width: '70px', flexShrink: 0 }}
                           />
                           <FMSelect
                             value={product.status}
@@ -813,32 +809,25 @@ function ProductManagement() {
                               { value: 'active', label: '활성' },
                               { value: 'inactive', label: '비활성' }
                             ]}
-                            className="w-32"
+                            isSearchable={false}
+                            style={{ width: '110px', flexShrink: 0 }}
                           />
                         </div>
                       ) : (
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900">{product.name}</span>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                product.status === 'active'
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-gray-100 text-gray-700'
-                              }`}
-                            >
-                              {product.status === 'active' ? '활성' : '비활성'}
-                            </span>
-                          </div>
-                          <div className="flex gap-2 text-xs text-gray-500">
-                            <span>
-                              {product.orderUnit} ({product.unitWeight}kg)
-                            </span>
-                            <span>•</span>
-                            <span>원산지 {product.originCount}개</span>
-                            <span>•</span>
-                            <span>규격 {product.specCount}개</span>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900">{product.name}</span>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                              product.status === 'active'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}
+                          >
+                            {product.status === 'active' ? '활성' : '비활성'}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {product.orderUnit} ({product.unitWeight}kg)
+                          </span>
                         </div>
                       )}
                     </div>
@@ -854,7 +843,7 @@ function ProductManagement() {
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
-                {selectedProduct ? `${selectedProduct.name} - 원산지 (${filteredOrigins.length})` : '원산지'}
+                원산지 ({filteredOrigins.length})
               </h2>
               {!editMode && selectedProduct && !isAddingOrigin && (
                 <FMButton variant="primary" onClick={handleAddOrigin}>
@@ -882,12 +871,9 @@ function ProductManagement() {
                         <FMInput
                           value={newOriginData.name}
                           onChange={(value) => setNewOriginData({ ...newOriginData, name: value })}
-                          placeholder="예: 완도 (쉼표로 여러 개 입력 가능)"
-                          maxLength={200}
+                          placeholder="예: 완도"
+                          maxLength={20}
                         />
-                        <div className="mt-1 text-xs text-gray-500">
-                          쉼표로 구분하여 여러 원산지를 한 번에 등록할 수 있습니다.
-                        </div>
                       </span>
                     </label>
                     <div className="mt-3 flex justify-end gap-2">
@@ -916,7 +902,7 @@ function ProductManagement() {
                         }`}
                       >
                         {editMode ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <FMInput
                               value={origin.name}
                               onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
@@ -931,7 +917,8 @@ function ProductManagement() {
                                 { value: 'active', label: '활성' },
                                 { value: 'inactive', label: '비활성' }
                               ]}
-                              className="w-32"
+                              isSearchable={false}
+                              style={{ width: '110px', flexShrink: 0 }}
                             />
                           </div>
                         ) : (
@@ -962,7 +949,7 @@ function ProductManagement() {
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
-                {selectedProduct ? `${selectedProduct.name} - 규격 (${filteredSpecs.length})` : '규격'}
+                규격 ({filteredSpecs.length})
               </h2>
               {!editMode && selectedProduct && !isAddingSpec && (
                 <FMButton variant="primary" onClick={handleAddSpec}>
@@ -990,12 +977,9 @@ function ProductManagement() {
                         <FMInput
                           value={newSpecData.name}
                           onChange={(value) => setNewSpecData({ ...newSpecData, name: value })}
-                          placeholder="예: 1.2kg (쉼표로 여러 개 입력 가능)"
-                          maxLength={200}
+                          placeholder="예: 1.2kg"
+                          maxLength={20}
                         />
-                        <div className="mt-1 text-xs text-gray-500">
-                          쉼표로 구분하여 여러 규격을 한 번에 등록할 수 있습니다.
-                        </div>
                       </span>
                     </label>
                     <div className="mt-3 flex justify-end gap-2">
@@ -1024,7 +1008,7 @@ function ProductManagement() {
                         }`}
                       >
                         {editMode ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <FMInput
                               value={spec.name}
                               onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
@@ -1035,6 +1019,8 @@ function ProductManagement() {
                             <FMSelect
                               value={spec.status}
                               onChange={(value) => handleSpecFieldChange(spec.id, 'status', value)}
+                              isSearchable={false}
+                              style={{ width: '110px', flexShrink: 0 }}
                               options={[
                                 { value: 'active', label: '활성' },
                                 { value: 'inactive', label: '비활성' }

@@ -7,6 +7,7 @@ export function FMInput({
   placeholder = '',
   disabled = false,
   className = '',
+  style = {},
   isCurrency = false,
   ...props
 }) {
@@ -25,7 +26,7 @@ export function FMInput({
     : value;
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full" style={style}>
       <input
         type={isCurrency ? 'text' : type}
         value={displayValue || ''}

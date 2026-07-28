@@ -25,7 +25,6 @@ import DriverManagement from './pages/DriverManagement';
 import DriverDetail from './pages/DriverDetail';
 import DriverRegister from './pages/DriverRegister';
 import ProductManagement from './pages/ProductManagement';
-import ProductList from './pages/ProductList';
 import StandardPrice from './pages/StandardPrice';
 import StandardPriceRegister from './pages/StandardPriceRegister';
 import TransactionLedger from './pages/TransactionLedger';
@@ -174,8 +173,7 @@ function App() {
       icon: <AppstoreOutlined />,
       label: '상품 관리',
       children: [
-        { key: '/product', label: '상품 관리' },
-        { key: '/product-list', label: '상품 리스트' },
+        { key: '/product', label: '상품마스터' },
       ],
     },
     {
@@ -333,7 +331,6 @@ function App() {
             <Route path="/driver/register" element={<DriverRegister />} />
             <Route path="/driver/:id" element={<DriverDetail />} />
             <Route path="/product" element={<ProductManagement />} />
-            <Route path="/product-list" element={<ProductList />} />
             <Route path="/transaction-ledger" element={<TransactionLedger />} />
             <Route path="/transaction-ledger/register" element={<TransactionLedgerRegister />} />
             <Route path="/claim-adjustment" element={<ClaimAdjustmentList />} />

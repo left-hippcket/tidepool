@@ -419,8 +419,8 @@ export const managers = ['최용환', '이시호', '노원진', '고영석', '�
 export const sellerDetails = {
   1: { // 해금 그룹
     keymen: [
-      { name: '김이수', position: '대표', phone: '010-1234-5678' },
-      { name: '김철호', position: '사무장', phone: '010-2345-6789' }
+      { name: '김이수', role: '대표', phone: '010-1234-5678' },
+      { name: '김철호', role: '사무장', phone: '010-2345-6789' }
     ],
     qualitativeRatings: {
       financial: '좋음',
@@ -488,7 +488,8 @@ export const sellerDetails = {
   },
   2: { // 갑운 그룹
     keymen: [
-      { name: '박갑운', position: '대표', phone: '010-3456-7890' }
+      { name: '박갑운', role: '대표', phone: '010-3456-7890' },
+      { name: '박민수', role: '광어담당', phone: '010-3456-7891' }
     ],
     qualitativeRatings: {
       financial: '보통',
@@ -539,7 +540,8 @@ export const sellerDetails = {
   },
   3: { // 성호수산 (사업자 1개)
     keymen: [
-      { name: '강성호', position: '대표', phone: '010-6666-7777' }
+      { name: '강성호', role: '대표', phone: '010-6666-7777' },
+      { name: '이경리', role: '경리', phone: '010-6666-7778' }
     ],
     qualitativeRatings: {
       financial: '좋음',
@@ -574,8 +576,9 @@ export const sellerDetails = {
   },
   4: { // 거제양식 (사업자 2개)
     keymen: [
-      { name: '김거제', position: '대표', phone: '010-7777-8888' },
-      { name: '박양식', position: '이사', phone: '010-8888-9999' }
+      { name: '김거제', role: '대표', phone: '010-7777-8888' },
+      { name: '박양식', role: '사무장', phone: '010-8888-9999' },
+      { name: '최광어', role: '광어담당', phone: '010-8888-9990' }
     ],
     qualitativeRatings: {
       financial: '보통',
@@ -631,8 +634,8 @@ export const sellerDetails = {
 export const buyerDetails = {
   1: { // 소라 그룹
     keymen: [
-      { name: '최소라', position: '대표', phone: '010-5678-9012' },
-      { name: '김영수', position: '구매담당', phone: '010-6789-0123' }
+      { name: '최소라', role: '대표', phone: '010-5678-9012' },
+      { name: '김영수', role: '구매담당', phone: '010-6789-0123' }
     ],
     kakaoGroupName: '[노량진]소라수산 거래방',
     paymentCycle: '기본 미수 3천만원, 초과분 월 2회 정산',

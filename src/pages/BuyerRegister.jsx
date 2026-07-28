@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Form, Input, Select, Button, Radio, Space, Divider,
-  message, AutoComplete, Upload, InputNumber
+  Form, Input, Select, Radio, Button,
+  AutoComplete, Upload, InputNumber
 } from 'antd';
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
+import { Upload as UploadIcon, Plus, Star } from 'lucide-react';
 import { buyerGroups, managers, territories, regions, productCategories, products, businessRegistry } from '../data/mockData';
+import { FMButton } from '../components/ui/FMButton';
+import { FMInput } from '../components/ui/FMInput';
+import { FMSelect } from '../components/ui/FMSelect';
+import { FMTagInput } from '../components/ui/FMTagInput';
+import toast from 'react-hot-toast';
 
 function BuyerRegister() {
   const navigate = useNavigate();
@@ -97,7 +103,7 @@ function BuyerRegister() {
           representative: businessInfo.representative,
           businessAddress: businessInfo.businessAddress,
         });
-        message.success('등록된 사업자 정보를 불러왔습니다.');
+        toast.success('등록된 사업자 정보를 불러왔습니다.');
       } else {
         form.setFieldsValue({
           businessName: undefined,
@@ -139,16 +145,16 @@ function BuyerRegister() {
       );
 
       if (existingTicker) {
-        message.error('이미 다른 사업자가 사용중인 ticker입니다. 변경 후 재입력 해주세요');
+        toast.error('이미 다른 사업자가 사용중인 ticker입니다. 변경 후 재입력 해주세요');
         return;
       }
 
       if (registrationType === 'new') {
-        message.success(`바이어 그룹 '${values.groupName}'이 등록되었습니다.`);
+        toast.success(`바이어 그룹 '${values.groupName}'이 등록되었습니다.`);
         // TODO: 상세 페이지로 이동
         navigate('/buyer');
       } else {
-        message.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
         navigate(`/buyer/${selectedGroup.id}`);
       }
     } catch (error) {
@@ -167,49 +173,58 @@ function BuyerRegister() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col gap-6 w-full">
       {/* 헤더 */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/buyer')}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-start">
+          <FMButton
+            variant="indigo"
+            icon={<ArrowLeftOutlined className="h-4 w-4" />}
+            href="/buyer"
           >
-            <ArrowLeftOutlined />
             목록으로
-          </button>
-          <h2 level={2}>바이어 등록</h2>
+          </FMButton>
         </div>
+        <h2 className="text-2xl font-bold text-gray-900">바이어 등록</h2>
       </div>
 
       {/* 등록 유형 선택 */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
         <Radio.Group value={registrationType} onChange={handleTypeChange}>
           <Radio value="new">신규 바이어그룹 생성</Radio>
           <Radio value="existing">기존 바이어그룹에 사업자 추가</Radio>
         </Radio.Group>
       </div>
 
-      <Form form={form} layout="vertical">
+      <Form
+        form={form}
+        layout="horizontal"
+        labelCol={{ flex: '20%' }}
+        wrapperCol={{ flex: '80%' }}
+        labelAlign="left"
+      >
         {/* 기존 그룹 검색 */}
         {registrationType === 'existing' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 mb-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">바이어그룹 검색</h3>
             <Form.Item
               name="searchGroup"
               label="바이어그룹 검색"
               rules={[{ required: true, message: '바이어그룹을 선택해주세요' }]}
             >
-              <AutoComplete
+              <FMSelect
+                value={form.getFieldValue('searchGroup')}
+                onChange={(value) => {
+                  form.setFieldsValue({ searchGroup: value });
+                  handleGroupSearch(value);
+                }}
                 options={buyerGroups.map(g => ({
                   value: g.name,
                   label: `${g.name} (담당자: ${g.salesPerson})`
                 }))}
-                onSelect={handleGroupSearch}
-                placeholder="바이어그룹명 입력"
-                filterOption={(inputValue, option) =>
-                  option.value.toLowerCase().includes(inputValue.toLowerCase())
-                }
+                placeholder="검색 & 선택"
+                isSearchable={true}
               />
             </Form.Item>
 
@@ -228,7 +243,7 @@ function BuyerRegister() {
 
         {/* 바이어그룹 기본 정보 (신규) */}
         {registrationType === 'new' && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 mb-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">바이어그룹 기본 정보</h3>
 
             <Form.Item
@@ -242,60 +257,6 @@ function BuyerRegister() {
             >
               <Input placeholder="예: 명성횟집 그룹" />
             </Form.Item>
-
-            <Divider orientation="left">키맨 정보</Divider>
-            <Form.List name="keymen" initialValue={[{}]}>
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map((field, index) => (
-                    <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
-                      <Space align="start" style={{ width: '100%' }}>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'name']}
-                          label="이름"
-                          rules={[{ max: 20, message: '최대 20자' }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <Input placeholder="김철수" />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'position']}
-                          label="직책"
-                          rules={[{ max: 20, message: '최대 20자' }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <Input placeholder="대표" />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          name={[field.name, 'phone']}
-                          label="연락처"
-                          rules={[
-                            { pattern: /^010-\d{4}-\d{4}$/, message: '010-XXXX-XXXX 형식' }
-                          ]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <Input placeholder="010-1234-5678" />
-                        </Form.Item>
-                        {fields.length > 1 && (
-                          <MinusCircleOutlined
-                            onClick={() => remove(field.name)}
-                            style={{ marginTop: 30 }}
-                          />
-                        )}
-                      </Space>
-                    </div>
-                  ))}
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                    키맨 추가하기
-                  </Button>
-                </>
-              )}
-            </Form.List>
-
-            <Divider />
 
             <Form.Item
               name="territory"
@@ -347,52 +308,129 @@ function BuyerRegister() {
               label="주요품목분류"
               rules={[{ required: true, message: '주요품목분류를 선택해주세요' }]}
             >
-              <Select
-                mode="multiple"
+              <FMSelect
+                value={form.getFieldValue('mainCategory') || []}
+                onChange={(value) => {
+                  form.setFieldsValue({ mainCategory: value });
+                  handleCategoryChange(value);
+                }}
+                options={productCategories.map(c => ({
+                  value: c.name,
+                  label: c.name
+                }))}
                 placeholder="품목분류 선택 (복수 선택 가능)"
-                onChange={handleCategoryChange}
-              >
-                {productCategories.map(c => (
-                  <Select.Option key={c.id} value={c.name}>{c.name}</Select.Option>
-                ))}
-              </Select>
+                isSearchable={true}
+                isMulti={true}
+              />
             </Form.Item>
 
             <Form.Item
               name="mainProducts"
               label="주요품목"
             >
-              <Select
-                mode="multiple"
+              <FMSelect
+                value={form.getFieldValue('mainProducts') || []}
+                onChange={(value) => form.setFieldsValue({ mainProducts: value })}
+                options={availableProducts.map(p => ({
+                  value: p.name,
+                  label: p.name
+                }))}
                 placeholder="주요품목 선택 (선택사항)"
-                disabled={!selectedCategory || selectedCategory.length === 0}
-              >
-                {availableProducts.map(p => (
-                  <Select.Option key={p.id} value={p.name}>
-                    {p.categoryName} / {p.name}
-                  </Select.Option>
-                ))}
-              </Select>
+                isSearchable={true}
+                isMulti={true}
+                isDisabled={!selectedCategory || selectedCategory.length === 0}
+              />
             </Form.Item>
 
             <Form.Item
               name="arrivalPricePolicy"
               label="넙치 도착단가 정책"
-              tooltip="상차단가에 추가할 금액을 입력하세요"
             >
-              <InputNumber
-                style={{ width: '100%' }}
-                placeholder="예: 800"
-                addonBefore="상차단가 +"
-                addonAfter="원"
-                step={100}
-                min={0}
-                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                parser={value => value.replace(/,/g, '')}
-              />
+              <div className="flex flex-col gap-1">
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="예: 800"
+                  addonBefore="상차단가 +"
+                  addonAfter="원"
+                  step={100}
+                  min={0}
+                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value.replace(/,/g, '')}
+                />
+                <span className="text-xs text-blue-500">상차단가에 추가할 금액을 입력하세요</span>
+              </div>
             </Form.Item>
 
-            <Divider orientation="left">거래 정보</Divider>
+            <div className="my-4 border-t border-gray-200"></div>
+            <h4 className="text-base font-semibold text-gray-900 mb-4">키맨 정보</h4>
+            <Form.List name="keymen" initialValue={[{}]}>
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map((field, index) => (
+                    <div key={field.key} className="mb-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <h5 className="text-sm font-medium text-gray-700">키맨 #{index + 1}</h5>
+                        {fields.length > 1 && (
+                          <Button
+                            type="text"
+                            icon={<MinusCircleOutlined />}
+                            onClick={() => remove(field.name)}
+                            danger
+                            size="small"
+                          />
+                        )}
+                      </div>
+
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'name']}
+                        label="성명"
+                        rules={[{ max: 20, message: '최대 20자' }]}
+                        className="mb-4"
+                      >
+                        <Input placeholder="홍길동" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'phone']}
+                        label="연락처"
+                        rules={[
+                          { pattern: /^010-\d{4}-\d{4}$/, message: '010-XXXX-XXXX 형식' }
+                        ]}
+                        className="mb-4"
+                      >
+                        <Input placeholder="010-1234-5678" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'role']}
+                        label="역할"
+                        rules={[{ max: 20, message: '최대 20자' }]}
+                        className="mb-0"
+                      >
+                        <Input placeholder="예: 대표, 구매담당" />
+                      </Form.Item>
+
+                      {index < fields.length - 1 && <div className="my-6 border-t border-gray-200"></div>}
+                    </div>
+                  ))}
+                  <div className="flex justify-end">
+                    <FMButton
+                      variant="green"
+                      icon={<Plus className="h-4 w-4" />}
+                      onClick={() => add()}
+                    >
+                      키맨 추가하기
+                    </FMButton>
+                  </div>
+                </>
+              )}
+            </Form.List>
+
+            <div className="my-4 border-t border-gray-200"></div>
+            <h4 className="text-base font-semibold text-gray-900 mb-4">거래 정보</h4>
 
             <Form.Item
               name="kakaoGroupName"
@@ -429,35 +467,37 @@ function BuyerRegister() {
             <Form.Item
               name="mainSuppliers"
               label="메인공급처"
-              rules={[{ max: 100, message: '최대 100자' }]}
             >
-              <Input placeholder="쉼표로 구분 (예: 호경유통, ING)" />
+              <FMTagInput
+                value={form.getFieldValue('mainSuppliers') || []}
+                onChange={(value) => form.setFieldsValue({ mainSuppliers: value })}
+                placeholder="공급처명 입력 후 엔터키"
+              />
             </Form.Item>
 
-            <Divider orientation="left">중요 평가 요소 (1-7순위)</Divider>
+            <div className="my-4 border-t border-gray-200"></div>
+            <h4 className="text-base font-semibold text-gray-900 mb-4">중요 평가 요소 (1-7순위)</h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7].map(num => (
-                <Form.Item
-                  key={num}
-                  name={`priority${num}`}
-                  label={`${num}순위`}
-                  rules={[{ validator: validatePriorityFactors }]}
-                >
-                  <Select placeholder="선택" allowClear>
-                    {priorityOptions.map(opt => (
-                      <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              ))}
-            </div>
+            {[1, 2, 3, 4, 5, 6, 7].map(num => (
+              <Form.Item
+                key={num}
+                name={`priority${num}`}
+                label={`${num}순위`}
+                rules={[{ validator: validatePriorityFactors }]}
+              >
+                <Select placeholder="선택" allowClear>
+                  {priorityOptions.map(opt => (
+                    <Select.Option key={opt.value} value={opt.value}>{opt.label}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            ))}
           </div>
         )}
 
         {/* 사업자 정보 (공통) */}
         {(registrationType === 'new' || selectedGroup) && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 mb-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
 
             <Form.Item
@@ -490,7 +530,6 @@ function BuyerRegister() {
               rules={[
                 { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
               ]}
-              extra="등록된 사업자번호 입력 시 상호, 대표자, 주소가 자동으로 입력됩니다"
             >
               <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
             </Form.Item>
@@ -552,22 +591,35 @@ function BuyerRegister() {
                 maxCount={1}
                 accept="image/*,.pdf"
               >
-                <Button icon={<UploadOutlined />}>사업자등록증 첨부하기 (최대 10MB)</Button>
+                <FMButton
+                  variant="green"
+                  icon={<UploadIcon className="h-4 w-4" />}
+                >
+                  사업자등록증 첨부하기 (최대 10MB)
+                </FMButton>
               </Upload>
             </Form.Item>
           </div>
         )}
 
         {/* 하단 버튼 */}
-        <Space>
-          <Button size="large" onClick={() => navigate('/buyer')}>
+        <div className="grid grid-cols-2 gap-3 w-full mt-6">
+          <FMButton
+            variant="secondary"
+            onClick={() => navigate('/buyer')}
+            className="w-full"
+          >
             취소
-          </Button>
-          <Button type="primary" size="large" onClick={handleSubmit}>
+          </FMButton>
+          <FMButton
+            onClick={handleSubmit}
+            className="w-full"
+          >
             저장
-          </Button>
-        </Space>
+          </FMButton>
+        </div>
       </Form>
+      </div>
     </div>
   );
 }

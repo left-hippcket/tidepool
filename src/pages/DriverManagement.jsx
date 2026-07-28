@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Select, Tag, Button, Card, Space, Flex, Typography, Row, Col } from 'antd';
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { drivers, driverDetails } from '../data/mockData';
-
-const { Title, Text } = Typography;
+import { FMSelectSimple } from '../components/ui/FMSelectSimple';
+import { FMButton } from '../components/ui/FMButton';
 
 function DriverManagement() {
   const navigate = useNavigate();
@@ -67,170 +66,168 @@ function DriverManagement() {
   // 정렬 아이콘
   const renderSortIcon = (key) => {
     if (sortConfig.key !== key) {
-      return <span style={{ color: '#d9d9d9', marginLeft: 4 }}>▼▲</span>;
+      return <span className="ml-1 text-gray-300">▼▲</span>;
     }
     return sortConfig.direction === 'desc' ? (
-      <CaretDownOutlined style={{ marginLeft: 4, color: '#1890ff' }} />
+      <CaretDownOutlined className="ml-1 text-blue-600" />
     ) : (
-      <CaretUpOutlined style={{ marginLeft: 4, color: '#1890ff' }} />
+      <CaretUpOutlined className="ml-1 text-blue-600" />
     );
   };
 
-  // 테이블 컬럼 (데스크톱)
-  const columns = [
-    {
-      title: () => (
-        <span onClick={() => handleSort('name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
-          드라이버명 {renderSortIcon('name')}
-        </span>
-      ),
-      dataIndex: 'name',
-      key: 'name',
-      render: (text, record) => (
-        <a onClick={() => navigate(`/driver/${record.id}`)} style={{ color: '#1890ff' }}>
-          {text}
-        </a>
-      ),
-    },
-    {
-      title: () => (
-        <span onClick={() => handleSort('vehicleType')} style={{ cursor: 'pointer', userSelect: 'none' }}>
-          차종 {renderSortIcon('vehicleType')}
-        </span>
-      ),
-      dataIndex: 'vehicleType',
-      key: 'vehicleType',
-    },
-    {
-      title: '보유통수',
-      dataIndex: 'tankCount',
-      key: 'tankCount',
-      render: (count) => `${count}통`,
-    },
-    {
-      title: '전화번호',
-      dataIndex: 'phone',
-      key: 'phone',
-    },
-    {
-      title: '정산사업자',
-      dataIndex: 'settlementBusiness',
-      key: 'settlementBusiness',
-      render: (text) => text || '-',
-    },
-    {
-      title: '과세유형',
-      dataIndex: 'taxType',
-      key: 'taxType',
-      render: (type) => {
-        if (!type) return <Tag color="#D9D9D9">미등록</Tag>;
-        if (type === '과세') return <Tag color="#1890FF">과세</Tag>;
-        if (type === '면세') return <Tag color="#52C41A">면세</Tag>;
-        return '-';
-      },
-    },
-    {
-      title: '사업자등록증',
-      dataIndex: 'id',
-      key: 'certificate',
-      width: 120,
-      align: 'center',
-      render: (id) => {
-        const detail = driverDetails[id];
-        const hasCertificate = detail?.settlementInfo?.hasCertificate;
-        return (
-          <input
-            type="checkbox"
-            checked={hasCertificate || false}
-            disabled
-           
-          />
-        );
-      },
-    },
-    {
-      title: '상세',
-      key: 'action',
-      width: 80,
-      align: 'center',
-      render: (_, record) => (
-        <Button size="small" onClick={() => navigate(`/driver/${record.id}`)}>
-          상세
-        </Button>
-      ),
-    },
-  ];
-
   return (
-    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Title level={2}>드라이버 관리</Title>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col gap-6 w-full">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">드라이버 관리</h2>
+          <FMButton
+            variant="primary"
+            icon={<PlusOutlined className="h-4 w-4" />}
+            onClick={() => navigate('/driver/register')}
+          >
+            드라이버 등록
+          </FMButton>
+        </div>
 
-      {/* 필터 */}
-      <Card>
-        <Row gutter={16}>
-          <Col xs={24} md={8}>
-            <Text style={{ display: 'block', marginBottom: 8 }}>차종</Text>
-            <Select
+      {/* 필터 영역 */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">차종:</label>
+            <FMSelectSimple
               value={vehicleTypeFilter}
               onChange={setVehicleTypeFilter}
-              style={{ width: '100%' }}
               options={[
                 { value: '전체', label: '전체' },
                 { value: '5.0톤', label: '5.0톤' },
-                { value: '1.0톤', label: '1.0톤' },
+                { value: '1.0톤', label: '1.0톤' }
               ]}
+              className="w-32"
             />
-          </Col>
-          <Col xs={24} md={8}>
-            <Text style={{ display: 'block', marginBottom: 8 }}>과세유형</Text>
-            <Select
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">과세유형:</label>
+            <FMSelectSimple
               value={taxTypeFilter}
               onChange={setTaxTypeFilter}
-              style={{ width: '100%' }}
               options={[
                 { value: '전체', label: '전체' },
                 { value: '과세', label: '과세' },
                 { value: '면세', label: '면세' },
-                { value: '미등록', label: '미등록' },
+                { value: '미등록', label: '미등록' }
               ]}
+              className="w-32"
             />
-          </Col>
-          <Col xs={24} md={8}>
-            <Text style={{ display: 'block', marginBottom: 8 }}>상태</Text>
-            <Select
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">상태:</label>
+            <FMSelectSimple
               value={statusFilter}
               onChange={setStatusFilter}
-              style={{ width: '100%' }}
               options={[
                 { value: '활성', label: '활성' },
                 { value: '비활성', label: '비활성' },
-                { value: '전체', label: '전체' },
+                { value: '전체', label: '전체' }
               ]}
+              className="w-28"
             />
-          </Col>
-        </Row>
-      </Card>
-
-      {/* 상단 버튼 영역 */}
-      <Flex justify="space-between" align="center">
-        <Tag color="blue">총 {sortedDrivers.length}명</Tag>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/driver/register')}>
-          드라이버 등록
-        </Button>
-      </Flex>
+          </div>
+        </div>
+      </div>
 
       {/* 테이블 */}
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={sortedDrivers}
-          rowKey="id"
-          pagination={{ pageSize: 20, showSizeChanger: false }}
-          rowClassName={(record) => record.status === 'inactive' ? 'opacity-50' : ''}
-        />
-      </Card>
-      </Space>
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-gray-50">
+              <tr className="border-b border-gray-200">
+                <th
+                  className="px-4 py-3 text-left text-sm font-medium text-gray-700 cursor-pointer select-none"
+                  onClick={() => handleSort('name')}
+                >
+                  드라이버명 {renderSortIcon('name')}
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-sm font-medium text-gray-700 cursor-pointer select-none"
+                  onClick={() => handleSort('vehicleType')}
+                >
+                  차종 {renderSortIcon('vehicleType')}
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">보유통수</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">전화번호</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">정산사업자</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">과세유형</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자등록증</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상세</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedDrivers.map((record) => {
+                const detail = driverDetails[record.id];
+                const hasCertificate = detail?.settlementInfo?.hasCertificate;
+
+                return (
+                  <tr
+                    key={record.id}
+                    className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                      record.status === 'inactive' ? 'opacity-50' : ''
+                    }`}
+                  >
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        onClick={() => navigate(`/driver/${record.id}`)}
+                        className="text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        {record.name}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{record.vehicleType}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{record.tankCount}통</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{record.phone}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{record.settlementBusiness || '-'}</td>
+                    <td className="px-4 py-3 text-sm">
+                      {!record.taxType && (
+                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700">
+                          미등록
+                        </span>
+                      )}
+                      {record.taxType === '과세' && (
+                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700">
+                          과세
+                        </span>
+                      )}
+                      {record.taxType === '면세' && (
+                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-700">
+                          면세
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={hasCertificate || false}
+                        disabled
+                        className="h-4 w-4"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => navigate(`/driver/${record.id}`)}
+                        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      >
+                        상세
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export function FMButton({
   children,
   onClick,
+  href,
   type = 'button',
   variant = 'primary',
   disabled = false,
@@ -21,15 +23,28 @@ export function FMButton({
 
   const sizeClasses = 'px-3 py-2 text-sm font-semibold justify-center';
 
-  const buttonElement = (
+  const content = (
+    <>
+      {icon && <span className="mr-1">{icon}</span>}
+      {children}
+    </>
+  );
+
+  const buttonElement = href ? (
+    <Link
+      to={href}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses} ${className}`}
+    >
+      {content}
+    </Link>
+  ) : (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses} ${className}`}
     >
-      {icon && <span className="mr-1">{icon}</span>}
-      {children}
+      {content}
     </button>
   );
 

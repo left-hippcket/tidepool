@@ -1,0 +1,1070 @@
+import React, { useState } from 'react';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Tag, Space, Card, Flex, Typography, Tabs, Row, Col } from 'antd';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+
+const { Title, Text } = Typography;
+import {
+  productCategories as initialCategories,
+  products as initialProducts,
+  origins as initialOrigins,
+  specifications as initialSpecs
+} from '../data/mockData';
+
+function ProductManagement() {
+  const [categories, setCategories] = useState(initialCategories);
+  const [products, setProducts] = useState(initialProducts);
+  const [origins, setOrigins] = useState(initialOrigins);
+  const [specs, setSpecs] = useState(initialSpecs);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(''); // 'product' | 'origin' | 'spec'
+  const [editingItem, setEditingItem] = useState(null);
+  const [form] = Form.useForm();
+
+  const [activeTab, setActiveTab] = useState('category');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // 품목분류 인라인 편집 state
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryData, setNewCategoryData] = useState({ name: '' });
+  const [editingCategoryData, setEditingCategoryData] = useState({});
+
+  // 품목 인라인 편집 state
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [newProductData, setNewProductData] = useState({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+  const [editingProductData, setEditingProductData] = useState({});
+
+  // ===== 탭 1: 품목분류 관리 =====
+  const categoryColumns = [
+    {
+      title: '품목분류명',
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
+      render: (text, record) => {
+        if (record.id === editingCategoryId) {
+          return (
+            <Input
+              value={editingCategoryData.name}
+              onChange={(e) => setEditingCategoryData({ ...editingCategoryData, name: e.target.value })}
+              maxLength={20}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '품목수',
+      dataIndex: 'itemCount',
+      key: 'itemCount',
+      width: 100,
+      render: (count) => `${count}개`,
+    },
+    {
+      title: '상태',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status, record) => {
+        if (record.id === editingCategoryId) {
+          return (
+            <Select
+              value={editingCategoryData.status}
+              onChange={(value) => setEditingCategoryData({ ...editingCategoryData, status: value })}
+              style={{ width: 80 }}
+            >
+              <Select.Option value="active">활성</Select.Option>
+              <Select.Option value="inactive">비활성</Select.Option>
+            </Select>
+          );
+        }
+        return (
+          <Tag color={status === 'active' ? 'green' : 'default'}>
+            {status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: '액션',
+      key: 'action',
+      width: 150,
+      render: (_, record) => {
+        if (record.id === editingCategoryId) {
+          return (
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSaveCategory(record)}
+              >
+                저장
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleCancelCategory(record)}
+              >
+                취소
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Button type="link" onClick={() => handleEditCategory(record)}>
+            수정
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const handleAddCategory = () => {
+    if (isAddingCategory || editingCategoryId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setNewCategoryData({ name: '' });
+    setIsAddingCategory(true);
+  };
+
+  const handleEditCategory = (record) => {
+    if (isAddingCategory || editingCategoryId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setEditingCategoryId(record.id);
+    setEditingCategoryData({
+      name: record.name,
+      status: record.status,
+    });
+  };
+
+  const handleSaveCategory = (record) => {
+    if (!record || record.id === editingCategoryId) {
+      // 기존 항목 수정
+      if (!editingCategoryData.name || editingCategoryData.name.trim() === '') {
+        message.error('품목분류명을 입력해주세요.');
+        return;
+      }
+      if (editingCategoryData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      const activeItemCount = products.filter(
+        p => p.categoryId === record.id && p.status === 'active'
+      ).length;
+
+      if (editingCategoryData.status === 'inactive' && activeItemCount > 0) {
+        message.error(`해당 분류에 ${activeItemCount}개의 품목이 사용중이어서 비활성화할 수 없습니다. 먼저 모든 품목을 비활성화해주세요.`);
+        return;
+      }
+
+      setCategories(categories.map(c =>
+        c.id === record.id ? { ...c, ...editingCategoryData } : c
+      ));
+      setEditingCategoryId(null);
+      setEditingCategoryData({});
+      message.success('품목분류 정보가 수정되었습니다.');
+    } else {
+      // 신규 추가 (고정 폼에서)
+      if (!newCategoryData.name || newCategoryData.name.trim() === '') {
+        message.error('품목분류명을 입력해주세요.');
+        return;
+      }
+      if (newCategoryData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+
+      const newId = Math.max(...categories.map(c => c.id)) + 1;
+      setCategories([...categories, {
+        id: newId,
+        name: newCategoryData.name,
+        itemCount: 0,
+        status: 'active',
+      }]);
+      setIsAddingCategory(false);
+      setNewCategoryData({ name: '' });
+      message.success(`품목분류 '${newCategoryData.name}'이 등록되었습니다.`);
+    }
+  };
+
+  const handleCancelCategory = (record) => {
+    if (record && record.id === editingCategoryId) {
+      setEditingCategoryId(null);
+      setEditingCategoryData({});
+    } else {
+      setIsAddingCategory(false);
+      setNewCategoryData({ name: '' });
+    }
+  };
+
+  // ===== 탭 2: 품목 관리 =====
+  const productColumns = [
+    {
+      title: '품목분류',
+      dataIndex: 'categoryName',
+      key: 'categoryName',
+      width: 150,
+    },
+    {
+      title: '품목명',
+      dataIndex: 'name',
+      key: 'name',
+      width: 150,
+      render: (text, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Input
+              value={editingProductData.name}
+              onChange={(e) => setEditingProductData({ ...editingProductData, name: e.target.value })}
+              maxLength={20}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '주문단위',
+      dataIndex: 'orderUnit',
+      key: 'orderUnit',
+      width: 100,
+      render: (text, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Select
+              value={editingProductData.orderUnit}
+              onChange={(value) => setEditingProductData({ ...editingProductData, orderUnit: value })}
+              style={{ width: '100%' }}
+            >
+              <Select.Option value="통">통</Select.Option>
+              <Select.Option value="박스">박스</Select.Option>
+              <Select.Option value="kg">kg</Select.Option>
+            </Select>
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '주문단위당중량(kg)',
+      dataIndex: 'unitWeight',
+      key: 'unitWeight',
+      width: 150,
+      render: (text, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <InputNumber
+              value={editingProductData.unitWeight}
+              onChange={(value) => setEditingProductData({ ...editingProductData, unitWeight: value })}
+              min={0.1}
+              step={0.1}
+              style={{ width: '100%' }}
+            />
+          );
+        }
+        return text;
+      },
+    },
+    {
+      title: '원산지 개수',
+      dataIndex: 'originCount',
+      key: 'originCount',
+      width: 110,
+      render: (count) => `${count}개`,
+    },
+    {
+      title: '규격 개수',
+      dataIndex: 'specCount',
+      key: 'specCount',
+      width: 100,
+      render: (count) => `${count}개`,
+    },
+    {
+      title: '상태',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Select
+              value={editingProductData.status}
+              onChange={(value) => setEditingProductData({ ...editingProductData, status: value })}
+              style={{ width: 80 }}
+            >
+              <Select.Option value="active">활성</Select.Option>
+              <Select.Option value="inactive">비활성</Select.Option>
+            </Select>
+          );
+        }
+        return (
+          <Tag color={status === 'active' ? 'green' : 'default'}>
+            {status === 'active' ? '활성' : '비활성'}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: '액션',
+      key: 'action',
+      width: 150,
+      render: (_, record) => {
+        if (record.id === editingProductId) {
+          return (
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSaveProduct(record)}
+              >
+                저장
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleCancelProduct(record)}
+              >
+                취소
+              </Button>
+            </Space>
+          );
+        }
+        return (
+          <Button type="link" onClick={() => handleEditProduct(record)}>
+            수정
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const handleAddProduct = () => {
+    if (editingProductId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setNewProductData({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+    setIsAddingProduct(true);
+  };
+
+  const handleEditProduct = (record) => {
+    if (isAddingProduct || editingProductId !== null) {
+      message.warning('먼저 진행 중인 작업을 완료해주세요.');
+      return;
+    }
+    setEditingProductId(record.id);
+    setEditingProductData({
+      name: record.name,
+      orderUnit: record.orderUnit,
+      unitWeight: record.unitWeight,
+      status: record.status,
+    });
+  };
+
+  const handleSaveProduct = (record) => {
+    if (!record || record.id === editingProductId) {
+      // 기존 항목 수정
+      if (!editingProductData.name || editingProductData.name.trim() === '') {
+        message.error('품목명을 입력해주세요.');
+        return;
+      }
+      if (!editingProductData.orderUnit) {
+        message.error('주문단위를 선택해주세요.');
+        return;
+      }
+      if (!editingProductData.unitWeight || editingProductData.unitWeight <= 0) {
+        message.error('주문단위당중량을 입력해주세요.');
+        return;
+      }
+
+      const activeOriginCount = origins.filter(
+        o => o.productId === record.id && o.status === 'active'
+      ).length;
+      const activeSpecCount = specs.filter(
+        s => s.productId === record.id && s.status === 'active'
+      ).length;
+
+      if (editingProductData.status === 'inactive' && (activeOriginCount > 0 || activeSpecCount > 0)) {
+        message.error(`소속된 활성 원산지/규격이 ${activeOriginCount + activeSpecCount}개 남아있어 비활성화할 수 없습니다. 먼저 '원산지/규격 관리' 탭에서 모든 원산지와 규격을 비활성화해주세요.`);
+        return;
+      }
+
+      setProducts(products.map(p =>
+        p.id === record.id ? { ...p, ...editingProductData } : p
+      ));
+      setEditingProductId(null);
+      setEditingProductData({});
+      message.success('품목 정보가 수정되었습니다.');
+    } else {
+      // 신규 추가 (고정 폼에서)
+      if (!newProductData.categoryId) {
+        message.error('품목분류를 선택해주세요.');
+        return;
+      }
+      if (!newProductData.name || newProductData.name.trim() === '') {
+        message.error('품목명을 입력해주세요.');
+        return;
+      }
+      if (newProductData.name.length > 20) {
+        message.error('최대 20자까지 입력 가능합니다.');
+        return;
+      }
+      if (!newProductData.orderUnit) {
+        message.error('주문단위를 선택해주세요.');
+        return;
+      }
+      if (!newProductData.unitWeight || newProductData.unitWeight <= 0) {
+        message.error('주문단위당중량을 입력해주세요.');
+        return;
+      }
+
+      const newId = Math.max(...products.map(p => p.id)) + 1;
+      const category = categories.find(c => c.id === newProductData.categoryId);
+      setProducts([...products, {
+        id: newId,
+        categoryId: newProductData.categoryId,
+        categoryName: category.name,
+        name: newProductData.name,
+        orderUnit: newProductData.orderUnit,
+        unitWeight: parseFloat(newProductData.unitWeight),
+        originCount: 0,
+        specCount: 0,
+        status: 'active',
+      }]);
+      setIsAddingProduct(false);
+      setNewProductData({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+      message.success(`품목 '${category.name} / ${newProductData.name}'이 등록되었습니다. 원산지와 규격은 '원산지/규격 관리' 탭에서 추가하실 수 있습니다.`);
+    }
+  };
+
+  const handleCancelProduct = (record) => {
+    if (record && record.id === editingProductId) {
+      setEditingProductId(null);
+      setEditingProductData({});
+    } else {
+      setIsAddingProduct(false);
+      setNewProductData({ categoryId: '', name: '', orderUnit: '', unitWeight: '' });
+    }
+  };
+
+  const filteredProducts = selectedCategoryFilter === 'all'
+    ? products
+    : products.filter(p => p.categoryId === parseInt(selectedCategoryFilter));
+
+  // ===== 탭 3: 원산지/규격 관리 =====
+  const handleProductSelect = (product) => {
+    setSelectedProduct(product);
+  };
+
+  const handleAddOrigin = () => {
+    if (!selectedProduct) {
+      message.warning('왼쪽에서 품목을 선택해주세요.');
+      return;
+    }
+    setModalType('origin');
+    setEditingItem(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleEditOrigin = (record) => {
+    setModalType('origin');
+    setEditingItem(record);
+    form.setFieldsValue(record);
+    setIsModalOpen(true);
+  };
+
+  const handleAddSpec = () => {
+    if (!selectedProduct) {
+      message.warning('왼쪽에서 품목을 선택해주세요.');
+      return;
+    }
+    setModalType('spec');
+    setEditingItem(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleEditSpec = (record) => {
+    setModalType('spec');
+    setEditingItem(record);
+    form.setFieldsValue(record);
+    setIsModalOpen(true);
+  };
+
+  const selectedOrigins = selectedProduct
+    ? origins.filter(o => o.productId === selectedProduct.id)
+    : [];
+
+  const selectedSpecs = selectedProduct
+    ? specs.filter(s => s.productId === selectedProduct.id)
+    : [];
+
+  // ===== 공통 제출 핸들러 (원산지/규격 전용) =====
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      if (modalType === 'origin') {
+        if (editingItem) {
+          setOrigins(origins.map(o =>
+            o.id === editingItem.id ? { ...o, ...values } : o
+          ));
+          message.success('원산지 정보가 수정되었습니다.');
+        } else {
+          // 쉼표로 구분된 여러 원산지명 처리
+          const originNames = values.name
+            .split(',')
+            .map(name => name.trim())
+            .filter(name => name.length > 0);
+
+          if (originNames.length === 0) {
+            message.error('원산지명을 입력해주세요.');
+            return;
+          }
+
+          let newId = Math.max(...origins.map(o => o.id)) + 1;
+          const newOrigins = originNames.map(name => ({
+            id: newId++,
+            productId: selectedProduct.id,
+            productName: selectedProduct.name,
+            name: name,
+            status: 'active',
+            createdAt: new Date().toISOString().split('T')[0],
+          }));
+
+          setOrigins([...origins, ...newOrigins]);
+
+          if (originNames.length === 1) {
+            message.success(`원산지 '${originNames[0]}'이 등록되었습니다.`);
+          } else {
+            message.success(`${originNames.length}개의 원산지가 등록되었습니다.`);
+          }
+        }
+      } else if (modalType === 'spec') {
+        if (editingItem) {
+          setSpecs(specs.map(s =>
+            s.id === editingItem.id ? { ...s, ...values } : s
+          ));
+          message.success('규격 정보가 수정되었습니다.');
+        } else {
+          // 쉼표로 구분된 여러 규격명 처리
+          const specNames = values.name
+            .split(',')
+            .map(name => name.trim())
+            .filter(name => name.length > 0);
+
+          if (specNames.length === 0) {
+            message.error('규격명을 입력해주세요.');
+            return;
+          }
+
+          let newId = Math.max(...specs.map(s => s.id)) + 1;
+          const newSpecs = specNames.map(name => ({
+            id: newId++,
+            productId: selectedProduct.id,
+            productName: selectedProduct.name,
+            name: name,
+            status: 'active',
+            createdAt: new Date().toISOString().split('T')[0],
+          }));
+
+          setSpecs([...specs, ...newSpecs]);
+
+          if (specNames.length === 1) {
+            message.success(`규격 '${specNames[0]}'이 등록되었습니다.`);
+          } else {
+            message.success(`${specNames.length}개의 규격이 등록되었습니다.`);
+          }
+        }
+      }
+
+      setIsModalOpen(false);
+      form.resetFields();
+    } catch (error) {
+      console.error('Validation failed:', error);
+    }
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>상품 관리</Title>
+
+      {/* 탭 버튼 */}
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={[
+          { key: 'category', label: '품목분류 관리' },
+          { key: 'product', label: '품목 관리' },
+          { key: 'origin-spec', label: '원산지/규격 관리' }
+        ]}
+      />
+
+      {/* 탭 1: 품목분류 관리 */}
+      {activeTab === 'category' && (
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          {!isAddingCategory && (
+            <Flex justify="flex-end">
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCategory}>
+                품목분류 등록
+              </Button>
+            </Flex>
+          )}
+
+          {isAddingCategory && (
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>품목분류 등록</Title>
+              <Flex align="flex-end" gap="middle">
+                <div style={{ flex: 1 }}>
+                  <Text style={{ display: 'block', marginBottom: 4 }}>
+                    품목분류명 <Text type="danger">*</Text>
+                  </Text>
+                  <Input
+                    value={newCategoryData.name}
+                    onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
+                    placeholder="예: 누운고기"
+                    maxLength={20}
+                    onPressEnter={handleSaveCategory}
+                  />
+                </div>
+                <Space>
+                  <Button onClick={handleCancelCategory}>취소</Button>
+                  <Button type="primary" onClick={handleSaveCategory}>
+                    저장
+                  </Button>
+                </Space>
+              </Flex>
+            </Card>
+          )}
+
+          <Card>
+            <Table
+              columns={categoryColumns}
+              dataSource={categories}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </Space>
+      )}
+
+      {/* 탭 2: 품목 관리 */}
+      {activeTab === 'product' && (
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Flex justify="space-between" align="center">
+            <Space>
+              <Text>품목분류:</Text>
+              <Select
+                style={{ width: 150 }}
+                value={selectedCategoryFilter}
+                onChange={setSelectedCategoryFilter}
+              >
+                <Select.Option value="all">전체</Select.Option>
+                {categories.filter(c => c.status === 'active').map(c => (
+                  <Select.Option key={c.id} value={c.id}>
+                    {c.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Space>
+            {!isAddingProduct && (
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddProduct}>
+                품목 등록
+              </Button>
+            )}
+          </Flex>
+
+          {isAddingProduct && (
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>품목 등록</Title>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <Flex gap="middle" wrap="wrap">
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      품목분류 <Text type="danger">*</Text>
+                    </Text>
+                  <Select
+                    value={newProductData.categoryId}
+                    onChange={(value) => setNewProductData({ ...newProductData, categoryId: value })}
+                    placeholder="품목분류 선택"
+                    style={{ width: '100%' }}
+                  >
+                    {categories.filter(c => c.status === 'active').map(c => (
+                      <Select.Option key={c.id} value={c.id}>
+                        {c.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      품목명 <Text type="danger">*</Text>
+                    </Text>
+                    <Input
+                      value={newProductData.name}
+                      onChange={(e) => setNewProductData({ ...newProductData, name: e.target.value })}
+                      placeholder="예: 광어"
+                      maxLength={20}
+                    />
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      주문단위 <Text type="danger">*</Text>
+                    </Text>
+                    <Select
+                      value={newProductData.orderUnit}
+                      onChange={(value) => setNewProductData({ ...newProductData, orderUnit: value })}
+                      placeholder="주문단위 선택"
+                      style={{ width: '100%' }}
+                    >
+                      <Select.Option value="통">통</Select.Option>
+                      <Select.Option value="박스">박스</Select.Option>
+                      <Select.Option value="kg">kg</Select.Option>
+                    </Select>
+                  </div>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <Text style={{ display: 'block', marginBottom: 4 }}>
+                      주문단위당중량(kg) <Text type="danger">*</Text>
+                    </Text>
+                    <InputNumber
+                      value={newProductData.unitWeight}
+                      onChange={(value) => setNewProductData({ ...newProductData, unitWeight: value })}
+                      placeholder="예: 1.2"
+                      style={{ width: '100%' }}
+                      min={0.1}
+                      step={0.1}
+                    />
+                  </div>
+                </Flex>
+                <Flex justify="flex-end" gap="small">
+                  <Button onClick={handleCancelProduct}>취소</Button>
+                  <Button type="primary" onClick={handleSaveProduct}>저장</Button>
+                </Flex>
+              </Space>
+            </Card>
+          )}
+
+          <Card>
+            <Table
+              columns={productColumns}
+              dataSource={filteredProducts}
+              rowKey="id"
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </Space>
+      )}
+
+      {/* 탭 3: 원산지/규격 관리 */}
+      {activeTab === 'origin-spec' && (
+        <Row gutter={16}>
+          {/* 왼쪽: 품목 선택 */}
+          <Col xs={24} lg={6}>
+            <Card>
+              <Title level={5} style={{ marginBottom: 16 }}>품목 선택</Title>
+              <div style={{ marginBottom: 12 }}>
+                <Select
+                  style={{ width: '100%' }}
+                  placeholder="품목분류 필터"
+                  allowClear
+                  onChange={(value) => {
+                    setSelectedCategoryFilter(value || 'all');
+                    setSelectedProduct(null);
+                  }}
+                >
+                  {categories.map(c => (
+                    <Select.Option key={c.id} value={c.id}>
+                      {c.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </div>
+              <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 500, overflow: 'auto' }}>
+                {filteredProducts.map(p => (
+                  <div
+                    key={p.id}
+                    onClick={() => handleProductSelect(p)}
+                    style={{
+                      padding: 12,
+                      cursor: 'pointer',
+                      borderRadius: 8,
+                      border: selectedProduct?.id === p.id ? '1px solid #1890ff' : '1px solid #d9d9d9',
+                      backgroundColor: selectedProduct?.id === p.id ? '#e6f7ff' : '#fff',
+                      transition: 'all 0.3s'
+                    }}
+                  >
+                    <Text style={{ fontSize: 14, fontWeight: 500 }}>
+                      {p.categoryName} / {p.name}
+                    </Text>
+                    {p.status === 'inactive' && (
+                      <Tag size="small" style={{ marginTop: 4 }}>비활성</Tag>
+                    )}
+                  </div>
+                ))}
+              </Space>
+            </Card>
+          </Col>
+
+          {/* 중앙: 원산지 관리 */}
+          <Col xs={24} lg={9}>
+            <Card>
+              <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+                <Title level={5} style={{ margin: 0 }}>
+                  {selectedProduct ? `${selectedProduct.categoryName} / ${selectedProduct.name}` : '원산지 관리'}
+                </Title>
+                {selectedProduct && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={handleAddOrigin}
+                    disabled={selectedProduct?.status === 'inactive'}
+                  >
+                    원산지 추가
+                  </Button>
+                )}
+              </Flex>
+              {!selectedProduct ? (
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
+                  왼쪽에서 품목을 선택해주세요.
+                </div>
+              ) : (
+                <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 500, overflow: 'auto' }}>
+                  {selectedOrigins.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#8c8c8c' }}>
+                      등록된 원산지가 없습니다.
+                    </div>
+                  ) : (
+                    selectedOrigins.map(origin => (
+                      <Card
+                        key={origin.id}
+                        size="small"
+                        style={{
+                          backgroundColor: origin.status === 'active' ? '#fff' : '#fafafa'
+                        }}
+                      >
+                        <Flex justify="space-between" align="center">
+                          <div>
+                            <Text style={{ fontWeight: 500 }}>{origin.name}</Text>
+                            <Tag
+                              color={origin.status === 'active' ? 'green' : 'default'}
+                              style={{ marginLeft: 8 }}
+                            >
+                              {origin.status === 'active' ? '활성' : '비활성'}
+                            </Tag>
+                          </div>
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditOrigin(origin)}
+                          >
+                            수정
+                          </Button>
+                        </Flex>
+                      </Card>
+                    ))
+                  )}
+                </Space>
+              )}
+            </Card>
+          </Col>
+
+          {/* 우측: 규격 관리 */}
+          <Col xs={24} lg={9}>
+            <Card>
+              <Flex justify="space-between" align="center" style={{ marginBottom: 16 }}>
+                <Title level={5} style={{ margin: 0 }}>
+                  {selectedProduct ? `${selectedProduct.categoryName} / ${selectedProduct.name}` : '규격 관리'}
+                </Title>
+                {selectedProduct && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<PlusOutlined />}
+                    onClick={handleAddSpec}
+                    disabled={selectedProduct?.status === 'inactive'}
+                  >
+                    규격 추가
+                  </Button>
+                )}
+              </Flex>
+              {!selectedProduct ? (
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
+                  왼쪽에서 품목을 선택해주세요.
+                </div>
+              ) : (
+                <Space direction="vertical" size="small" style={{ width: '100%', maxHeight: 500, overflow: 'auto' }}>
+                  {selectedSpecs.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '24px 0', color: '#8c8c8c' }}>
+                      등록된 규격이 없습니다.
+                    </div>
+                  ) : (
+                    selectedSpecs.map(spec => (
+                      <Card
+                        key={spec.id}
+                        size="small"
+                        style={{
+                          backgroundColor: spec.status === 'active' ? '#fff' : '#fafafa'
+                        }}
+                      >
+                        <Flex justify="space-between" align="center">
+                          <div>
+                            <Text style={{ fontWeight: 500 }}>{spec.name}</Text>
+                            <Tag
+                              color={spec.status === 'active' ? 'green' : 'default'}
+                              style={{ marginLeft: 8 }}
+                            >
+                              {spec.status === 'active' ? '활성' : '비활성'}
+                            </Tag>
+                          </div>
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditSpec(spec)}
+                          >
+                            수정
+                          </Button>
+                        </Flex>
+                      </Card>
+                    ))
+                  )}
+                </Space>
+              )}
+            </Card>
+          </Col>
+        </Row>
+      )}
+      </Space>
+
+      {/* 공통 모달 (원산지/규격 전용) */}
+      <Modal
+        title={
+          modalType === 'origin' ? (editingItem ? '원산지 수정' : `원산지 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
+          modalType === 'spec' ? (editingItem ? '규격 수정' : `규격 등록 - ${selectedProduct?.categoryName} / ${selectedProduct?.name}`) :
+          ''
+        }
+        open={isModalOpen}
+        onOk={handleSubmit}
+        onCancel={() => {
+          setIsModalOpen(false);
+          form.resetFields();
+        }}
+        okText={editingItem ? '저장' : '등록'}
+        cancelText="취소"
+        width={500}
+      >
+        <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
+          {modalType === 'origin' && (
+            <>
+              {editingItem ? (
+                // 수정 모드: 단일 원산지명
+                <>
+                  <Form.Item
+                    label="원산지명"
+                    name="name"
+                    rules={[
+                      { required: true, message: '원산지명을 입력해주세요' },
+                      { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                    ]}
+                  >
+                    <Input placeholder="예: 완도" />
+                  </Form.Item>
+                  <Form.Item
+                    label="상태"
+                    name="status"
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      <Select.Option value="active">활성</Select.Option>
+                      <Select.Option value="inactive">비활성</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </>
+              ) : (
+                // 추가 모드: 여러 원산지명을 쉼표로 구분 입력
+                <>
+                  <Form.Item
+                    label="원산지명 (여러 개 입력 시 쉼표로 구분)"
+                    name="name"
+                    rules={[
+                      { required: true, message: '원산지명을 입력해주세요' },
+                    ]}
+                  >
+                    <Input.TextArea
+                      placeholder="예: 완도, 진도, 통영, 거제&#10;(쉼표로 구분하여 여러 개를 한 번에 등록할 수 있습니다)"
+                      rows={4}
+                    />
+                  </Form.Item>
+                  <div className="text-xs text-gray-500 mt-1 -mt-4 mb-4">
+                    💡 팁: 쉼표(,)로 구분하여 여러 원산지를 한 번에 등록할 수 있습니다.
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {modalType === 'spec' && (
+            <>
+              {editingItem ? (
+                // 수정 모드: 단일 규격명
+                <>
+                  <Form.Item
+                    label="규격명"
+                    name="name"
+                    rules={[
+                      { required: true, message: '규격명을 입력해주세요' },
+                      { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                    ]}
+                  >
+                    <Input placeholder="예: 1.2kg, 4~5kg" />
+                  </Form.Item>
+                  <Form.Item
+                    label="상태"
+                    name="status"
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      <Select.Option value="active">활성</Select.Option>
+                      <Select.Option value="inactive">비활성</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </>
+              ) : (
+                // 추가 모드: 여러 규격명을 쉼표로 구분 입력
+                <>
+                  <Form.Item
+                    label="규격명 (여러 개 입력 시 쉼표로 구분)"
+                    name="name"
+                    rules={[
+                      { required: true, message: '규격명을 입력해주세요' },
+                    ]}
+                  >
+                    <Input.TextArea
+                      placeholder="예: 500g, 700g, 1.0kg, 1.2kg&#10;(쉼표로 구분하여 여러 개를 한 번에 등록할 수 있습니다)"
+                      rows={4}
+                    />
+                  </Form.Item>
+                  <div className="text-xs text-gray-500 mt-1 -mt-4 mb-4">
+                    💡 팁: 쉼표(,)로 구분하여 여러 규격을 한 번에 등록할 수 있습니다.
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </Form>
+      </Modal>
+    </div>
+  );
+}
+
+export default ProductManagement;

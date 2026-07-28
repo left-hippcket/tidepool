@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Select, message, Card, Space, Flex, Typography, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { buyerGroups, managers, territories } from '../data/mockData';
-
-const { Title, Text } = Typography;
+import { FMSelectSimple } from '../components/ui/FMSelectSimple';
+import { FMButton } from '../components/ui/FMButton';
 
 function BuyerManagement() {
   const navigate = useNavigate();
@@ -39,164 +38,164 @@ function BuyerManagement() {
   const sortedData = filteredData;
 
   return (
-    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Title level={2}>바이어 관리</Title>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col gap-6 w-full">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">바이어 관리</h2>
+          <FMButton
+            variant="primary"
+            icon={<PlusOutlined className="h-4 w-4" />}
+            onClick={handleRegister}
+          >
+            바이어 등록
+          </FMButton>
+        </div>
 
       {/* 필터 영역 */}
-      <Card>
-        <Space wrap size="middle">
-            <Space size="small">
-              <Text>담당영업사원:</Text>
-              <Select
-                style={{ width: 128 }}
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">담당영업사원:</label>
+              <FMSelectSimple
                 value={selectedSalesPerson}
                 onChange={setSelectedSalesPerson}
-              >
-                <Select.Option value="전체">전체</Select.Option>
-                {managers.map(m => (
-                  <Select.Option key={m} value={m}>{m}</Select.Option>
-                ))}
-              </Select>
-            </Space>
+                options={[
+                  { value: '전체', label: '전체' },
+                  ...managers.map(m => ({ value: m, label: m }))
+                ]}
+                className="w-32"
+              />
+            </div>
 
-            <Space size="small">
-              <Text>주요품목분류:</Text>
-              <Select
-                style={{ width: 128 }}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">주요품목분류:</label>
+              <FMSelectSimple
                 value={selectedCategory}
                 onChange={setSelectedCategory}
-              >
-                <Select.Option value="전체">전체</Select.Option>
-                <Select.Option value="누운고기">누운고기</Select.Option>
-                <Select.Option value="뜬고기">뜬고기</Select.Option>
-                <Select.Option value="갑각류">갑각류</Select.Option>
-              </Select>
-            </Space>
+                options={[
+                  { value: '전체', label: '전체' },
+                  { value: '누운고기', label: '누운고기' },
+                  { value: '뜬고기', label: '뜬고기' },
+                  { value: '갑각류', label: '갑각류' }
+                ]}
+                className="w-32"
+              />
+            </div>
 
-            <Space size="small">
-              <Text>사업권역:</Text>
-              <Select
-                style={{ width: 128 }}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">사업권역:</label>
+              <FMSelectSimple
                 value={selectedTerritory}
                 onChange={setSelectedTerritory}
-              >
-                <Select.Option value="전체">전체</Select.Option>
-                {territories
-                  .sort((a, b) => a.displayOrder - b.displayOrder)
-                  .map(t => (
-                    <Select.Option key={t.id} value={t.name}>{t.name}</Select.Option>
-                  ))}
-              </Select>
-            </Space>
+                options={[
+                  { value: '전체', label: '전체' },
+                  ...territories
+                    .sort((a, b) => a.displayOrder - b.displayOrder)
+                    .map(t => ({ value: t.name, label: t.name }))
+                ]}
+                className="w-32"
+              />
+            </div>
 
-            <Space size="small">
-              <Text>상세지역:</Text>
-              <Select
-                style={{ width: 128 }}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">상세지역:</label>
+              <FMSelectSimple
                 value={selectedRegion}
                 onChange={setSelectedRegion}
-              >
-                <Select.Option value="전체">전체</Select.Option>
-                <Select.Option value="노량진">노량진</Select.Option>
-                <Select.Option value="하남/미사리">하남/미사리</Select.Option>
-                <Select.Option value="경기남부">경기남부</Select.Option>
-                <Select.Option value="부산">부산</Select.Option>
-              </Select>
-            </Space>
+                options={[
+                  { value: '전체', label: '전체' },
+                  { value: '노량진', label: '노량진' },
+                  { value: '하남/미사리', label: '하남/미사리' },
+                  { value: '경기남부', label: '경기남부' },
+                  { value: '부산', label: '부산' }
+                ]}
+                className="w-32"
+              />
+            </div>
 
-            <Space size="small">
-              <Text>상태:</Text>
-              <Select
-                style={{ width: 112 }}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">상태:</label>
+              <FMSelectSimple
                 value={selectedStatus}
                 onChange={setSelectedStatus}
-              >
-                <Select.Option value="전체">전체</Select.Option>
-                <Select.Option value="활성">활성</Select.Option>
-                <Select.Option value="비활성">비활성</Select.Option>
-              </Select>
-            </Space>
-        </Space>
-      </Card>
-
-      {/* 상단 버튼 영역 */}
-      <Flex justify="space-between" align="center">
-        <Tag color="blue">총 {sortedData.length}개 그룹</Tag>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleRegister}>
-          바이어 등록
-        </Button>
-      </Flex>
+                options={[
+                  { value: '전체', label: '전체' },
+                  { value: '활성', label: '활성' },
+                  { value: '비활성', label: '비활성' }
+                ]}
+                className="w-28"
+              />
+            </div>
+        </div>
+      </div>
 
       {/* 테이블 */}
-      <Card>
-        <Table
-          dataSource={sortedData}
-          rowKey="id"
-          pagination={{ pageSize: 10 }}
-          onRow={(record) => ({
-            onClick: () => handleViewDetail(record),
-            style: { cursor: 'pointer' }
-          })}
-          columns={[
-            {
-              title: '바이어그룹명',
-              dataIndex: 'name',
-              key: 'name',
-              render: (text, record) => (
-                <Button type="link" onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}>
-                  {text}
-                </Button>
-              ),
-            },
-            { title: '사업자수', dataIndex: 'businessCount', key: 'businessCount', render: (val) => `${val}개` },
-            { title: '담당영업사원', dataIndex: 'salesPerson', key: 'salesPerson' },
-            { title: '주요품목분류', dataIndex: 'mainCategory', key: 'mainCategory' },
-            { title: '사업권역', dataIndex: 'territory', key: 'territory' },
-            { title: '상세지역', dataIndex: 'region', key: 'region' },
-            {
-              title: <Text type="secondary">매출액(누적)</Text>,
-              dataIndex: 'totalSales',
-              key: 'totalSales',
-              align: 'right',
-              render: (val) => <Text type="secondary">{(val / 100000000).toFixed(1)}억</Text>
-            },
-            {
-              title: <Text type="secondary">매출액(최근 3개월)</Text>,
-              dataIndex: 'sales3M',
-              key: 'sales3M',
-              align: 'right',
-              render: (val) => <Text type="secondary">{(val / 100000000).toFixed(1)}억</Text>
-            },
-            {
-              title: <Text type="secondary">매출액(최근 1개월)</Text>,
-              dataIndex: 'sales1M',
-              key: 'sales1M',
-              align: 'right',
-              render: (val) => <Text type="secondary">{(val / 100000000).toFixed(1)}억</Text>
-            },
-            { title: '최근거래일', dataIndex: 'lastTradeDate', key: 'lastTradeDate' },
-            {
-              title: '사업자등록증',
-              dataIndex: 'hasCertificate',
-              key: 'hasCertificate',
-              align: 'center',
-              render: (val) => <input type="checkbox" checked={val} disabled />
-            },
-            {
-              title: '상세',
-              key: 'action',
-              align: 'center',
-              render: (_, record) => (
-                <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}>
-                  상세
-                </Button>
-              ),
-            },
-          ]}
-        />
-      </Card>
-      </Space>
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-gray-50">
+              <tr className="border-b border-gray-200">
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">바이어그룹명</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">사업자수</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">담당영업사원</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">주요품목분류</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">사업권역</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">상세지역</th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(누적)</th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(최근 3개월)</th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(최근 1개월)</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">최근거래일</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자등록증</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상세</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((record) => (
+                <tr
+                  key={record.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => handleViewDetail(record)}
+                >
+                  <td className="px-4 py-3 text-sm">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
+                      className="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      {record.name}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.businessCount}개</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.salesPerson}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.mainCategory}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.territory}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.region}</td>
+                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.totalSales / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.sales3M / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.sales1M / 100000000).toFixed(1)}억</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{record.lastTradeDate}</td>
+                  <td className="px-4 py-3 text-center">
+                    <input
+                      type="checkbox"
+                      checked={record.hasCertificate}
+                      disabled
+                      className="h-4 w-4"
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      상세
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div>
     </div>
   );
 }
