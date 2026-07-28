@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import StandardPriceComparison from './StandardPriceComparison';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-import { FMSelect } from '../components/ui/FMSelect';
+import { FMSelectSimple } from '../components/ui/FMSelectSimpleSimple';
 import { FMInput } from '../components/ui/FMInput';
 import { FMButton } from '../components/ui/FMButton';
 
@@ -343,8 +343,8 @@ function StandardPrice() {
             <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
               <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
               <div className="flex gap-3 items-center">
-                {/* FMSelect - 품목분류 */}
-                <FMSelect
+                {/* FMSelectSimple - 품목분류 */}
+                <FMSelectSimple
                   value={selectedCategory}
                   onChange={(value) => {
                     setSelectedCategory(value);
@@ -359,8 +359,8 @@ function StandardPrice() {
                   className="flex-1"
                 />
 
-                {/* FMSelect - 품목 */}
-                <FMSelect
+                {/* FMSelectSimple - 품목 */}
+                <FMSelectSimple
                   value={selectedProduct}
                   onChange={(value) => {
                     setSelectedProduct(value);
@@ -374,8 +374,8 @@ function StandardPrice() {
                   className="flex-1"
                 />
 
-                {/* FMSelect - 원산지 */}
-                <FMSelect
+                {/* FMSelectSimple - 원산지 */}
+                <FMSelectSimple
                   value={selectedOrigin}
                   onChange={(value) => setSelectedOrigin(value)}
                   options={[
@@ -465,7 +465,7 @@ function StandardPrice() {
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {editMode ? (
                         <div className="w-full min-w-[120px]">
-                          <FMSelect
+                          <FMSelectSimple
                             value={row.spec}
                             onChange={(value) => handleFieldChange(index, 'spec', value)}
                             options={(() => {

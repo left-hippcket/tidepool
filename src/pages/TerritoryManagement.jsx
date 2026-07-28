@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
+import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import {
   DndContext,
   closestCenter,
@@ -616,17 +617,20 @@ function TerritoryManagement() {
               {!editMode && isAddingTerritory && (
                 <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
                   <div className="flex flex-col gap-3">
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">
-                        권역명 <span className="text-red-500">*</span>
-                      </label>
-                      <FMInput
-                        value={newTerritoryData.name}
-                        onChange={(value) => setNewTerritoryData({ ...newTerritoryData, name: value })}
-                        placeholder="권역명 입력"
-                        className="mt-1"
-                      />
-                    </div>
+                    <label className="flex w-full items-start gap-2">
+                      <span className="shrink-0 pt-2" style={{ width: '20%' }}>
+                        <span className="block text-sm text-gray-600 text-left font-medium">
+                          권역명 <span className="text-red-500">*</span>
+                        </span>
+                      </span>
+                      <span style={{ width: '80%' }}>
+                        <FMInput
+                          value={newTerritoryData.name}
+                          onChange={(value) => setNewTerritoryData({ ...newTerritoryData, name: value })}
+                          placeholder="권역명 입력"
+                        />
+                      </span>
+                    </label>
                     <div className="flex justify-end gap-2">
                       <FMButton variant="secondary" onClick={handleCancelTerritory}>취소</FMButton>
                       <FMButton variant="primary" onClick={handleSaveTerritory}>저장</FMButton>
@@ -681,7 +685,7 @@ function TerritoryManagement() {
                                           { value: 'active', label: '활성' },
                                           { value: 'inactive', label: '비활성' }
                                         ]}
-                                        className="w-20"
+                                        className="w-24"
                                       />
                                     </div>
                                   ) : (
@@ -740,17 +744,20 @@ function TerritoryManagement() {
                   {!editMode && isAddingRegion && (
                     <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
                       <div className="flex flex-col gap-3">
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">
-                            지역명 <span className="text-red-500">*</span>
-                          </label>
-                          <FMInput
-                            value={newRegionData.name}
-                            onChange={(value) => setNewRegionData({ ...newRegionData, name: value })}
-                            placeholder="지역명 입력"
-                            className="mt-1"
-                          />
-                        </div>
+                        <label className="flex w-full items-start gap-2">
+                          <span className="shrink-0 pt-2" style={{ width: '20%' }}>
+                            <span className="block text-sm text-gray-600 text-left font-medium">
+                              지역명 <span className="text-red-500">*</span>
+                            </span>
+                          </span>
+                          <span style={{ width: '80%' }}>
+                            <FMInput
+                              value={newRegionData.name}
+                              onChange={(value) => setNewRegionData({ ...newRegionData, name: value })}
+                              placeholder="지역명 입력"
+                            />
+                          </span>
+                        </label>
                         <div className="flex justify-end gap-2">
                           <FMButton variant="secondary" onClick={handleCancelRegion}>취소</FMButton>
                           <FMButton variant="primary" onClick={handleSaveRegion}>저장</FMButton>
@@ -803,7 +810,7 @@ function TerritoryManagement() {
                                                 { value: 'active', label: '활성' },
                                                 { value: 'inactive', label: '비활성' }
                                               ]}
-                                              className="w-20"
+                                              className="w-24"
                                             />
                                           </div>
                                         ) : (

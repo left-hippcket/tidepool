@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-import { FMSelect } from '../components/ui/FMSelect';
+import { FMSelectSimple } from '../components/ui/FMSelectSimpleSimple';
 import { FMButton } from '../components/ui/FMButton';
 
 function StandardPriceRegister() {
@@ -149,7 +149,7 @@ function StandardPriceRegister() {
 
           <div className="flex-1">
             <label className="mb-1 block text-sm font-medium text-gray-700">품목분류</label>
-            <FMSelect
+            <FMSelectSimple
               value={selectedCategory}
               onChange={(value) => onCategoryChange(value)}
               options={productCategories.map(cat => ({ value: cat.id, label: cat.name }))}
@@ -159,7 +159,7 @@ function StandardPriceRegister() {
 
           <div className="flex-1">
             <label className="mb-1 block text-sm font-medium text-gray-700">품목</label>
-            <FMSelect
+            <FMSelectSimple
               value={selectedProduct || ''}
               onChange={(value) => onProductChange(value)}
               options={[
@@ -172,7 +172,7 @@ function StandardPriceRegister() {
 
           <div className="flex-1">
             <label className="mb-1 block text-sm font-medium text-gray-700">원산지</label>
-            <FMSelect
+            <FMSelectSimple
               value={selectedOrigin || ''}
               onChange={(value) => onOriginChange(parseInt(value))}
               options={[

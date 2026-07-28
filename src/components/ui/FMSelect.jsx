@@ -1,79 +1,111 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
+import Select from 'react-select';
 
-export function FMSelect({ value, onChange, options, placeholder = "선택", className = "" }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef(null);
-
-  // 선택된 옵션 찾기
-  const selectedOption = options.find(opt => opt.value === value);
-  const displayText = selectedOption ? selectedOption.label : placeholder;
-
-  // 외부 클릭 감지
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
+export function FMSelect({ value, onChange, options, placeholder = "선택", className = "", isDisabled = false }) {
+  // react-select 스타일 커스터마이징
+  const customStyles = {
+    control: (base, state) => ({
+      ...base,
+      borderRadius: '0.5rem',
+      border: state.isFocused ? '1px solid #D1D5DB' : '1px solid #D1D5DB',
+      backgroundColor: 'white',
+      padding: '0.125rem',
+      fontSize: '0.875rem',
+      minHeight: '38px',
+      boxShadow: 'none',
+      transition: 'border-color 0.2s',
+      '&:hover': {
+        borderColor: '#D1D5DB',
       }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const handleSelect = (optionValue) => {
-    onChange(optionValue);
-    setIsOpen(false);
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      gap: '0.25rem',
+      padding: '0.25rem 0.5rem',
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: '#111827',
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: '#9CA3AF',
+    }),
+    input: (base) => ({
+      ...base,
+      color: 'inherit',
+      margin: 0,
+      padding: 0,
+    }),
+    indicatorSeparator: (base) => ({
+      ...base,
+      backgroundColor: '#E5E7EB',
+      marginTop: '0.375rem',
+      marginBottom: '0.375rem',
+      width: '1px',
+    }),
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: '0.5rem',
+      color: '#9CA3AF',
+      '&:hover': {
+        color: '#6B7280',
+      }
+    }),
+    clearIndicator: (base) => ({
+      ...base,
+      padding: '0.25rem',
+      color: '#9CA3AF',
+      cursor: 'pointer',
+      '&:hover': {
+        color: '#6B7280',
+      }
+    }),
+    menu: (base) => ({
+      ...base,
+      borderRadius: '0.5rem',
+      border: '1px solid #E5E7EB',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      marginTop: '0.25rem',
+      overflow: 'hidden',
+    }),
+    menuList: (base) => ({
+      ...base,
+      padding: 0,
+      maxHeight: '240px',
+    }),
+    option: (base, state) => ({
+      ...base,
+      fontSize: '0.875rem',
+      padding: '0.5rem 0.75rem',
+      backgroundColor: state.isSelected
+        ? '#EFF6FF'
+        : state.isFocused
+        ? '#F3F4F6'
+        : 'white',
+      color: state.isSelected ? '#1D4ED8' : '#111827',
+      cursor: 'pointer',
+      '&:active': {
+        backgroundColor: '#EFF6FF',
+      }
+    }),
   };
 
+  // value를 react-select 형식으로 변환
+  const selectedOption = options.find(opt => opt.value === value);
+
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      {/* Select Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full appearance-none rounded-lg border bg-white px-3 py-2 pr-8 text-left text-sm outline-none transition-colors hover:border-gray-400 ${
-          isOpen ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-300'
-        } ${!selectedOption ? 'text-gray-400' : 'text-gray-900'}`}
-      >
-        {displayText}
-      </button>
-
-      {/* Dropdown Arrow */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-        <svg
-          className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
-          <div className="max-h-60 overflow-auto py-1">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleSelect(option.value)}
-                className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 ${
-                  option.value === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-900'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className={className}>
+      <Select
+        value={selectedOption || null}
+        onChange={(option) => onChange(option?.value)}
+        options={options}
+        styles={customStyles}
+        placeholder={placeholder}
+        isClearable
+        isDisabled={isDisabled}
+        isSearchable={false}
+      />
     </div>
   );
 }

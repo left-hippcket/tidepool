@@ -3,7 +3,7 @@ import { Line } from '@ant-design/charts';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { productCategories, products, origins, specifications } from '../data/mockData';
-import { FMSelect } from '../components/ui/FMSelect';
+import { FMSelectSimple } from '../components/ui/FMSelectSimpleSimple';
 import { FMMultiSelect } from '../components/ui/FMMultiSelect';
 import { FMButton } from '../components/ui/FMButton';
 
@@ -241,8 +241,8 @@ function StandardPriceComparison({ activeTab }) {
           <div className="flex flex-col gap-4">
             {/* 첫 번째 줄 */}
             <div className="flex gap-3 items-center">
-              {/* FMSelect - 품목분류 */}
-              <FMSelect
+              {/* FMSelectSimple - 품목분류 */}
+              <FMSelectSimple
                 value={selectedCategory}
                 onChange={(value) => onCategoryChange(parseInt(value))}
                 options={[
@@ -253,8 +253,8 @@ function StandardPriceComparison({ activeTab }) {
                 className="flex-1"
               />
 
-              {/* FMSelect - 품목 */}
-              <FMSelect
+              {/* FMSelectSimple - 품목 */}
+              <FMSelectSimple
                 value={selectedProduct || ''}
                 onChange={(value) => onProductChange(parseInt(value))}
                 options={[
