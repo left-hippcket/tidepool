@@ -1064,8 +1064,11 @@ function ProductManagement() {
             )}
           </div>
         </div>
+        {/* End of 4-column grid */}
       </div>
+      {/* End of flex container */}
     </div>
+    {/* End of page container */}
   );
 }
 
