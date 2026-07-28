@@ -1064,6 +1064,7 @@ function ProductManagement() {
             )}
           </div>
         </div>
+        </div>
       </div>
     </div>
   );
