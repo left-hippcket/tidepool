@@ -683,7 +683,7 @@ function TerritoryManagement() {
                                           { value: 'active', label: '활성' },
                                           { value: 'inactive', label: '비활성' }
                                         ]}
-                                        className="w-24"
+                                        className="w-32"
                                       />
                                     </div>
                                   ) : (
@@ -806,7 +806,7 @@ function TerritoryManagement() {
                                                 { value: 'active', label: '활성' },
                                                 { value: 'inactive', label: '비활성' }
                                               ]}
-                                              className="w-24"
+                                              className="w-32"
                                             />
                                           </div>
                                         ) : (
