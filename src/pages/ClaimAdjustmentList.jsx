@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Card, Table, Button, DatePicker, Space, Typography, Badge, message, Divider, Modal
-} from 'antd';
+import { Table, Badge, Modal, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { claimAdjustmentData } from '../data/mockData';
+import { FMButton } from '../components/ui/FMButton';
+import toast from 'react-hot-toast';
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
-
-const { Title } = Typography;
-const { RangePicker } = DatePicker;
 
 function ClaimAdjustmentList() {
   const navigate = useNavigate();
@@ -98,7 +95,7 @@ function ClaimAdjustmentList() {
       cancelText: '취소',
       onOk: () => {
         // TODO: API 호출하여 클레임 삭제 및 거래장부 복구
-        message.success('클레임/조정이 삭제되었습니다.');
+        toast.success('클레임/조정이 삭제되었습니다.');
         // 페이지 새로고침 (실제로는 데이터 다시 조회)
       },
     });
@@ -358,75 +355,122 @@ function ClaimAdjustmentList() {
       width: 150,
       render: (_, record) => (
         <Space size="small">
-          <Button size="small" onClick={(e) => handleEdit(e, record.id)}>
+          <button
+            onClick={(e) => handleEdit(e, record.id)}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+          >
             수정
-          </Button>
-          <Button size="small" danger onClick={(e) => handleDelete(e, record)}>
+          </button>
+          <button
+            onClick={(e) => handleDelete(e, record)}
+            className="rounded-lg border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+          >
             삭제
-          </Button>
+          </button>
         </Space>
       ),
     },
   ];
 
   return (
-    <div>
-      {/* 헤더 */}
-      <div style={{ marginBottom: 24 }}>
-        <Title level={2} style={{ margin: 0, marginBottom: 16 }}>클레임/조정 관리</Title>
-      </div>
-
-      {/* 날짜 필터 + 등록 버튼 */}
-      <Card style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Space wrap>
-            <Button onClick={() => handleQuickDate('today')}>오늘</Button>
-            <Button onClick={() => handleQuickDate('yesterday')}>어제</Button>
-            <Button onClick={() => handleQuickDate('7days')}>최근 7일</Button>
-            <Button onClick={() => handleQuickDate('30days')}>최근 30일</Button>
-            <RangePicker
-              value={dateRange}
-              onChange={setDateRange}
-              format="YYYY-MM-DD"
-              style={{ width: 300 }}
-            />
-          </Space>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleRegister}
-          >
-            클레임/조정 등록
-          </Button>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col gap-6 w-full">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">클레임/조정 관리</h2>
         </div>
-      </Card>
 
-      {/* 테이블 */}
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={filteredData}
-          rowKey="id"
-          pagination={{
-            defaultPageSize: 20,
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            showTotal: (total) => `전체 ${total}건`,
-          }}
-          expandable={{
-            expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
-            expandedRowRender: renderExpandedRow,
-            showExpandColumn: false,
-          }}
-          onRow={(record) => ({
-            onClick: () => {
-              setExpandedRowKey(expandedRowKey === record.id ? null : record.id);
-            },
-            style: { cursor: 'pointer' },
-          })}
-          scroll={{ x: 1800 }}
-        />
-      </Card>
+        {/* 날짜 필터 + 등록 버튼 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <FMButton
+                onClick={() => handleQuickDate('today')}
+                variant="secondary"
+                className="whitespace-nowrap px-3 py-1.5"
+              >
+                오늘
+              </FMButton>
+              <FMButton
+                onClick={() => handleQuickDate('yesterday')}
+                variant="secondary"
+                className="whitespace-nowrap px-3 py-1.5"
+              >
+                어제
+              </FMButton>
+              <FMButton
+                onClick={() => handleQuickDate('7days')}
+                variant="secondary"
+                className="whitespace-nowrap px-3 py-1.5"
+              >
+                최근 7일
+              </FMButton>
+              <FMButton
+                onClick={() => handleQuickDate('30days')}
+                variant="secondary"
+                className="whitespace-nowrap px-3 py-1.5"
+              >
+                최근 30일
+              </FMButton>
+
+              {/* 기간 선택 UI */}
+              <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 w-[380px]">
+                <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
+                <input
+                  type="date"
+                  value={dateRange[0]?.format('YYYY-MM-DD')}
+                  onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
+                  className="text-sm outline-none w-[120px]"
+                />
+                <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                <span className="text-xs text-gray-600 whitespace-nowrap">종료일:</span>
+                <input
+                  type="date"
+                  value={dateRange[1]?.format('YYYY-MM-DD')}
+                  onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
+                  className="text-sm outline-none w-[120px]"
+                />
+              </div>
+            </div>
+            <FMButton
+              variant="primary"
+              icon={<PlusOutlined className="h-4 w-4" />}
+              onClick={handleRegister}
+            >
+              클레임/조정 등록
+            </FMButton>
+          </div>
+        </div>
+
+        {/* 테이블 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <Table
+            columns={columns}
+            dataSource={filteredData}
+            rowKey="id"
+            pagination={{
+              defaultPageSize: 20,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '50', '100'],
+              showTotal: (total) => `전체 ${total}건`,
+            }}
+            expandable={{
+              expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
+              expandedRowRender: renderExpandedRow,
+              showExpandColumn: false,
+            }}
+            onRow={(record) => ({
+              onClick: () => {
+                setExpandedRowKey(expandedRowKey === record.id ? null : record.id);
+              },
+              style: { cursor: 'pointer' },
+            })}
+            scroll={{ x: 1800 }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
