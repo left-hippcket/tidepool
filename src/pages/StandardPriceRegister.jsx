@@ -193,7 +193,7 @@ function StandardPriceRegister() {
           {selectedOrigin && (
             <div className="mb-8">
               <h3 className="mb-2 text-base font-semibold text-gray-900">규격별 가격</h3>
-              <div className="mb-4 text-sm text-gray-600">
+              <div className="mb-4 text-sm text-blue-600">
                 최근 가격이 자동 입력됩니다. 수정 가능하며, 빈 칸은 업데이트되지 않습니다.
               </div>
 
