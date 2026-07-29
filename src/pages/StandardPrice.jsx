@@ -230,10 +230,30 @@ function StandardPrice() {
     }
   };
 
-  // 중복 검증 함수
-  const isDuplicateEntry = (editedRow, allData, currentIndex) => {
-    return allData.some((row, idx) => {
+  // 중복 검증 함수 - 수정 중인 데이터 내부에서 중복 체크
+  const isDuplicateInEditingData = (editedRow, editingData, currentIndex) => {
+    return editingData.some((row, idx) => {
       if (idx === currentIndex) return false; // 자기 자신 제외
+      return (
+        row.applyDate === editedRow.applyDate &&
+        row.categoryName === editedRow.categoryName &&
+        row.productName === editedRow.productName &&
+        row.originName === editedRow.originName &&
+        row.spec === editedRow.spec
+      );
+    });
+  };
+
+  // 중복 검증 함수 - 전체 원본 데이터와 비교 (수정되지 않은 다른 데이터 포함)
+  const isDuplicateWithOriginalData = (editedRow, currentRowId) => {
+    return dataSource.some((row) => {
+      // 현재 수정 중인 행은 제외
+      if (row.id === currentRowId || row.key === currentRowId) return false;
+
+      // 수정 중인 데이터에 있는 행도 제외 (이미 위에서 체크함)
+      const isBeingEdited = editingDataSource.some(e => e.id === row.id || e.key === row.key);
+      if (isBeingEdited) return false;
+
       return (
         row.applyDate === editedRow.applyDate &&
         row.categoryName === editedRow.categoryName &&
@@ -253,9 +273,18 @@ function StandardPrice() {
 
     // 원산지나 규격 변경 시 중복 체크
     if (field === 'originName' || field === 'spec') {
-      const isDuplicate = isDuplicateEntry(updatedRow, editingDataSource, index);
-      if (isDuplicate) {
-        toast.error('이미 같은 조합(날짜+분류+품목+원산지+규격)이 존재합니다.');
+      // 1. 수정 중인 데이터 내부에서 중복 체크
+      const duplicateInEditing = isDuplicateInEditingData(updatedRow, editingDataSource, index);
+      if (duplicateInEditing) {
+        toast.error('수정 중인 데이터 내에 이미 같은 조합(날짜+분류+품목+원산지+규격)이 존재합니다.');
+        return;
+      }
+
+      // 2. 전체 원본 데이터와 중복 체크
+      const currentRowId = newData[index].id || newData[index].key;
+      const duplicateWithOriginal = isDuplicateWithOriginalData(updatedRow, currentRowId);
+      if (duplicateWithOriginal) {
+        toast.error('저장된 데이터에 이미 같은 조합(날짜+분류+품목+원산지+규격)이 존재합니다.');
         return;
       }
     }
@@ -276,8 +305,8 @@ function StandardPrice() {
   };
 
   const handleSaveAll = () => {
-    // 최종 중복 검증
-    const duplicates = [];
+    // 1. 수정 중인 데이터 내부에서 중복 검증
+    const internalDuplicates = [];
     for (let i = 0; i < editingDataSource.length; i++) {
       for (let j = i + 1; j < editingDataSource.length; j++) {
         const row1 = editingDataSource[i];
@@ -289,18 +318,53 @@ function StandardPrice() {
           row1.originName === row2.originName &&
           row1.spec === row2.spec
         ) {
-          duplicates.push({ row1: i + 1, row2: j + 1, row: row1 });
+          internalDuplicates.push({ row1: i + 1, row2: j + 1, row: row1 });
         }
       }
     }
 
-    if (duplicates.length > 0) {
-      const dupInfo = duplicates[0];
+    if (internalDuplicates.length > 0) {
+      const dupInfo = internalDuplicates[0];
       toast.error(
-        `중복된 조합이 있습니다:\n` +
+        `수정 중인 데이터 내에 중복된 조합이 있습니다:\n` +
         `${dupInfo.row.applyDate} / ${dupInfo.row.categoryName} / ${dupInfo.row.productName} / ` +
         `${dupInfo.row.originName} / ${dupInfo.row.spec}\n` +
-        `(${dupInfo.row1}번째 행과 ${dupInfo.row2}번째 행)`
+        `(표시된 ${dupInfo.row1}번째 행과 ${dupInfo.row2}번째 행)`
+      );
+      return;
+    }
+
+    // 2. 수정된 데이터와 수정되지 않은 원본 데이터 간 중복 검증
+    const editingIds = editingDataSource.map(e => e.id || e.key);
+    const nonEditingData = dataSource.filter(item => !editingIds.includes(item.id || item.key));
+
+    const externalDuplicates = [];
+    for (let i = 0; i < editingDataSource.length; i++) {
+      const editedRow = editingDataSource[i];
+      const duplicate = nonEditingData.find(row =>
+        row.applyDate === editedRow.applyDate &&
+        row.categoryName === editedRow.categoryName &&
+        row.productName === editedRow.productName &&
+        row.originName === editedRow.originName &&
+        row.spec === editedRow.spec
+      );
+
+      if (duplicate) {
+        externalDuplicates.push({
+          editedRowIndex: i + 1,
+          editedRow,
+          originalRow: duplicate
+        });
+      }
+    }
+
+    if (externalDuplicates.length > 0) {
+      const dupInfo = externalDuplicates[0];
+      toast.error(
+        `저장된 데이터와 중복된 조합이 있습니다:\n` +
+        `${dupInfo.editedRow.applyDate} / ${dupInfo.editedRow.categoryName} / ${dupInfo.editedRow.productName} / ` +
+        `${dupInfo.editedRow.originName} / ${dupInfo.editedRow.spec}\n` +
+        `(표시된 ${dupInfo.editedRowIndex}번째 행)`
       );
       return;
     }
