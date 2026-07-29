@@ -276,21 +276,26 @@ function StandardPrice() {
   const handleSaveAll = () => {
     // 수정된 데이터로 원본 데이터 업데이트
     const editingIds = editingDataSource.map(e => e.id || e.key);
+    const originalIds = originalDataSource.map(o => o.id || o.key);
 
     // 삭제된 행 제거 + 수정된 행 업데이트
     const updatedDataSource = dataSource
       .filter(item => {
+        const itemId = item.id || item.key;
         // 수정 모드에 있던 행들 중 삭제되지 않은 것만 유지
-        const wasInEditMode = originalDataSource.some(o => (o.id || o.key) === (item.id || item.key));
-        if (wasInEditMode) {
-          return editingIds.includes(item.id || item.key);
+        if (originalIds.includes(itemId)) {
+          return editingIds.includes(itemId);
         }
         return true; // 수정 모드에 없던 행은 그대로 유지
       })
       .map(item => {
-        // 수정된 값으로 교체
-        const editedItem = editingDataSource.find(e => (e.key === item.key || e.id === item.id));
-        return editedItem || item;
+        const itemId = item.id || item.key;
+        // 수정 모드에 있던 행만 수정된 값으로 교체
+        if (originalIds.includes(itemId)) {
+          const editedItem = editingDataSource.find(e => (e.id || e.key) === itemId);
+          return editedItem || item;
+        }
+        return item; // 수정 모드에 없던 행은 그대로 유지
       });
 
     setDataSource(updatedDataSource);
