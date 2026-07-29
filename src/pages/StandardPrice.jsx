@@ -18,9 +18,9 @@ function StandardPrice() {
   const [originalDataSource, setOriginalDataSource] = useState([]);
 
   // 필터 상태 - 디폴트 값 설정
-  const [selectedCategory, setSelectedCategory] = useState('모두');
-  const [selectedProduct, setSelectedProduct] = useState('모두');
-  const [selectedOrigin, setSelectedOrigin] = useState('모두');
+  const [selectedCategory, setSelectedCategory] = useState('누운고기');
+  const [selectedProduct, setSelectedProduct] = useState('넙치');
+  const [selectedOrigin, setSelectedOrigin] = useState('완도');
   const [selectedSpec, setSelectedSpec] = useState('모두');
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
   const [showLatestOnly, setShowLatestOnly] = useState(true);
@@ -435,7 +435,7 @@ function StandardPrice() {
                 />
 
                 {/* 기간 선택 */}
-                <div className="flex w-full flex-col gap-1 flex-1 min-w-[360px]">
+                <div className="flex w-full flex-col gap-1 min-w-[420px]">
                   <span className="block text-sm text-gray-600 text-left font-medium">기간</span>
                   <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
                     <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
@@ -443,7 +443,7 @@ function StandardPrice() {
                       type="date"
                       value={dateRange[0]?.format('YYYY-MM-DD')}
                       onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
-                      className="flex-1 text-sm outline-none"
+                      className="w-[130px] text-sm outline-none"
                     />
                     <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -453,7 +453,7 @@ function StandardPrice() {
                       type="date"
                       value={dateRange[1]?.format('YYYY-MM-DD')}
                       onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
-                      className="flex-1 text-sm outline-none"
+                      className="w-[130px] text-sm outline-none"
                     />
                   </div>
                 </div>
