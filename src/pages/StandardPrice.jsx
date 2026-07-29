@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
@@ -230,80 +230,36 @@ function StandardPrice() {
     }
   };
 
-  // 특정 행에서 선택 가능한 규격 목록 가져오기
-  const getAvailableSpecsForRow = (currentRow, currentIndex) => {
-    const currentRowId = currentRow.id || currentRow.key;
-
-    // 1. 수정 중인 데이터에서 이미 사용 중인 규격 찾기
-    const usedSpecsInEditing = editingDataSource
-      .filter((row, idx) => {
-        if (idx === currentIndex) return false; // 자기 자신 제외
-        return (
-          row.applyDate === currentRow.applyDate &&
-          row.categoryName === currentRow.categoryName &&
-          row.productName === currentRow.productName &&
-          row.originName === currentRow.originName
-        );
-      })
-      .map(row => row.spec);
-
-    // 2. 원본 데이터(수정되지 않은)에서 이미 사용 중인 규격 찾기
-    const editingIds = editingDataSource.map(e => e.id || e.key);
-    const usedSpecsInOriginal = dataSource
-      .filter(row => {
-        // 수정 중인 행은 제외
-        if (editingIds.includes(row.id || row.key)) return false;
-
-        return (
-          row.applyDate === currentRow.applyDate &&
-          row.categoryName === currentRow.categoryName &&
-          row.productName === currentRow.productName &&
-          row.originName === currentRow.originName
-        );
-      })
-      .map(row => row.spec);
-
-    // 3. 모든 사용 중인 규격 합치기
-    const allUsedSpecs = [...new Set([...usedSpecsInEditing, ...usedSpecsInOriginal])];
-
-    // 4. 해당 품목의 전체 규격 목록에서 사용 중인 것 제외
-    const allSpecsForProduct = [...new Set(
-      dataSource
-        .filter(d => d.productName === currentRow.productName)
-        .map(d => d.spec)
-        .filter(Boolean)
-    )];
-
-    // 사용 가능한 규격 = 전체 규격 - 사용 중인 규격
-    const availableSpecs = allSpecsForProduct.filter(spec => !allUsedSpecs.includes(spec));
-
-    // 현재 선택된 규격은 항상 포함 (수정 전 값)
-    if (currentRow.spec && !availableSpecs.includes(currentRow.spec)) {
-      availableSpecs.unshift(currentRow.spec);
-    }
-
-    return availableSpecs;
-  };
-
   const handleFieldChange = (index, field, value) => {
     const newData = [...editingDataSource];
-
-    // 원산지가 변경되면 규격을 리셋
-    if (field === 'originName') {
-      newData[index] = {
-        ...newData[index],
-        originName: value,
-        spec: null  // 규격 자동 리셋
-      };
-      toast.info('원산지가 변경되었습니다. 규격을 다시 선택해주세요.');
-    } else {
-      newData[index] = {
-        ...newData[index],
-        [field]: value
-      };
-    }
-
+    newData[index] = {
+      ...newData[index],
+      [field]: value
+    };
     setEditingDataSource(newData);
+  };
+
+  const handleDeleteRow = (index) => {
+    const row = editingDataSource[index];
+
+    if (window.confirm(
+      `이 행을 삭제하시겠습니까?\n\n` +
+      `날짜: ${row.applyDate}\n` +
+      `품목: ${row.productName}\n` +
+      `원산지: ${row.originName}\n` +
+      `규격: ${row.spec}\n` +
+      `가격: ${row.price.toLocaleString()}원`
+    )) {
+      const newData = editingDataSource.filter((_, idx) => idx !== index);
+
+      if (newData.length === 0) {
+        toast.error('최소 1개 이상의 행이 필요합니다. 모두 삭제하려면 수정 모드를 취소하세요.');
+        return;
+      }
+
+      setEditingDataSource(newData);
+      toast.success('행이 삭제되었습니다.');
+    }
   };
 
   const handleRegister = () => {
@@ -318,94 +274,36 @@ function StandardPrice() {
   };
 
   const handleSaveAll = () => {
-    // 0. 규격이 선택되지 않은 행 확인
-    const missingSpecs = editingDataSource
-      .map((row, idx) => ({ row, idx: idx + 1 }))
-      .filter(({ row }) => !row.spec);
-
-    if (missingSpecs.length > 0) {
-      const firstMissing = missingSpecs[0];
-      toast.error(
-        `규격이 선택되지 않은 행이 있습니다.\n` +
-        `${firstMissing.idx}번째 행 (${firstMissing.row.productName} ${firstMissing.row.originName})`
-      );
-      return;
-    }
-
-    // 1. 수정 중인 데이터 내부에서 중복 검증
-    const internalDuplicates = [];
-    for (let i = 0; i < editingDataSource.length; i++) {
-      for (let j = i + 1; j < editingDataSource.length; j++) {
-        const row1 = editingDataSource[i];
-        const row2 = editingDataSource[j];
-        if (
-          row1.applyDate === row2.applyDate &&
-          row1.categoryName === row2.categoryName &&
-          row1.productName === row2.productName &&
-          row1.originName === row2.originName &&
-          row1.spec === row2.spec
-        ) {
-          internalDuplicates.push({ row1: i + 1, row2: j + 1, row: row1 });
-        }
-      }
-    }
-
-    if (internalDuplicates.length > 0) {
-      const dupInfo = internalDuplicates[0];
-      toast.error(
-        `수정 중인 데이터 내에 중복된 조합이 있습니다:\n` +
-        `${dupInfo.row.applyDate} / ${dupInfo.row.categoryName} / ${dupInfo.row.productName} / ` +
-        `${dupInfo.row.originName} / ${dupInfo.row.spec}\n` +
-        `(표시된 ${dupInfo.row1}번째 행과 ${dupInfo.row2}번째 행)`
-      );
-      return;
-    }
-
-    // 2. 수정된 데이터와 수정되지 않은 원본 데이터 간 중복 검증
+    // 수정된 데이터로 원본 데이터 업데이트
     const editingIds = editingDataSource.map(e => e.id || e.key);
-    const nonEditingData = dataSource.filter(item => !editingIds.includes(item.id || item.key));
 
-    const externalDuplicates = [];
-    for (let i = 0; i < editingDataSource.length; i++) {
-      const editedRow = editingDataSource[i];
-      const duplicate = nonEditingData.find(row =>
-        row.applyDate === editedRow.applyDate &&
-        row.categoryName === editedRow.categoryName &&
-        row.productName === editedRow.productName &&
-        row.originName === editedRow.originName &&
-        row.spec === editedRow.spec
-      );
-
-      if (duplicate) {
-        externalDuplicates.push({
-          editedRowIndex: i + 1,
-          editedRow,
-          originalRow: duplicate
-        });
-      }
-    }
-
-    if (externalDuplicates.length > 0) {
-      const dupInfo = externalDuplicates[0];
-      toast.error(
-        `저장된 데이터와 중복된 조합이 있습니다:\n` +
-        `${dupInfo.editedRow.applyDate} / ${dupInfo.editedRow.categoryName} / ${dupInfo.editedRow.productName} / ` +
-        `${dupInfo.editedRow.originName} / ${dupInfo.editedRow.spec}\n` +
-        `(표시된 ${dupInfo.editedRowIndex}번째 행)`
-      );
-      return;
-    }
-
-    const updatedDataSource = dataSource.map(item => {
-      const editedItem = editingDataSource.find(e => e.key === item.key || e.id === item.id);
-      return editedItem || item;
-    });
+    // 삭제된 행 제거 + 수정된 행 업데이트
+    const updatedDataSource = dataSource
+      .filter(item => {
+        // 수정 모드에 있던 행들 중 삭제되지 않은 것만 유지
+        const wasInEditMode = originalDataSource.some(o => (o.id || o.key) === (item.id || item.key));
+        if (wasInEditMode) {
+          return editingIds.includes(item.id || item.key);
+        }
+        return true; // 수정 모드에 없던 행은 그대로 유지
+      })
+      .map(item => {
+        // 수정된 값으로 교체
+        const editedItem = editingDataSource.find(e => (e.key === item.key || e.id === item.id));
+        return editedItem || item;
+      });
 
     setDataSource(updatedDataSource);
     setEditMode(false);
     setEditingDataSource([]);
     setOriginalDataSource([]);
-    toast.success('모든 변경사항이 저장되었습니다.');
+
+    const deletedCount = originalDataSource.length - editingDataSource.length;
+    if (deletedCount > 0) {
+      toast.success(`${deletedCount}개 행 삭제, ${editingDataSource.length}개 행 수정되었습니다.`);
+    } else {
+      toast.success('모든 변경사항이 저장되었습니다.');
+    }
   };
 
   const handleCancelEdit = () => {
@@ -503,7 +401,7 @@ function StandardPrice() {
                   <path d="M12 8h.01" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <div className="font-medium text-blue-700">
-                  여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다.
+                  가격만 수정 가능합니다. 적용일자, 원산지, 규격, 출처가 잘못된 경우 삭제 버튼으로 삭제 후 재등록하세요.
                 </div>
               </div>
             </div>
@@ -646,56 +544,19 @@ function StandardPrice() {
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>규격</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 160 }}>표준가격</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>가격출처</th>
+                  {editMode && (
+                    <th className="px-4 py-3 text-center text-sm font-medium text-gray-700" style={{ width: 80 }}>삭제</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {paginatedData.map((row, index) => (
                   <tr key={row.id || row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <input
-                          type="date"
-                          value={row.applyDate}
-                          onChange={(e) => handleFieldChange(index, 'applyDate', e.target.value)}
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
-                        />
-                      ) : (
-                        row.applyDate
-                      )}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.applyDate}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{row.categoryName}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{row.productName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[100px]">
-                          <FMSelectSimple
-                            value={row.originName}
-                            onChange={(value) => handleFieldChange(index, 'originName', value)}
-                            options={availableOrigins.map(o => ({ value: o, label: o }))}
-                            placeholder="원산지"
-                          />
-                        </div>
-                      ) : (
-                        row.originName
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[120px]">
-                          <FMSelectSimple
-                            value={row.spec || ''}
-                            onChange={(value) => handleFieldChange(index, 'spec', value)}
-                            options={getAvailableSpecsForRow(row, index).map(spec => ({
-                              value: spec,
-                              label: spec
-                            }))}
-                            placeholder={!row.originName ? "먼저 원산지를 선택하세요" : "규격 선택"}
-                          />
-                        </div>
-                      ) : (
-                        row.spec
-                      )}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.originName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.spec}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {editMode ? (
                         <div className="w-full min-w-[140px]">
@@ -710,20 +571,19 @@ function StandardPrice() {
                         `${row.price.toLocaleString()}원`
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[120px]">
-                          <FMInput
-                            type="text"
-                            value={row.source}
-                            onChange={(value) => handleFieldChange(index, 'source', value)}
-                            placeholder="출처"
-                          />
-                        </div>
-                      ) : (
-                        row.source
-                      )}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{row.source}</td>
+                    {editMode && (
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => handleDeleteRow(index)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                          title="이 행 삭제"
+                        >
+                          <DeleteOutlined className="h-3 w-3" />
+                          삭제
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
