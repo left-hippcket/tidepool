@@ -15,7 +15,7 @@ function StandardPriceComparison({ activeTab }) {
   const [chartData, setChartData] = useState([]);
   const [allPriceData, setAllPriceData] = useState([]);
 
-  // 실제 데이터 로드
+  // 실제 데이터 로드 및 초기값 설정
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -26,6 +26,32 @@ function StandardPriceComparison({ activeTab }) {
         const data = await response.json();
         console.log('가격 비교 데이터 로드 성공:', data.length, '건');
         setAllPriceData(data);
+
+        // 초기 디폴트값 설정: 누운고기(categoryId=1) - 넙치
+        const nuwongogi = data.find(d => d.categoryName === '누운고기');
+        if (nuwongogi) {
+          setSelectedCategory(nuwongogi.categoryId);
+
+          const nubchi = data.find(d => d.categoryId === nuwongogi.categoryId && d.productName === '넙치');
+          if (nubchi) {
+            setSelectedProduct('넙치');
+
+            // 넙치의 모든 원산지 추출
+            const nubchiOrigins = [...new Set(
+              data
+                .filter(d => d.productName === '넙치')
+                .map(d => d.originName)
+            )];
+            setSelectedOrigins(nubchiOrigins);
+
+            // 1.5kg 규격이 있는지 확인
+            const has15kg = data.some(d => d.productName === '넙치' && d.spec === '1.5kg');
+            if (has15kg) {
+              setSelectedSpecs(['1.5kg']);
+            }
+            // 1.5kg이 없으면 규격은 빈 배열로 유지 (블랭크)
+          }
+        }
       } catch (error) {
         console.error('가격 비교 데이터 로드 실패:', error);
         setAllPriceData([]);
