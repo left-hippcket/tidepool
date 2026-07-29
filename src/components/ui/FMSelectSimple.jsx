@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export function FMSelectSimple({ value, onChange, options, placeholder = "선택", className = "" }) {
+export function FMSelectSimple({ value, onChange, options, placeholder = "선택", label, className = "" }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -31,49 +31,52 @@ export function FMSelectSimple({ value, onChange, options, placeholder = "선택
   };
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      {/* Select Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full appearance-none rounded-lg border bg-white px-3 py-2 pr-8 text-left text-sm outline-none transition-colors hover:border-gray-400 ${
-          isOpen ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-300'
-        } ${!selectedOption ? 'text-gray-400' : 'text-gray-900'}`}
-      >
-        {displayText}
-      </button>
-
-      {/* Dropdown Arrow */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-        <svg
-          className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <div className={`flex w-full flex-col gap-1 ${className}`}>
+      {label && <span className="block text-sm text-gray-600 text-left font-medium">{label}</span>}
+      <div ref={containerRef} className="relative w-full">
+        {/* Select Button */}
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-full appearance-none rounded-lg border bg-white px-3 py-2 pr-8 text-left text-sm outline-none transition-colors hover:border-gray-400 ${
+            isOpen ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-300'
+          } ${!selectedOption ? 'text-gray-400' : 'text-gray-900'}`}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
+          {displayText}
+        </button>
 
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
-          <div className="max-h-60 overflow-auto py-1">
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => handleSelect(option.value)}
-                className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 ${
-                  option.value === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-900'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+        {/* Dropdown Arrow */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+          <svg
+            className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
-      )}
+
+        {/* Dropdown Menu */}
+        {isOpen && (
+          <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+            <div className="max-h-60 overflow-auto py-1">
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleSelect(option.value)}
+                  className={`w-full px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 ${
+                    option.value === value ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-900'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

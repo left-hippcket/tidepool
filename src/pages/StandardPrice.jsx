@@ -18,9 +18,10 @@ function StandardPrice() {
   const [originalDataSource, setOriginalDataSource] = useState([]);
 
   // 필터 상태 - 디폴트 값 설정
-  const [selectedCategory, setSelectedCategory] = useState('누운고기');
-  const [selectedProduct, setSelectedProduct] = useState('넙치');
-  const [selectedOrigin, setSelectedOrigin] = useState('완도');
+  const [selectedCategory, setSelectedCategory] = useState('모두');
+  const [selectedProduct, setSelectedProduct] = useState('모두');
+  const [selectedOrigin, setSelectedOrigin] = useState('모두');
+  const [selectedSpec, setSelectedSpec] = useState('모두');
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
   const [showLatestOnly, setShowLatestOnly] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -98,16 +99,24 @@ function StandardPrice() {
 
   // Cascading 필터 옵션
   const availableProducts = React.useMemo(() => {
-    if (!selectedCategory) return [...new Set(dataSource.map(d => d.productName))];
+    if (!selectedCategory || selectedCategory === '모두') return [...new Set(dataSource.map(d => d.productName))];
     return [...new Set(dataSource.filter(d => d.categoryName === selectedCategory).map(d => d.productName))];
   }, [dataSource, selectedCategory]);
 
   const availableOrigins = React.useMemo(() => {
     let filtered = dataSource;
-    if (selectedCategory) filtered = filtered.filter(d => d.categoryName === selectedCategory);
-    if (selectedProduct) filtered = filtered.filter(d => d.productName === selectedProduct);
+    if (selectedCategory && selectedCategory !== '모두') filtered = filtered.filter(d => d.categoryName === selectedCategory);
+    if (selectedProduct && selectedProduct !== '모두') filtered = filtered.filter(d => d.productName === selectedProduct);
     return [...new Set(filtered.map(d => d.originName))];
   }, [dataSource, selectedCategory, selectedProduct]);
+
+  const availableSpecs = React.useMemo(() => {
+    let filtered = dataSource;
+    if (selectedCategory && selectedCategory !== '모두') filtered = filtered.filter(d => d.categoryName === selectedCategory);
+    if (selectedProduct && selectedProduct !== '모두') filtered = filtered.filter(d => d.productName === selectedProduct);
+    if (selectedOrigin && selectedOrigin !== '모두') filtered = filtered.filter(d => d.originName === selectedOrigin);
+    return [...new Set(filtered.map(d => d.spec).filter(Boolean))];
+  }, [dataSource, selectedCategory, selectedProduct, selectedOrigin]);
 
   // 최신 가격 추출 함수
   const getLatestPrices = (data) => {
@@ -138,14 +147,17 @@ function StandardPrice() {
   // 필터 적용된 데이터
   const displayData = React.useMemo(() => {
     let filtered = dataSource;
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== '모두') {
       filtered = filtered.filter(item => item.categoryName === selectedCategory);
     }
-    if (selectedProduct) {
+    if (selectedProduct && selectedProduct !== '모두') {
       filtered = filtered.filter(item => item.productName === selectedProduct);
     }
-    if (selectedOrigin) {
+    if (selectedOrigin && selectedOrigin !== '모두') {
       filtered = filtered.filter(item => item.originName === selectedOrigin);
+    }
+    if (selectedSpec && selectedSpec !== '모두') {
+      filtered = filtered.filter(item => item.spec === selectedSpec);
     }
     if (dateRange && dateRange.length === 2) {
       const [start, end] = dateRange;
@@ -168,12 +180,12 @@ function StandardPrice() {
       if (originCompare !== 0) return originCompare;
       return parseSpec(a.spec) - parseSpec(b.spec);
     });
-  }, [dataSource, selectedCategory, selectedProduct, selectedOrigin, dateRange, showLatestOnly]);
+  }, [dataSource, selectedCategory, selectedProduct, selectedOrigin, selectedSpec, dateRange, showLatestOnly]);
 
   // 필터 변경 시 첫 페이지로 리셋
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedProduct, selectedOrigin, dateRange, showLatestOnly, pageSize]);
+  }, [selectedCategory, selectedProduct, selectedOrigin, selectedSpec, dateRange, showLatestOnly, pageSize]);
 
   // 페이지네이션 계산
   const totalPages = Math.ceil((editMode ? editingDataSource : displayData).length / pageSize);
@@ -355,38 +367,68 @@ function StandardPrice() {
           {!editMode && (
             <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
               <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-3 items-start">
                 {/* FMSelectSimple - 품목분류 */}
                 <FMSelectSimple
+                  label="품목분류"
                   value={selectedCategory}
                   onChange={(value) => {
                     setSelectedCategory(value);
                     setSelectedProduct(null);
                     setSelectedOrigin(null);
+                    setSelectedSpec('모두');
                   }}
-                  options={categoryFilters.map(c => ({ value: c.value, label: c.text }))}
-                  placeholder="품목분류"
+                  options={[
+                    { value: '모두', label: '모두' },
+                    ...categoryFilters.map(c => ({ value: c.value, label: c.text }))
+                  ]}
+                  placeholder="검색 & 선택"
                   className="flex-1"
                 />
 
                 {/* FMSelectSimple - 품목 */}
                 <FMSelectSimple
+                  label="품목"
                   value={selectedProduct}
                   onChange={(value) => {
                     setSelectedProduct(value);
-                    setSelectedOrigin(null);
+                    setSelectedOrigin('모두');
+                    setSelectedSpec('모두');
                   }}
-                  options={availableProducts.map(p => ({ value: p, label: p }))}
-                  placeholder="품목"
+                  options={[
+                    { value: '모두', label: '모두' },
+                    ...availableProducts.map(p => ({ value: p, label: p }))
+                  ]}
+                  placeholder="검색 & 선택"
                   className="flex-1"
                 />
 
                 {/* FMSelectSimple - 원산지 */}
                 <FMSelectSimple
+                  label="원산지"
                   value={selectedOrigin}
-                  onChange={(value) => setSelectedOrigin(value)}
-                  options={availableOrigins.map(o => ({ value: o, label: o }))}
-                  placeholder="원산지"
+                  onChange={(value) => {
+                    setSelectedOrigin(value);
+                    setSelectedSpec('모두');
+                  }}
+                  options={[
+                    { value: '모두', label: '모두' },
+                    ...availableOrigins.map(o => ({ value: o, label: o }))
+                  ]}
+                  placeholder="검색 & 선택"
+                  className="flex-1"
+                />
+
+                {/* FMSelectSimple - 규격 */}
+                <FMSelectSimple
+                  label="규격"
+                  value={selectedSpec}
+                  onChange={(value) => setSelectedSpec(value)}
+                  options={[
+                    { value: '모두', label: '모두' },
+                    ...availableSpecs.map(s => ({ value: s, label: s }))
+                  ]}
+                  placeholder="검색 & 선택"
                   className="flex-1"
                 />
 
