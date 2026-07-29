@@ -367,7 +367,9 @@ function StandardPrice() {
           {!editMode && (
             <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
               <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
-              <div className="flex gap-3 items-start">
+
+              {/* 첫 번째 줄: 필터 셀렉트 박스들 */}
+              <div className="flex gap-3 items-start mb-3">
                 {/* FMSelectSimple - 품목분류 */}
                 <FMSelectSimple
                   label="품목분류"
@@ -431,47 +433,61 @@ function StandardPrice() {
                   placeholder="검색 & 선택"
                   className="flex-1"
                 />
+              </div>
 
-                {/* 직관적인 기간 선택 UI - 한 줄로 */}
-                <div className="flex-[2] flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
-                  <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
-                  <input
-                    type="date"
-                    value={dateRange[0]?.format('YYYY-MM-DD')}
-                    onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
-                    className="flex-1 text-sm outline-none"
-                  />
-                  <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                  <span className="text-xs text-gray-600 whitespace-nowrap">종료일:</span>
-                  <input
-                    type="date"
-                    value={dateRange[1]?.format('YYYY-MM-DD')}
-                    onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
-                    className="flex-1 text-sm outline-none"
-                  />
+              {/* 두 번째 줄: 기간, 옵션, 다운로드 */}
+              <div className="flex gap-3 items-start">
+                {/* 기간 선택 */}
+                <div className="flex w-full flex-col gap-1 flex-[2]">
+                  <span className="block text-sm text-gray-600 text-left font-medium">기간</span>
+                  <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
+                    <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
+                    <input
+                      type="date"
+                      value={dateRange[0]?.format('YYYY-MM-DD')}
+                      onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
+                      className="flex-1 text-sm outline-none"
+                    />
+                    <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                    <span className="text-xs text-gray-600 whitespace-nowrap">종료일:</span>
+                    <input
+                      type="date"
+                      value={dateRange[1]?.format('YYYY-MM-DD')}
+                      onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
+                      className="flex-1 text-sm outline-none"
+                    />
+                  </div>
                 </div>
 
-                <label className="flex items-center gap-2 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    checked={showLatestOnly}
-                    onChange={(e) => setShowLatestOnly(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">품목별 최신 가격만</span>
-                </label>
+                {/* 품목별 최신 가격만 체크박스 */}
+                <div className="flex w-full flex-col gap-1 flex-1">
+                  <span className="block text-sm text-gray-600 text-left font-medium">&nbsp;</span>
+                  <label className="flex items-center gap-2 whitespace-nowrap h-[42px] px-3">
+                    <input
+                      type="checkbox"
+                      checked={showLatestOnly}
+                      onChange={(e) => setShowLatestOnly(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">품목별 최신 가격만</span>
+                  </label>
+                </div>
 
-                <FMButton
-                  onClick={handleCSVDownload}
-                  disabled={downloading}
-                  variant="indigo"
-                  icon={<DownloadOutlined className="h-4 w-4" />}
-                  className="whitespace-nowrap"
-                >
-                  CSV 다운로드 ({displayData.length}건)
-                </FMButton>
+                {/* CSV 다운로드 버튼 */}
+                <div className="flex w-full flex-col gap-1 flex-1">
+                  <span className="block text-sm text-gray-600 text-left font-medium">&nbsp;</span>
+                  <FMButton
+                    onClick={handleCSVDownload}
+                    disabled={downloading}
+                    variant="indigo"
+                    icon={<DownloadOutlined className="h-4 w-4" />}
+                    className="whitespace-nowrap h-[42px]"
+                  >
+                    CSV 다운로드 ({displayData.length}건)
+                  </FMButton>
+                </div>
               </div>
             </div>
           )}
