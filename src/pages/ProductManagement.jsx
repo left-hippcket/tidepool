@@ -664,7 +664,7 @@ function ProductManagement() {
           </div>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(250px, 1.2fr) minmax(250px, 1.6fr) minmax(210px, 1.1fr) minmax(210px, 1.1fr)' }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(150px, 1fr) minmax(450px, 3fr) minmax(150px, 1fr) minmax(150px, 1fr)' }}>
         {/* Column 1: Categories */}
         <div>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -742,13 +742,14 @@ function ProductManagement() {
                                 >
                                   <HolderOutlined className="text-gray-400" />
                                 </div>
-                                <FMInput
-                                  value={category.name}
-                                  onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
-                                  placeholder="분류명"
-                                  maxLength={20}
-                                  className="flex-1 min-w-0"
-                                />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <FMInput
+                                    value={category.name}
+                                    onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
+                                    placeholder="분류명"
+                                    maxLength={20}
+                                  />
+                                </div>
                               </div>
                               <div className="flex-shrink-0">
                                 <FMSwitch
@@ -1062,13 +1063,14 @@ function ProductManagement() {
                                       >
                                         <HolderOutlined className="text-gray-400" />
                                       </div>
-                                      <FMInput
-                                        value={origin.name}
-                                        onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
-                                        placeholder="원산지명"
-                                        maxLength={20}
-                                        className="flex-1 min-w-0"
-                                      />
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <FMInput
+                                          value={origin.name}
+                                          onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
+                                          placeholder="원산지명"
+                                          maxLength={20}
+                                        />
+                                      </div>
                                     </div>
                                     <div className="flex-shrink-0">
                                       <FMSwitch
@@ -1190,13 +1192,14 @@ function ProductManagement() {
                                       >
                                         <HolderOutlined className="text-gray-400" />
                                       </div>
-                                      <FMInput
-                                        value={spec.name}
-                                        onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
-                                        placeholder="규격명"
-                                        maxLength={20}
-                                        className="flex-1 min-w-0"
-                                      />
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <FMInput
+                                          value={spec.name}
+                                          onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
+                                          placeholder="규격명"
+                                          maxLength={20}
+                                        />
+                                      </div>
                                     </div>
                                     <div className="flex-shrink-0">
                                       <FMSwitch
