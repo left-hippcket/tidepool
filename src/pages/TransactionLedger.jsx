@@ -744,13 +744,13 @@ function TransactionLedger() {
             </FMButton>
 
             {/* 직관적인 기간 선택 UI */}
-            <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 w-[320px]">
+            <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 w-[380px]">
               <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
               <input
                 type="date"
                 value={dateRange[0]?.format('YYYY-MM-DD')}
                 onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
-                className="text-sm outline-none w-[100px]"
+                className="text-sm outline-none w-[120px]"
               />
               <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -760,7 +760,7 @@ function TransactionLedger() {
                 type="date"
                 value={dateRange[1]?.format('YYYY-MM-DD')}
                 onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
-                className="text-sm outline-none w-[100px]"
+                className="text-sm outline-none w-[120px]"
               />
             </div>
           </div>
