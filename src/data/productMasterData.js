@@ -1,6 +1,6 @@
 // 품목분류 데이터
 export const productCategories = [
-  { id: 1, icon: '🐟', name: '누운고기', itemCount: 4, status: 'active', createdAt: '2024-01-15' },
+  { id: 1, icon: '🐟', name: '누운고기', itemCount: 3, status: 'active', createdAt: '2024-01-15' },
   { id: 2, icon: '🦈', name: '뜬고기', itemCount: 18, status: 'active', createdAt: '2024-01-16' },
   { id: 3, icon: '🐟', name: '연어', itemCount: 1, status: 'active', createdAt: '2024-01-17' },
 ];
