@@ -78,20 +78,6 @@ function StandardPriceComparison({ activeTab }) {
     return uniqueSpecs.map((name, index) => ({ id: index + 1, name, productName: selectedProduct }));
   }, [allPriceData, selectedProduct]);
 
-  // 초기 로드 시 넙치의 규격과 원산지 자동 설정
-  useEffect(() => {
-    if (allPriceData.length > 0 && selectedProduct === '넙치' && selectedOrigins.length === 0) {
-      const origins = availableOrigins.map(o => o.name);
-      setSelectedOrigins(origins);
-    }
-  }, [allPriceData, availableOrigins, selectedProduct, selectedOrigins.length]);
-
-  // 규격 자동 설정
-  useEffect(() => {
-    if (allPriceData.length > 0 && selectedProduct === '넙치' && availableSpecs.length > 0 && selectedSpecs.length === 0) {
-      setSelectedSpecs([availableSpecs[0].name]);
-    }
-  }, [allPriceData, availableSpecs, selectedProduct, selectedSpecs.length]);
 
   // 탭 활성화 시 차트 리사이즈
   useEffect(() => {
@@ -103,12 +89,6 @@ function StandardPriceComparison({ activeTab }) {
     }
   }, [activeTab]);
 
-  // 초기 로드 시 자동 조회
-  useEffect(() => {
-    if (activeTab === '2' && chartData.length === 0 && allPriceData.length > 0 && selectedOrigins.length > 0) {
-      handleQuery();
-    }
-  }, [activeTab, allPriceData, selectedOrigins]);
 
   const onCategoryChange = (value) => {
     setSelectedCategory(value);
