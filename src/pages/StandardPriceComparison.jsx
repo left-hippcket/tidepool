@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Line } from '@ant-design/charts';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
-import { productCategories, products, origins, specifications } from '../data/mockData';
+import { productCategories } from '../data/mockData';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMMultiSelect } from '../components/ui/FMMultiSelect';
 import { FMButton } from '../components/ui/FMButton';
@@ -10,12 +10,10 @@ import { FMButton } from '../components/ui/FMButton';
 function StandardPriceComparison({ activeTab }) {
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
   const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
-  const [selectedProduct, setSelectedProduct] = useState(2); // 넙치
+  const [selectedProduct, setSelectedProduct] = useState('넙치');
   const [selectedOrigins, setSelectedOrigins] = useState([]);
   const [selectedSpecs, setSelectedSpecs] = useState(['1.5kg']);
   const [chartData, setChartData] = useState([]);
-  const [availableOrigins, setAvailableOrigins] = useState([]);
-  const [availableSpecs, setAvailableSpecs] = useState([]);
   const [allPriceData, setAllPriceData] = useState([]);
 
   // 실제 데이터 로드
@@ -37,21 +35,46 @@ function StandardPriceComparison({ activeTab }) {
     loadData();
   }, []);
 
+  // 실제 데이터에서 품목 목록 추출
+  const products = useMemo(() => {
+    if (!selectedCategory) return [];
+    const uniqueProducts = [...new Set(
+      allPriceData
+        .filter(d => d.categoryId === selectedCategory)
+        .map(d => d.productName)
+    )];
+    return uniqueProducts.map((name, index) => ({ id: index + 1, name, categoryId: selectedCategory }));
+  }, [allPriceData, selectedCategory]);
+
+  // 실제 데이터에서 원산지 목록 추출
+  const availableOrigins = useMemo(() => {
+    if (!selectedProduct) return [];
+    const uniqueOrigins = [...new Set(
+      allPriceData
+        .filter(d => d.productName === selectedProduct)
+        .map(d => d.originName)
+    )];
+    return uniqueOrigins.map((name, index) => ({ id: index + 1, name, productName: selectedProduct }));
+  }, [allPriceData, selectedProduct]);
+
+  // 실제 데이터에서 규격 목록 추출
+  const availableSpecs = useMemo(() => {
+    if (!selectedProduct) return [];
+    const uniqueSpecs = [...new Set(
+      allPriceData
+        .filter(d => d.productName === selectedProduct)
+        .map(d => d.spec)
+    )];
+    return uniqueSpecs.map((name, index) => ({ id: index + 1, name, productName: selectedProduct }));
+  }, [allPriceData, selectedProduct]);
+
   // 초기 로드 시 넙치의 규격과 원산지 자동 설정
   useEffect(() => {
-    if (selectedProduct === 2) {
-      const productSpecs = specifications.filter(s =>
-        s.productId === 2 && s.status === 'active'
-      );
-      setAvailableSpecs(productSpecs);
-
-      const productOrigins = origins.filter(o =>
-        o.productId === 2 && o.status === 'active'
-      );
-      setAvailableOrigins(productOrigins);
-      setSelectedOrigins(productOrigins.map(o => o.name));
+    if (allPriceData.length > 0 && selectedProduct === '넙치') {
+      const origins = availableOrigins.map(o => o.name);
+      setSelectedOrigins(origins);
     }
-  }, []);
+  }, [allPriceData, availableOrigins]);
 
   // 탭 활성화 시 차트 리사이즈
   useEffect(() => {
@@ -75,30 +98,23 @@ function StandardPriceComparison({ activeTab }) {
     setSelectedProduct(null);
     setSelectedSpecs([]);
     setSelectedOrigins([]);
-    setAvailableOrigins([]);
-    setAvailableSpecs([]);
   };
 
   const onProductChange = (value) => {
     setSelectedProduct(value);
 
-    const productSpecs = specifications.filter(s =>
-      s.productId === value && s.status === 'active'
-    );
-    setAvailableSpecs(productSpecs);
+    // 실제 데이터에서 해당 품목의 규격과 원산지를 추출
+    const productData = allPriceData.filter(d => d.productName === value);
+    const specs = [...new Set(productData.map(d => d.spec))];
+    const origins = [...new Set(productData.map(d => d.originName))];
 
-    const productOrigins = origins.filter(o =>
-      o.productId === value && o.status === 'active'
-    );
-    setAvailableOrigins(productOrigins);
-
-    if (productSpecs.length > 0) {
-      setSelectedSpecs([productSpecs[0].name]);
+    if (specs.length > 0) {
+      setSelectedSpecs([specs[0]]);
     } else {
       setSelectedSpecs([]);
     }
 
-    setSelectedOrigins(productOrigins.map(o => o.name));
+    setSelectedOrigins(origins);
   };
 
   const handlePeriodClick = (period) => {
@@ -166,7 +182,7 @@ function StandardPriceComparison({ activeTab }) {
 
     const filteredData = allPriceData
       .filter(item =>
-        item.productId === selectedProduct &&
+        item.productName === selectedProduct &&
         selectedSpecs.includes(item.spec) &&
         selectedOrigins.includes(item.originName) &&
         dayjs(item.applyDate).isAfter(dateRange[0].subtract(1, 'day')) &&
@@ -345,7 +361,7 @@ function StandardPriceComparison({ activeTab }) {
         {chartData.length > 0 && (
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <h3 className="mb-4 text-base font-semibold text-gray-900">
-              {products.find(p => p.id === selectedProduct)?.name || ''} - 규격별·원산지별 가격 추이
+              {selectedProduct || ''} - 규격별·원산지별 가격 추이
             </h3>
             <div className="w-full" style={{ height: 400 }}>
               <Line {...config} />
