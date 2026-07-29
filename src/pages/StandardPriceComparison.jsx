@@ -8,8 +8,8 @@ import { FMButton } from '../components/ui/FMButton';
 
 function StandardPriceComparison({ activeTab }) {
   const [dateRange, setDateRange] = useState([dayjs().subtract(1, 'year'), dayjs()]);
-  const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
-  const [selectedProduct, setSelectedProduct] = useState('넙치');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedOrigins, setSelectedOrigins] = useState([]);
   const [selectedSpecs, setSelectedSpecs] = useState([]);
   const [chartData, setChartData] = useState([]);
@@ -99,19 +99,8 @@ function StandardPriceComparison({ activeTab }) {
 
   const onProductChange = (value) => {
     setSelectedProduct(value);
-
-    // 실제 데이터에서 해당 품목의 규격과 원산지를 추출
-    const productData = allPriceData.filter(d => d.productName === value);
-    const specs = [...new Set(productData.map(d => d.spec))];
-    const origins = [...new Set(productData.map(d => d.originName))];
-
-    if (specs.length > 0) {
-      setSelectedSpecs([specs[0]]);
-    } else {
-      setSelectedSpecs([]);
-    }
-
-    setSelectedOrigins(origins);
+    setSelectedSpecs([]);
+    setSelectedOrigins([]);
   };
 
   const handlePeriodClick = (period) => {
@@ -266,8 +255,8 @@ function StandardPriceComparison({ activeTab }) {
               {/* FMSelectSimple - 품목 */}
               <FMSelectSimple
                 value={selectedProduct || ''}
-                onChange={(value) => onProductChange(parseInt(value))}
-                options={selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : []}
+                onChange={(value) => onProductChange(value)}
+                options={selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.name, label: p.name })) : []}
                 placeholder="품목"
                 className="w-32 min-w-[128px]"
               />
