@@ -287,10 +287,22 @@ function StandardPrice() {
 
   const handleFieldChange = (index, field, value) => {
     const newData = [...editingDataSource];
-    newData[index] = {
-      ...newData[index],
-      [field]: value
-    };
+
+    // 원산지가 변경되면 규격을 리셋
+    if (field === 'originName') {
+      newData[index] = {
+        ...newData[index],
+        originName: value,
+        spec: null  // 규격 자동 리셋
+      };
+      toast.info('원산지가 변경되었습니다. 규격을 다시 선택해주세요.');
+    } else {
+      newData[index] = {
+        ...newData[index],
+        [field]: value
+      };
+    }
+
     setEditingDataSource(newData);
   };
 
@@ -306,6 +318,20 @@ function StandardPrice() {
   };
 
   const handleSaveAll = () => {
+    // 0. 규격이 선택되지 않은 행 확인
+    const missingSpecs = editingDataSource
+      .map((row, idx) => ({ row, idx: idx + 1 }))
+      .filter(({ row }) => !row.spec);
+
+    if (missingSpecs.length > 0) {
+      const firstMissing = missingSpecs[0];
+      toast.error(
+        `규격이 선택되지 않은 행이 있습니다.\n` +
+        `${firstMissing.idx}번째 행 (${firstMissing.row.productName} ${firstMissing.row.originName})`
+      );
+      return;
+    }
+
     // 1. 수정 중인 데이터 내부에서 중복 검증
     const internalDuplicates = [];
     for (let i = 0; i < editingDataSource.length; i++) {
@@ -657,13 +683,13 @@ function StandardPrice() {
                       {editMode ? (
                         <div className="w-full min-w-[120px]">
                           <FMSelectSimple
-                            value={row.spec}
+                            value={row.spec || ''}
                             onChange={(value) => handleFieldChange(index, 'spec', value)}
                             options={getAvailableSpecsForRow(row, index).map(spec => ({
                               value: spec,
                               label: spec
                             }))}
-                            placeholder="규격"
+                            placeholder={!row.originName ? "먼저 원산지를 선택하세요" : "규격 선택"}
                           />
                         </div>
                       ) : (
