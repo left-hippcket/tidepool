@@ -250,7 +250,7 @@ function StandardPriceComparison({ activeTab }) {
                   ...productCategories.map(cat => ({ value: cat.id, label: cat.name }))
                 ]}
                 placeholder="품목분류"
-                className="flex-1"
+                className="w-40 flex-shrink-0"
               />
 
               {/* FMSelectSimple - 품목 */}
@@ -262,7 +262,7 @@ function StandardPriceComparison({ activeTab }) {
                   ...(selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : [])
                 ]}
                 placeholder="품목"
-                className="flex-1"
+                className="w-32 flex-shrink-0"
               />
 
               {/* FMMultiSelect - 규격 (다중 선택) */}
@@ -271,11 +271,11 @@ function StandardPriceComparison({ activeTab }) {
                 onChange={setSelectedSpecs}
                 options={availableSpecs.map(spec => ({ value: spec.name, label: spec.name }))}
                 placeholder="규격 검색 & 선택"
-                className="flex-1"
+                className="flex-1 min-w-[280px]"
               />
 
               {/* 직관적인 기간 선택 UI */}
-              <div className="flex-[2] flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
+              <div className="flex-[2] flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 min-w-[360px]">
                 <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
                 <input
                   type="date"
