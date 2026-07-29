@@ -754,6 +754,7 @@ function ProductManagement() {
                                 onChange={(checked) => handleCategoryFieldChange(category.id, 'status', checked ? 'active' : 'inactive')}
                                 onLabel="활성"
                                 offLabel="비활성"
+                                size="small"
                               />
                             </div>
                           ) : (
@@ -937,6 +938,7 @@ function ProductManagement() {
                                     onChange={(checked) => handleProductFieldChange(product.id, 'status', checked ? 'active' : 'inactive')}
                                     onLabel="활성"
                                     offLabel="비활성"
+                                    size="small"
                                   />
                                 </div>
                               ) : (
@@ -1063,6 +1065,7 @@ function ProductManagement() {
                                       onChange={(checked) => handleOriginFieldChange(origin.id, 'status', checked ? 'active' : 'inactive')}
                                       onLabel="활성"
                                       offLabel="비활성"
+                                      size="small"
                                     />
                                   </div>
                                 ) : (
@@ -1187,6 +1190,7 @@ function ProductManagement() {
                                       onChange={(checked) => handleSpecFieldChange(spec.id, 'status', checked ? 'active' : 'inactive')}
                                       onLabel="활성"
                                       offLabel="비활성"
+                                      size="small"
                                     />
                                   </div>
                                 ) : (
