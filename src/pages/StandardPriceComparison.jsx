@@ -11,7 +11,7 @@ function StandardPriceComparison({ activeTab }) {
   const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
   const [selectedProduct, setSelectedProduct] = useState('넙치');
   const [selectedOrigins, setSelectedOrigins] = useState([]);
-  const [selectedSpecs, setSelectedSpecs] = useState(['1.5kg']);
+  const [selectedSpecs, setSelectedSpecs] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [allPriceData, setAllPriceData] = useState([]);
 
@@ -73,17 +73,25 @@ function StandardPriceComparison({ activeTab }) {
       allPriceData
         .filter(d => d.productName === selectedProduct)
         .map(d => d.spec)
+        .filter(s => s) // null/undefined 제외
     )];
     return uniqueSpecs.map((name, index) => ({ id: index + 1, name, productName: selectedProduct }));
   }, [allPriceData, selectedProduct]);
 
   // 초기 로드 시 넙치의 규격과 원산지 자동 설정
   useEffect(() => {
-    if (allPriceData.length > 0 && selectedProduct === '넙치') {
+    if (allPriceData.length > 0 && selectedProduct === '넙치' && selectedOrigins.length === 0) {
       const origins = availableOrigins.map(o => o.name);
       setSelectedOrigins(origins);
     }
-  }, [allPriceData, availableOrigins]);
+  }, [allPriceData, availableOrigins, selectedProduct, selectedOrigins.length]);
+
+  // 규격 자동 설정
+  useEffect(() => {
+    if (allPriceData.length > 0 && selectedProduct === '넙치' && availableSpecs.length > 0 && selectedSpecs.length === 0) {
+      setSelectedSpecs([availableSpecs[0].name]);
+    }
+  }, [allPriceData, availableSpecs, selectedProduct, selectedSpecs.length]);
 
   // 탭 활성화 시 차트 리사이즈
   useEffect(() => {
