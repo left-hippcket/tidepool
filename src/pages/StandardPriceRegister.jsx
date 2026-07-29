@@ -109,14 +109,16 @@ function StandardPriceRegister() {
   return (
     <div>
       {/* 상단 헤더 */}
-      <div className="mb-6 flex items-center gap-4">
-        <FMButton
-          onClick={() => navigate('/standard-price')}
-          variant="secondary"
-          icon={<ArrowLeftOutlined className="h-4 w-4" />}
-        >
-          목록으로
-        </FMButton>
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex justify-start">
+          <FMButton
+            variant="indigo"
+            icon={<ArrowLeftOutlined className="h-4 w-4" />}
+            href="/standard-price"
+          >
+            목록으로
+          </FMButton>
+        </div>
         <h2 className="text-2xl font-bold text-gray-900">표준가격 등록</h2>
       </div>
 
@@ -221,24 +223,28 @@ function StandardPriceRegister() {
             </div>
           )}
 
-          {/* 하단 버튼 */}
-          <div className="flex flex-wrap justify-end gap-2 border-t border-gray-200 pt-6">
-            <FMButton
-              type="button"
-              onClick={() => navigate('/standard-price')}
-              variant="secondary"
-            >
-              취소
-            </FMButton>
-            <FMButton
-              type="submit"
-              variant="primary"
-            >
-              등록
-            </FMButton>
-          </div>
         </div>
       </form>
+
+      {/* 하단 버튼 */}
+      <div className="mt-8 border-t border-gray-200 pt-6">
+        <div className="grid grid-cols-2 gap-4">
+          <FMButton
+            variant="secondary"
+            onClick={() => navigate('/standard-price')}
+            className="w-full"
+          >
+            취소
+          </FMButton>
+          <FMButton
+            variant="primary"
+            onClick={handleSubmit}
+            className="w-full"
+          >
+            저장
+          </FMButton>
+        </div>
+      </div>
     </div>
   );
 }
