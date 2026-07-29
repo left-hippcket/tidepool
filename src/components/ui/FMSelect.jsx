@@ -36,6 +36,7 @@ export function FMSelect({
       padding: isMulti ? '0.25rem 0.5rem' : '0.25rem 0.5rem',
       cursor: 'text',
       flexWrap: 'wrap',
+      overflow: 'visible',
     }),
     multiValue: (base) => ({
       ...base,
@@ -73,6 +74,10 @@ export function FMSelect({
       ...base,
       color: '#111827',
       fontSize: '0.875rem',
+      overflow: 'visible',
+      textOverflow: 'clip',
+      whiteSpace: 'nowrap',
+      maxWidth: 'none',
     }),
     placeholder: (base) => ({
       ...base,

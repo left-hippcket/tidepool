@@ -673,7 +673,7 @@ function ProductManagement() {
                 품목분류 ({displayCategories.length})
               </h2>
               {!editMode && !isAddingCategory && (
-                <FMButton variant="primary" onClick={handleAddCategory}>
+                <FMButton variant="green" onClick={handleAddCategory}>
                   + 분류 추가
                 </FMButton>
               )}
@@ -793,7 +793,7 @@ function ProductManagement() {
                 품목 ({filteredProducts.length})
               </h2>
               {!editMode && selectedCategory && !isAddingProduct && (
-                <FMButton variant="primary" onClick={handleAddProduct}>
+                <FMButton variant="green" onClick={handleAddProduct}>
                   + 품목 추가
                 </FMButton>
               )}
@@ -925,7 +925,7 @@ function ProductManagement() {
                                         { value: 'kg', label: 'kg' }
                                       ]}
                                       isSearchable={false}
-                                      style={{ width: '70px', flexShrink: 0 }}
+                                      style={{ width: '75px', minWidth: '75px', flexShrink: 0 }}
                                     />
                                     <FMInput
                                       type="number"
@@ -984,7 +984,7 @@ function ProductManagement() {
                 원산지 ({filteredOrigins.length})
               </h2>
               {!editMode && selectedProduct && !isAddingOrigin && (
-                <FMButton variant="primary" onClick={handleAddOrigin}>
+                <FMButton variant="green" onClick={handleAddOrigin}>
                   + 원산지 추가
                 </FMButton>
               )}
@@ -1112,7 +1112,7 @@ function ProductManagement() {
                 규격 ({filteredSpecs.length})
               </h2>
               {!editMode && selectedProduct && !isAddingSpec && (
-                <FMButton variant="primary" onClick={handleAddSpec}>
+                <FMButton variant="green" onClick={handleAddSpec}>
                   + 규격 추가
                 </FMButton>
               )}
