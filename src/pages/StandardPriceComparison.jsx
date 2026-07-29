@@ -245,10 +245,7 @@ function StandardPriceComparison({ activeTab }) {
               <FMSelectSimple
                 value={selectedCategory}
                 onChange={(value) => onCategoryChange(parseInt(value))}
-                options={[
-                  { value: '', label: '품목분류' },
-                  ...productCategories.map(cat => ({ value: cat.id, label: cat.name }))
-                ]}
+                options={productCategories.map(cat => ({ value: cat.id, label: cat.name }))}
                 placeholder="품목분류"
                 className="w-40 min-w-[160px]"
               />
@@ -257,10 +254,7 @@ function StandardPriceComparison({ activeTab }) {
               <FMSelectSimple
                 value={selectedProduct || ''}
                 onChange={(value) => onProductChange(parseInt(value))}
-                options={[
-                  { value: '', label: '품목' },
-                  ...(selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : [])
-                ]}
+                options={selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : []}
                 placeholder="품목"
                 className="w-32 min-w-[128px]"
               />
