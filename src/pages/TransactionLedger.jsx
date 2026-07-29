@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Card, Tabs, Table, Button, DatePicker, Space, Typography, Descriptions,
-  Divider, Checkbox, Collapse, message, Spin, Dropdown
-} from 'antd';
-import {
-  DownloadOutlined, FileTextOutlined, ShoppingCartOutlined,
-  CarOutlined, TeamOutlined, WarningOutlined, DollarOutlined,
-  DownOutlined
-} from '@ant-design/icons';
+import { Table, Checkbox, Collapse } from 'antd';
+import { DownloadOutlined, DownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { transactionLedgerData } from '../data/mockData';
+import { FMButton } from '../components/ui/FMButton';
+import toast from 'react-hot-toast';
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
-
-const { Title, Text } = Typography;
-const { RangePicker } = DatePicker;
 
 function TransactionLedger() {
   const navigate = useNavigate();
@@ -27,6 +19,7 @@ function TransactionLedger() {
   const [expandedRowKey, setExpandedRowKey] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [downloading, setDownloading] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   // 전체 보기 탭 기본 선택 칼럼 (거래식별 정보 제외)
   const defaultColumns = [
@@ -106,6 +99,7 @@ function TransactionLedger() {
   // CSV 다운로드
   const handleCSVDownload = async (type = 'period') => {
     setDownloading(true);
+    setShowDownloadMenu(false);
     try {
       // 시뮬레이션: 실제로는 서버에서 다운로드
       await new Promise(resolve => setTimeout(resolve, type === 'all' ? 2000 : 500));
@@ -113,7 +107,7 @@ function TransactionLedger() {
       const dataToExport = type === 'all' ? transactionLedgerData : filteredData;
 
       if (dataToExport.length === 0) {
-        message.warning('조회된 데이터가 없습니다.');
+        toast('조회된 데이터가 없습니다.');
         return;
       }
 
@@ -137,13 +131,13 @@ function TransactionLedger() {
       link.click();
       URL.revokeObjectURL(url);
 
-      message.success(
+      toast.success(
         type === 'all'
           ? `전체 기간 CSV 파일이 다운로드되었습니다. (총 ${dataToExport.length}건)`
           : 'CSV 파일이 다운로드되었습니다.'
       );
     } catch (error) {
-      message.error('CSV 다운로드에 실패했습니다. 다시 시도해주세요.');
+      toast.error('CSV 다운로드에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setDownloading(false);
     }
@@ -427,9 +421,9 @@ function TransactionLedger() {
       key: '거래손익',
       width: 110,
       render: (value) => (
-        <Text style={{ color: getProfitColor(value) }}>
+        <span style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
-        </Text>
+        </span>
       ),
       align: 'right',
     },
@@ -439,9 +433,12 @@ function TransactionLedger() {
       key: '거래메모',
       width: 90,
       render: (text, record) => text ? (
-        <Button type="link" size="small" onClick={(e) => handleMemoClick(e, record)}>
+        <button
+          onClick={(e) => handleMemoClick(e, record)}
+          className="text-sm text-blue-600 hover:text-blue-700 underline"
+        >
           메모 보기
-        </Button>
+        </button>
       ) : null,
     },
   ];
@@ -515,18 +512,18 @@ function TransactionLedger() {
       title: (
         <span>
           알파수익단가
-          <Text type="secondary" style={{ fontSize: 11, marginLeft: 4 }}>
+          <span className="text-xs text-gray-500 ml-1">
             ⓘ
-          </Text>
+          </span>
         </span>
       ),
       dataIndex: '알파수익단가',
       key: '알파수익단가',
       width: 130,
       render: (value) => value !== null ? (
-        <Text style={{ color: getProfitColor(value) }}>
+        <span style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
-        </Text>
+        </span>
       ) : '-',
       align: 'right',
     },
@@ -605,9 +602,9 @@ function TransactionLedger() {
       key: '거래손익',
       width: 110,
       render: (value) => (
-        <Text style={{ color: getProfitColor(value) }}>
+        <span style={{ color: getProfitColor(value) }}>
           {formatCurrency(value)}
-        </Text>
+        </span>
       ),
       align: 'right',
     },
@@ -643,7 +640,7 @@ function TransactionLedger() {
       '통당운임단가': { width: 120, render: formatCurrency, align: 'right' },
       '운송비포함여부': { width: 120 },
       '도착단가': { width: 120, render: formatCurrency, align: 'right' },
-      '알파수익단가': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
+      '알파수익단가': { width: 120, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
       '셀러명': { width: 120, filters: getUniqueValues(filteredData, '셀러명'), onFilter: (value, record) => record.셀러명 === value, filterSearch: true },
       '셀러그룹명': { width: 150, filters: getUniqueValues(filteredData, '셀러그룹명'), onFilter: (value, record) => record.셀러그룹명 === value, filterSearch: true },
       '바이어명': { width: 120, filters: getUniqueValues(filteredData, '바이어명'), onFilter: (value, record) => record.바이어명 === value, filterSearch: true },
@@ -652,18 +649,18 @@ function TransactionLedger() {
       '드라이버명': { width: 100 },
       '클레임/조정 유형': { width: 150 },
       '클레임/조정 내용': { width: 200 },
-      '바이어정산조정금액': { width: 150, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
+      '바이어정산조정금액': { width: 150, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
       '셀러정산조정물량': { width: 150 },
-      '셀러정산조정금액': { width: 150, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
-      '드라이버정산조정금액': { width: 150, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
-      '회계처리용조정금액': { width: 150, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
+      '셀러정산조정금액': { width: 150, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
+      '드라이버정산조정금액': { width: 150, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
+      '회계처리용조정금액': { width: 150, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
       '매출액': { width: 120, render: formatCurrency, align: 'right' },
       '매입액': { width: 120, render: formatCurrency, align: 'right' },
       '운송비(비용)': { width: 120, render: formatCurrency, align: 'right' },
-      '거래손익': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
+      '거래손익': { width: 120, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
       '상차수수료수익': { width: 120, render: formatCurrency, align: 'right' },
-      '셀러조정손익': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
-      '바이어조정손익': { width: 120, render: (value) => <Text style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</Text>, align: 'right' },
+      '셀러조정손익': { width: 120, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
+      '바이어조정손익': { width: 120, render: (value) => <span style={{ color: getProfitColor(value) }}>{formatCurrency(value)}</span>, align: 'right' },
       '거래메모': { width: 200, render: (text) => text || '' },
     };
 
@@ -708,245 +705,296 @@ function TransactionLedger() {
     }));
   };
 
-  const downloadMenuItems = [
-    {
-      key: 'period',
-      label: '조회 기간 다운로드',
-      onClick: () => handleCSVDownload('period'),
-    },
-    {
-      key: 'all',
-      label: '전체 기간 다운로드',
-      onClick: () => handleCSVDownload('all'),
-    },
-  ];
-
   return (
-    <div>
-      {/* 헤더 */}
-      <div style={{ marginBottom: 24 }}>
-        <Title level={2} style={{ margin: 0 }}>장부 조회</Title>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col gap-6 w-full">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">장부 조회</h2>
+        </div>
 
-      {/* 기간 설정 */}
-      <Card className="mb-4">
-        <Space wrap>
-          <Button onClick={() => handleQuickDate('today')}>오늘</Button>
-          <Button onClick={() => handleQuickDate('yesterday')}>어제</Button>
-          <Button onClick={() => handleQuickDate('7days')}>최근 7일</Button>
-          <Button onClick={() => handleQuickDate('30days')}>최근 30일</Button>
-          <RangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            format="YYYY-MM-DD"
-            style={{ width: 300 }}
-          />
-        </Space>
-      </Card>
+        {/* 기간 설정 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <FMButton variant="secondary" onClick={() => handleQuickDate('today')}>
+              오늘
+            </FMButton>
+            <FMButton variant="secondary" onClick={() => handleQuickDate('yesterday')}>
+              어제
+            </FMButton>
+            <FMButton variant="secondary" onClick={() => handleQuickDate('7days')}>
+              최근 7일
+            </FMButton>
+            <FMButton variant="secondary" onClick={() => handleQuickDate('30days')}>
+              최근 30일
+            </FMButton>
+            <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
+              <input
+                type="date"
+                value={dateRange[0]?.format('YYYY-MM-DD')}
+                onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
+                className="text-sm outline-none"
+              />
+              <span className="text-gray-400">~</span>
+              <input
+                type="date"
+                value={dateRange[1]?.format('YYYY-MM-DD')}
+                onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
+                className="text-sm outline-none"
+              />
+            </div>
+          </div>
+        </div>
 
-      {/* 탭 */}
-      <Card>
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          tabBarExtraContent={
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => navigate('/transaction-ledger/register')}
-              >
-                장부 한줄 등록
-              </Button>
-              <Dropdown
-                menu={{ items: downloadMenuItems }}
-                trigger={['click']}
-              >
-                <Button
-                  loading={downloading}
-                  onClick={() => handleCSVDownload('period')}
-                  style={{
-                    backgroundColor: '#595959',
-                    borderColor: '#595959',
-                    color: '#fff',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#434343';
-                    e.currentTarget.style.borderColor = '#434343';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#595959';
-                    e.currentTarget.style.borderColor = '#595959';
-                  }}
+        {/* 탭 */}
+        <div className="rounded-xl border border-gray-200 bg-white">
+          {/* 탭 헤더 */}
+          <div className="border-b border-gray-200 px-5 pt-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setActiveTab('summary')}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    activeTab === 'summary'
+                      ? 'bg-white text-blue-600 border border-b-0 border-gray-200'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
-                  <DownloadOutlined /> CSV 다운로드 <DownOutlined />
-                </Button>
-              </Dropdown>
-            </Space>
-          }
-          items={[
-            {
-              key: 'summary',
-              label: '거래 요약보기',
-              children: (
-                <Table
-                  columns={summaryColumns}
-                  dataSource={filteredData}
-                  pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
-                  scroll={{ x: 1400 }}
-                  onRow={(record) => ({
-                    onClick: () => handleRowClick(record),
-                    style: { cursor: 'pointer' }
-                  })}
-                  expandable={{
-                    expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
-                    expandedRowRender: renderExpandedRow,
-                    showExpandColumn: false,
-                  }}
-                />
-              ),
-            },
-            {
-              key: 'price',
-              label: '거래단가 정보',
-              children: (
-                <Table
-                  columns={priceColumns}
-                  dataSource={filteredData}
-                  pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
-                  scroll={{ x: 1000 }}
-                  onRow={(record) => ({
-                    onClick: () => handleRowClick(record),
-                    style: { cursor: 'pointer' }
-                  })}
-                  expandable={{
-                    expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
-                    expandedRowRender: renderExpandedRow,
-                    showExpandColumn: false,
-                  }}
-                />
-              ),
-            },
-            {
-              key: 'profit',
-              label: '손익 정보',
-              children: (
-                <Table
-                  columns={profitColumns}
-                  dataSource={filteredData}
-                  pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
-                  scroll={{ x: 1000 }}
-                  onRow={(record) => ({
-                    onClick: () => handleRowClick(record),
-                    style: { cursor: 'pointer' }
-                  })}
-                  expandable={{
-                    expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
-                    expandedRowRender: renderExpandedRow,
-                    showExpandColumn: false,
-                  }}
-                />
-              ),
-            },
-            {
-              key: 'all',
-              label: '전체 보기',
-              children: (
-                <>
-                  <Table
-                    columns={getAllColumns()}
-                    dataSource={filteredData}
-                    pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
-                    scroll={{ x: 'max-content' }}
-                    locale={{
-                      emptyText: selectedColumns.length === 0 ? '칼럼을 선택해주세요.' : '조회된 데이터가 없습니다.'
-                    }}
-                  />
+                  거래 요약보기
+                </button>
+                <button
+                  onClick={() => setActiveTab('price')}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    activeTab === 'price'
+                      ? 'bg-white text-blue-600 border border-b-0 border-gray-200'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  거래단가 정보
+                </button>
+                <button
+                  onClick={() => setActiveTab('profit')}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    activeTab === 'profit'
+                      ? 'bg-white text-blue-600 border border-b-0 border-gray-200'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  손익 정보
+                </button>
+                <button
+                  onClick={() => setActiveTab('all')}
+                  className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    activeTab === 'all'
+                      ? 'bg-white text-blue-600 border border-b-0 border-gray-200'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  전체 보기
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <FMButton
+                  variant="primary"
+                  onClick={() => navigate('/transaction-ledger/register')}
+                >
+                  장부 한줄 등록
+                </FMButton>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                    disabled={downloading}
+                    className="inline-flex items-center gap-2 rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    <DownloadOutlined />
+                    CSV 다운로드
+                    <DownOutlined />
+                  </button>
+                  {showDownloadMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg z-10">
+                      <button
+                        onClick={() => handleCSVDownload('period')}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                      >
+                        조회 기간 다운로드
+                      </button>
+                      <button
+                        onClick={() => handleCSVDownload('all')}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg"
+                      >
+                        전체 기간 다운로드
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
 
-                  {/* 칼럼 선택 섹션 */}
-                  <Card title="칼럼 선택" style={{ marginTop: 16 }} extra={
-                    <Space>
-                      <Button size="small" onClick={handleSelectAll}>전체 선택</Button>
-                      <Button size="small" onClick={handleDeselectAll}>전체 해제</Button>
-                    </Space>
-                  }>
-                    <Collapse defaultActiveKey={['1', '2', '3', '4', '5', '6', '7', '8']}>
-                      <Collapse.Panel header="거래식별 정보" key="1">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('주문코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문코드'] : selectedColumns.filter(c => c !== '주문코드'))}>주문코드</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('거래코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래코드'] : selectedColumns.filter(c => c !== '거래코드'))}>거래코드</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('운송코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송코드'] : selectedColumns.filter(c => c !== '운송코드'))}>운송코드</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="날짜 정보" key="2">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('주문일')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문일'] : selectedColumns.filter(c => c !== '주문일'))}>주문일</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('납품일')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '납품일'] : selectedColumns.filter(c => c !== '납품일'))}>납품일</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="품목 정보" key="3">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('품목')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '품목'] : selectedColumns.filter(c => c !== '품목'))}>품목</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('원산지')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '원산지'] : selectedColumns.filter(c => c !== '원산지'))}>원산지</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('규격')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '규격'] : selectedColumns.filter(c => c !== '규격'))}>규격</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="수량/가격 정보" key="4">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('주문수량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문수량'] : selectedColumns.filter(c => c !== '주문수량'))}>주문수량</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('주문중량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문중량'] : selectedColumns.filter(c => c !== '주문중량'))}>주문중량</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('상차단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차단가'] : selectedColumns.filter(c => c !== '상차단가'))}>상차단가</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('상차수수료율')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료율'] : selectedColumns.filter(c => c !== '상차수수료율'))}>상차수수료율</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('통당운임단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '통당운임단가'] : selectedColumns.filter(c => c !== '통당운임단가'))}>통당운임단가</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('운송비포함여부')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송비포함여부'] : selectedColumns.filter(c => c !== '운송비포함여부'))}>운송비포함여부</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('도착단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '도착단가'] : selectedColumns.filter(c => c !== '도착단가'))}>도착단가</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('알파수익단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '알파수익단가'] : selectedColumns.filter(c => c !== '알파수익단가'))}>알파수익단가</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="파트너 정보" key="5">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('셀러명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러명'] : selectedColumns.filter(c => c !== '셀러명'))}>셀러명</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('셀러그룹명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러그룹명'] : selectedColumns.filter(c => c !== '셀러그룹명'))}>셀러그룹명</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('바이어명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어명'] : selectedColumns.filter(c => c !== '바이어명'))}>바이어명</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('바이어그룹명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어그룹명'] : selectedColumns.filter(c => c !== '바이어그룹명'))}>바이어그룹명</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('바이어사업권역')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어사업권역'] : selectedColumns.filter(c => c !== '바이어사업권역'))}>바이어사업권역</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('드라이버명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '드라이버명'] : selectedColumns.filter(c => c !== '드라이버명'))}>드라이버명</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="클레임/조정 정보" key="6">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('클레임/조정 유형')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '클레임/조정 유형'] : selectedColumns.filter(c => c !== '클레임/조정 유형'))}>클레임/조정 유형</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('클레임/조정 내용')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '클레임/조정 내용'] : selectedColumns.filter(c => c !== '클레임/조정 내용'))}>클레임/조정 내용</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('바이어정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어정산조정금액'] : selectedColumns.filter(c => c !== '바이어정산조정금액'))}>바이어정산조정금액</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('셀러정산조정물량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러정산조정물량'] : selectedColumns.filter(c => c !== '셀러정산조정물량'))}>셀러정산조정물량</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('셀러정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러정산조정금액'] : selectedColumns.filter(c => c !== '셀러정산조정금액'))}>셀러정산조정금액</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('드라이버정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '드라이버정산조정금액'] : selectedColumns.filter(c => c !== '드라이버정산조정금액'))}>드라이버정산조정금액</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('회계처리용조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '회계처리용조정금액'] : selectedColumns.filter(c => c !== '회계처리용조정금액'))}>회계처리용조정금액</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="손익 정보" key="7">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('매출액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '매출액'] : selectedColumns.filter(c => c !== '매출액'))}>매출액</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('매입액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '매입액'] : selectedColumns.filter(c => c !== '매입액'))}>매입액</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('운송비(비용)')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송비(비용)'] : selectedColumns.filter(c => c !== '운송비(비용)'))}>운송비(비용)</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('거래손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래손익'] : selectedColumns.filter(c => c !== '거래손익'))}>거래손익</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('상차수수료수익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료수익'] : selectedColumns.filter(c => c !== '상차수수료수익'))}>상차수수료수익</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('셀러조정손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러조정손익'] : selectedColumns.filter(c => c !== '셀러조정손익'))}>셀러조정손익</Checkbox>
-                          <Checkbox checked={selectedColumns.includes('바이어조정손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어조정손익'] : selectedColumns.filter(c => c !== '바이어조정손익'))}>바이어조정손익</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                      <Collapse.Panel header="기타 정보" key="8">
-                        <Space wrap>
-                          <Checkbox checked={selectedColumns.includes('거래메모')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래메모'] : selectedColumns.filter(c => c !== '거래메모'))}>거래메모</Checkbox>
-                        </Space>
-                      </Collapse.Panel>
-                    </Collapse>
-                  </Card>
-                </>
-              ),
-            },
-          ]}
-        />
-      </Card>
+          {/* 탭 컨텐츠 */}
+          <div className="p-5">
+            {activeTab === 'summary' && (
+              <Table
+                columns={summaryColumns}
+                dataSource={filteredData}
+                pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
+                scroll={{ x: 1400 }}
+                onRow={(record) => ({
+                  onClick: () => handleRowClick(record),
+                  style: { cursor: 'pointer' }
+                })}
+                expandable={{
+                  expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
+                  expandedRowRender: renderExpandedRow,
+                  showExpandColumn: false,
+                }}
+              />
+            )}
+
+            {activeTab === 'price' && (
+              <Table
+                columns={priceColumns}
+                dataSource={filteredData}
+                pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
+                scroll={{ x: 1000 }}
+                onRow={(record) => ({
+                  onClick: () => handleRowClick(record),
+                  style: { cursor: 'pointer' }
+                })}
+                expandable={{
+                  expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
+                  expandedRowRender: renderExpandedRow,
+                  showExpandColumn: false,
+                }}
+              />
+            )}
+
+            {activeTab === 'profit' && (
+              <Table
+                columns={profitColumns}
+                dataSource={filteredData}
+                pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
+                scroll={{ x: 1000 }}
+                onRow={(record) => ({
+                  onClick: () => handleRowClick(record),
+                  style: { cursor: 'pointer' }
+                })}
+                expandable={{
+                  expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
+                  expandedRowRender: renderExpandedRow,
+                  showExpandColumn: false,
+                }}
+              />
+            )}
+
+            {activeTab === 'all' && (
+              <>
+                <Table
+                  columns={getAllColumns()}
+                  dataSource={filteredData}
+                  pagination={{ pageSize: 20, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
+                  scroll={{ x: 'max-content' }}
+                  locale={{
+                    emptyText: selectedColumns.length === 0 ? '칼럼을 선택해주세요.' : '조회된 데이터가 없습니다.'
+                  }}
+                />
+
+                {/* 칼럼 선택 섹션 */}
+                <div className="mt-6 rounded-lg border border-gray-200 bg-white">
+                  <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                    <h3 className="text-sm font-semibold text-gray-900">칼럼 선택</h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSelectAll}
+                        className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                      >
+                        전체 선택
+                      </button>
+                      <button
+                        onClick={handleDeselectAll}
+                        className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                      >
+                        전체 해제
+                      </button>
+                    </div>
+                  </div>
+                  <Collapse defaultActiveKey={['1', '2', '3', '4', '5', '6', '7', '8']}>
+                    <Collapse.Panel header="거래식별 정보" key="1">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('주문코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문코드'] : selectedColumns.filter(c => c !== '주문코드'))}>주문코드</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('거래코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래코드'] : selectedColumns.filter(c => c !== '거래코드'))}>거래코드</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('운송코드')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송코드'] : selectedColumns.filter(c => c !== '운송코드'))}>운송코드</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="날짜 정보" key="2">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('주문일')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문일'] : selectedColumns.filter(c => c !== '주문일'))}>주문일</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('납품일')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '납품일'] : selectedColumns.filter(c => c !== '납품일'))}>납품일</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="품목 정보" key="3">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('품목')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '품목'] : selectedColumns.filter(c => c !== '품목'))}>품목</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('원산지')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '원산지'] : selectedColumns.filter(c => c !== '원산지'))}>원산지</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('규격')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '규격'] : selectedColumns.filter(c => c !== '규격'))}>규격</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="수량/가격 정보" key="4">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('주문수량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문수량'] : selectedColumns.filter(c => c !== '주문수량'))}>주문수량</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('주문중량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '주문중량'] : selectedColumns.filter(c => c !== '주문중량'))}>주문중량</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('상차단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차단가'] : selectedColumns.filter(c => c !== '상차단가'))}>상차단가</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('상차수수료율')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료율'] : selectedColumns.filter(c => c !== '상차수수료율'))}>상차수수료율</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('통당운임단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '통당운임단가'] : selectedColumns.filter(c => c !== '통당운임단가'))}>통당운임단가</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('운송비포함여부')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송비포함여부'] : selectedColumns.filter(c => c !== '운송비포함여부'))}>운송비포함여부</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('도착단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '도착단가'] : selectedColumns.filter(c => c !== '도착단가'))}>도착단가</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('알파수익단가')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '알파수익단가'] : selectedColumns.filter(c => c !== '알파수익단가'))}>알파수익단가</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="파트너 정보" key="5">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('셀러명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러명'] : selectedColumns.filter(c => c !== '셀러명'))}>셀러명</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('셀러그룹명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러그룹명'] : selectedColumns.filter(c => c !== '셀러그룹명'))}>셀러그룹명</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('바이어명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어명'] : selectedColumns.filter(c => c !== '바이어명'))}>바이어명</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('바이어그룹명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어그룹명'] : selectedColumns.filter(c => c !== '바이어그룹명'))}>바이어그룹명</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('바이어사업권역')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어사업권역'] : selectedColumns.filter(c => c !== '바이어사업권역'))}>바이어사업권역</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('드라이버명')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '드라이버명'] : selectedColumns.filter(c => c !== '드라이버명'))}>드라이버명</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="클레임/조정 정보" key="6">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('클레임/조정 유형')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '클레임/조정 유형'] : selectedColumns.filter(c => c !== '클레임/조정 유형'))}>클레임/조정 유형</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('클레임/조정 내용')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '클레임/조정 내용'] : selectedColumns.filter(c => c !== '클레임/조정 내용'))}>클레임/조정 내용</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('바이어정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어정산조정금액'] : selectedColumns.filter(c => c !== '바이어정산조정금액'))}>바이어정산조정금액</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('셀러정산조정물량')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러정산조정물량'] : selectedColumns.filter(c => c !== '셀러정산조정물량'))}>셀러정산조정물량</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('셀러정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러정산조정금액'] : selectedColumns.filter(c => c !== '셀러정산조정금액'))}>셀러정산조정금액</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('드라이버정산조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '드라이버정산조정금액'] : selectedColumns.filter(c => c !== '드라이버정산조정금액'))}>드라이버정산조정금액</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('회계처리용조정금액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '회계처리용조정금액'] : selectedColumns.filter(c => c !== '회계처리용조정금액'))}>회계처리용조정금액</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="손익 정보" key="7">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('매출액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '매출액'] : selectedColumns.filter(c => c !== '매출액'))}>매출액</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('매입액')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '매입액'] : selectedColumns.filter(c => c !== '매입액'))}>매입액</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('운송비(비용)')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '운송비(비용)'] : selectedColumns.filter(c => c !== '운송비(비용)'))}>운송비(비용)</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('거래손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래손익'] : selectedColumns.filter(c => c !== '거래손익'))}>거래손익</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('상차수수료수익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '상차수수료수익'] : selectedColumns.filter(c => c !== '상차수수료수익'))}>상차수수료수익</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('셀러조정손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '셀러조정손익'] : selectedColumns.filter(c => c !== '셀러조정손익'))}>셀러조정손익</Checkbox>
+                        <Checkbox checked={selectedColumns.includes('바이어조정손익')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '바이어조정손익'] : selectedColumns.filter(c => c !== '바이어조정손익'))}>바이어조정손익</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                    <Collapse.Panel header="기타 정보" key="8">
+                      <div className="flex flex-wrap gap-4">
+                        <Checkbox checked={selectedColumns.includes('거래메모')} onChange={(e) => handleColumnChange(e.target.checked ? [...selectedColumns, '거래메모'] : selectedColumns.filter(c => c !== '거래메모'))}>거래메모</Checkbox>
+                      </div>
+                    </Collapse.Panel>
+                  </Collapse>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
