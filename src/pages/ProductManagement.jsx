@@ -4,7 +4,23 @@ import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
 import { FMSwitch } from '../components/ui/FMSwitch';
-import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined, HolderOutlined } from '@ant-design/icons';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import {
   productCategories as initialCategories,
@@ -13,12 +29,44 @@ import {
   specifications as initialSpecs
 } from '../data/mockData';
 
+// Sortable Item Component
+function SortableItem({ id, children, disabled }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id, disabled });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      {children(listeners)}
+    </div>
+  );
+}
+
 function ProductManagement() {
   // Data state
   const [categories, setCategories] = useState(initialCategories);
   const [products, setProducts] = useState(initialProducts);
   const [origins, setOrigins] = useState(initialOrigins);
   const [specs, setSpecs] = useState(initialSpecs);
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Selection state
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -220,6 +268,51 @@ function ProductManagement() {
     setEditingCategories(editingCategories.map(c =>
       c.id === id ? { ...c, [field]: value } : c
     ));
+  };
+
+  // ===== Drag and Drop Handlers =====
+  const handleDragEndCategory = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setEditingCategories((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  };
+
+  const handleDragEndProduct = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setEditingProducts((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  };
+
+  const handleDragEndOrigin = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setEditingOrigins((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  };
+
+  const handleDragEndSpec = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setEditingSpecs((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
   };
 
   // ===== Product Handlers =====
@@ -616,53 +709,75 @@ function ProductManagement() {
             )}
 
             {/* Category List */}
-            <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-              {displayCategories.map((category) => (
-                <div
-                  key={category.id}
-                  onClick={() => !editMode && setSelectedCategory(category)}
-                  className={`rounded-lg border p-3 transition-all ${
-                    editMode
-                      ? 'cursor-default border-gray-200 bg-white'
-                      : selectedCategory?.id === category.id
-                      ? 'cursor-pointer border-2 border-blue-500 bg-blue-50'
-                      : 'cursor-pointer border-gray-200 bg-white hover:bg-gray-50'
-                  }`}
-                >
-                  {editMode ? (
-                    <div className="flex items-center gap-2">
-                      <FMInput
-                        value={category.name}
-                        onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
-                        placeholder="분류명"
-                        maxLength={20}
-                        className="flex-1"
-                      />
-                      <FMSwitch
-                        checked={category.status === 'active'}
-                        onChange={(checked) => handleCategoryFieldChange(category.id, 'status', checked ? 'active' : 'inactive')}
-                        onLabel="활성"
-                        offLabel="비활성"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">{category.name}</span>
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                          category.status === 'active'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {category.status === 'active' ? '활성' : '비활성'}
-                      </span>
-                      <span className="text-xs text-gray-500">{category.itemCount}개 품목</span>
-                    </div>
-                  )}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEndCategory}
+            >
+              <SortableContext
+                items={displayCategories.map(c => c.id)}
+                strategy={verticalListSortingStrategy}
+                disabled={!editMode}
+              >
+                <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                  {displayCategories.map((category) => (
+                    <SortableItem key={category.id} id={category.id} disabled={!editMode}>
+                      {(listeners) => (
+                        <div
+                          onClick={() => !editMode && setSelectedCategory(category)}
+                          className={`rounded-lg border p-3 transition-all ${
+                            editMode
+                              ? 'cursor-default border-gray-200 bg-white'
+                              : selectedCategory?.id === category.id
+                              ? 'cursor-pointer border-2 border-blue-500 bg-blue-50'
+                              : 'cursor-pointer border-gray-200 bg-white hover:bg-gray-50'
+                          }`}
+                        >
+                          {editMode ? (
+                            <div className="flex items-center gap-2">
+                              <div
+                                {...listeners}
+                                className="cursor-grab active:cursor-grabbing touch-none"
+                                style={{ marginRight: '8px' }}
+                              >
+                                <HolderOutlined className="text-gray-400" />
+                              </div>
+                              <FMInput
+                                value={category.name}
+                                onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
+                                placeholder="분류명"
+                                maxLength={20}
+                                className="flex-1"
+                              />
+                              <FMSwitch
+                                checked={category.status === 'active'}
+                                onChange={(checked) => handleCategoryFieldChange(category.id, 'status', checked ? 'active' : 'inactive')}
+                                onLabel="활성"
+                                offLabel="비활성"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900">{category.name}</span>
+                              <span
+                                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                  category.status === 'active'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-700'
+                                }`}
+                              >
+                                {category.status === 'active' ? '활성' : '비활성'}
+                              </span>
+                              <span className="text-xs text-gray-500">{category.itemCount}개 품목</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </SortableItem>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
 
@@ -757,75 +872,97 @@ function ProductManagement() {
                 )}
 
                 {/* Product List */}
-                <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                  {filteredProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      onClick={() => !editMode && setSelectedProduct(product)}
-                      className={`rounded-lg border p-3 transition-all ${
-                        editMode
-                          ? 'cursor-default border-gray-200 bg-white'
-                          : selectedProduct?.id === product.id
-                          ? 'cursor-pointer border-2 border-blue-500 bg-blue-50'
-                          : 'cursor-pointer border-gray-200 bg-white hover:bg-gray-50'
-                      }`}
-                    >
-                      {editMode ? (
-                        <div className="flex items-center gap-1">
-                          <FMInput
-                            value={product.name}
-                            onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
-                            placeholder="품목명"
-                            maxLength={20}
-                            className="flex-1"
-                          />
-                          <FMSelect
-                            value={product.orderUnit}
-                            onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
-                            options={[
-                              { value: '통', label: '통' },
-                              { value: '박스', label: '박스' },
-                              { value: 'kg', label: 'kg' }
-                            ]}
-                            isSearchable={false}
-                            style={{ width: '80px', flexShrink: 0 }}
-                          />
-                          <FMInput
-                            type="number"
-                            value={product.unitWeight}
-                            onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
-                            placeholder="중량"
-                            step="0.1"
-                            min="0.1"
-                            style={{ width: '70px', flexShrink: 0 }}
-                          />
-                          <FMSwitch
-                            checked={product.status === 'active'}
-                            onChange={(checked) => handleProductFieldChange(product.id, 'status', checked ? 'active' : 'inactive')}
-                            onLabel="활성"
-                            offLabel="비활성"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{product.name}</span>
-                          <span
-                            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                              product.status === 'active'
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-700'
-                            }`}
-                          >
-                            {product.status === 'active' ? '활성' : '비활성'}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {product.orderUnit} ({product.unitWeight}kg)
-                          </span>
-                        </div>
-                      )}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEndProduct}
+                >
+                  <SortableContext
+                    items={filteredProducts.map(p => p.id)}
+                    strategy={verticalListSortingStrategy}
+                    disabled={!editMode}
+                  >
+                    <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                      {filteredProducts.map((product) => (
+                        <SortableItem key={product.id} id={product.id} disabled={!editMode}>
+                          {(listeners) => (
+                            <div
+                              onClick={() => !editMode && setSelectedProduct(product)}
+                              className={`rounded-lg border p-3 transition-all ${
+                                editMode
+                                  ? 'cursor-default border-gray-200 bg-white'
+                                  : selectedProduct?.id === product.id
+                                  ? 'cursor-pointer border-2 border-blue-500 bg-blue-50'
+                                  : 'cursor-pointer border-gray-200 bg-white hover:bg-gray-50'
+                              }`}
+                            >
+                              {editMode ? (
+                                <div className="flex items-center gap-1">
+                                  <div
+                                    {...listeners}
+                                    className="cursor-grab active:cursor-grabbing touch-none"
+                                    style={{ marginRight: '8px' }}
+                                  >
+                                    <HolderOutlined className="text-gray-400" />
+                                  </div>
+                                  <FMInput
+                                    value={product.name}
+                                    onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
+                                    placeholder="품목명"
+                                    maxLength={20}
+                                    className="flex-1"
+                                  />
+                                  <FMSelect
+                                    value={product.orderUnit}
+                                    onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
+                                    options={[
+                                      { value: '통', label: '통' },
+                                      { value: '박스', label: '박스' },
+                                      { value: 'kg', label: 'kg' }
+                                    ]}
+                                    isSearchable={false}
+                                    style={{ width: '80px', flexShrink: 0 }}
+                                  />
+                                  <FMInput
+                                    type="number"
+                                    value={product.unitWeight}
+                                    onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
+                                    placeholder="중량"
+                                    step="0.1"
+                                    min="0.1"
+                                    style={{ width: '70px', flexShrink: 0 }}
+                                  />
+                                  <FMSwitch
+                                    checked={product.status === 'active'}
+                                    onChange={(checked) => handleProductFieldChange(product.id, 'status', checked ? 'active' : 'inactive')}
+                                    onLabel="활성"
+                                    offLabel="비활성"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-gray-900">{product.name}</span>
+                                  <span
+                                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                      product.status === 'active'
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-gray-100 text-gray-700'
+                                    }`}
+                                  >
+                                    {product.status === 'active' ? '활성' : '비활성'}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {product.orderUnit} ({product.unitWeight}kg)
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </SortableItem>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               </>
             )}
           </div>
@@ -881,53 +1018,75 @@ function ProductManagement() {
                 )}
 
                 {/* Origin List */}
-                <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                  {filteredOrigins.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400">
-                      <span>등록된 원산지가 없습니다.</span>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEndOrigin}
+                >
+                  <SortableContext
+                    items={filteredOrigins.map(o => o.id)}
+                    strategy={verticalListSortingStrategy}
+                    disabled={!editMode}
+                  >
+                    <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                      {filteredOrigins.length === 0 ? (
+                        <div className="py-12 text-center text-gray-400">
+                          <span>등록된 원산지가 없습니다.</span>
+                        </div>
+                      ) : (
+                        filteredOrigins.map((origin) => (
+                          <SortableItem key={origin.id} id={origin.id} disabled={!editMode}>
+                            {(listeners) => (
+                              <div
+                                className={`rounded-lg border border-gray-200 p-3 ${
+                                  origin.status === 'active' ? 'bg-white' : 'bg-gray-50'
+                                }`}
+                              >
+                                {editMode ? (
+                                  <div className="flex items-center gap-1">
+                                    <div
+                                      {...listeners}
+                                      className="cursor-grab active:cursor-grabbing touch-none"
+                                      style={{ marginRight: '8px' }}
+                                    >
+                                      <HolderOutlined className="text-gray-400" />
+                                    </div>
+                                    <FMInput
+                                      value={origin.name}
+                                      onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
+                                      placeholder="원산지명"
+                                      maxLength={20}
+                                      className="flex-1"
+                                    />
+                                    <FMSwitch
+                                      checked={origin.status === 'active'}
+                                      onChange={(checked) => handleOriginFieldChange(origin.id, 'status', checked ? 'active' : 'inactive')}
+                                      onLabel="활성"
+                                      offLabel="비활성"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-900">{origin.name}</span>
+                                    <span
+                                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                        origin.status === 'active'
+                                          ? 'bg-green-100 text-green-700'
+                                          : 'bg-gray-100 text-gray-700'
+                                      }`}
+                                    >
+                                      {origin.status === 'active' ? '활성' : '비활성'}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </SortableItem>
+                        ))
+                      )}
                     </div>
-                  ) : (
-                    filteredOrigins.map((origin) => (
-                      <div
-                        key={origin.id}
-                        className={`rounded-lg border border-gray-200 p-3 ${
-                          origin.status === 'active' ? 'bg-white' : 'bg-gray-50'
-                        }`}
-                      >
-                        {editMode ? (
-                          <div className="flex items-center gap-1">
-                            <FMInput
-                              value={origin.name}
-                              onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
-                              placeholder="원산지명"
-                              maxLength={20}
-                              className="flex-1"
-                            />
-                            <FMSwitch
-                              checked={origin.status === 'active'}
-                              onChange={(checked) => handleOriginFieldChange(origin.id, 'status', checked ? 'active' : 'inactive')}
-                              onLabel="활성"
-                              offLabel="비활성"
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900">{origin.name}</span>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                origin.status === 'active'
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-gray-100 text-gray-700'
-                              }`}
-                            >
-                              {origin.status === 'active' ? '활성' : '비활성'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
+                  </SortableContext>
+                </DndContext>
               </>
             )}
           </div>
@@ -983,53 +1142,75 @@ function ProductManagement() {
                 )}
 
                 {/* Spec List */}
-                <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                  {filteredSpecs.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400">
-                      <span>등록된 규격이 없습니다.</span>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEndSpec}
+                >
+                  <SortableContext
+                    items={filteredSpecs.map(s => s.id)}
+                    strategy={verticalListSortingStrategy}
+                    disabled={!editMode}
+                  >
+                    <div className="space-y-2" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                      {filteredSpecs.length === 0 ? (
+                        <div className="py-12 text-center text-gray-400">
+                          <span>등록된 규격이 없습니다.</span>
+                        </div>
+                      ) : (
+                        filteredSpecs.map((spec) => (
+                          <SortableItem key={spec.id} id={spec.id} disabled={!editMode}>
+                            {(listeners) => (
+                              <div
+                                className={`rounded-lg border border-gray-200 p-3 ${
+                                  spec.status === 'active' ? 'bg-white' : 'bg-gray-50'
+                                }`}
+                              >
+                                {editMode ? (
+                                  <div className="flex items-center gap-1">
+                                    <div
+                                      {...listeners}
+                                      className="cursor-grab active:cursor-grabbing touch-none"
+                                      style={{ marginRight: '8px' }}
+                                    >
+                                      <HolderOutlined className="text-gray-400" />
+                                    </div>
+                                    <FMInput
+                                      value={spec.name}
+                                      onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
+                                      placeholder="규격명"
+                                      maxLength={20}
+                                      className="flex-1"
+                                    />
+                                    <FMSwitch
+                                      checked={spec.status === 'active'}
+                                      onChange={(checked) => handleSpecFieldChange(spec.id, 'status', checked ? 'active' : 'inactive')}
+                                      onLabel="활성"
+                                      offLabel="비활성"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-900">{spec.name}</span>
+                                    <span
+                                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                        spec.status === 'active'
+                                          ? 'bg-green-100 text-green-700'
+                                          : 'bg-gray-100 text-gray-700'
+                                      }`}
+                                    >
+                                      {spec.status === 'active' ? '활성' : '비활성'}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </SortableItem>
+                        ))
+                      )}
                     </div>
-                  ) : (
-                    filteredSpecs.map((spec) => (
-                      <div
-                        key={spec.id}
-                        className={`rounded-lg border border-gray-200 p-3 ${
-                          spec.status === 'active' ? 'bg-white' : 'bg-gray-50'
-                        }`}
-                      >
-                        {editMode ? (
-                          <div className="flex items-center gap-1">
-                            <FMInput
-                              value={spec.name}
-                              onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
-                              placeholder="규격명"
-                              maxLength={20}
-                              className="flex-1"
-                            />
-                            <FMSwitch
-                              checked={spec.status === 'active'}
-                              onChange={(checked) => handleSpecFieldChange(spec.id, 'status', checked ? 'active' : 'inactive')}
-                              onLabel="활성"
-                              offLabel="비활성"
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900">{spec.name}</span>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                spec.status === 'active'
-                                  ? 'bg-green-100 text-green-700'
-                                  : 'bg-gray-100 text-gray-700'
-                              }`}
-                            >
-                              {spec.status === 'active' ? '활성' : '비활성'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
+                  </SortableContext>
+                </DndContext>
               </>
             )}
           </div>
