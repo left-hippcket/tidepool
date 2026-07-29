@@ -135,17 +135,6 @@ function DriverRegister() {
                 ]}
               />
             </Form.Item>
-
-            <Form.Item name="driverLevel" label="Driver Level" initialValue="모름">
-              <Select
-                options={[
-                  { value: '잘함', label: '잘함' },
-                  { value: '보통', label: '보통' },
-                  { value: '못함', label: '못함' },
-                  { value: '모름', label: '모름' }
-                ]}
-              />
-            </Form.Item>
           </div>
 
           {/* 정산사업자 정보 */}

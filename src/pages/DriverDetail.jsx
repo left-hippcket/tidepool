@@ -82,7 +82,6 @@ function DriverDetail() {
       phone: basicInfo.phone,
       vehicleType: basicInfo.vehicleType,
       tankCount: basicInfo.tankCount,
-      driverLevel: basicInfo.driverLevel,
       status: basicInfo.status
     });
 
@@ -307,17 +306,6 @@ function DriverDetail() {
                 />
               </Form.Item>
 
-              <Form.Item name="driverLevel" label="Driver Level">
-                <Select
-                  options={[
-                    { value: '잘함', label: '잘함' },
-                    { value: '보통', label: '보통' },
-                    { value: '못함', label: '못함' },
-                    { value: '모름', label: '모름' }
-                  ]}
-                />
-              </Form.Item>
-
               <Form.Item name="status" label="상태">
                 <Select
                   options={[
@@ -344,10 +332,6 @@ function DriverDetail() {
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">보유통수:</span>
                 <span className="w-4/5 text-gray-900">{basicInfo.tankCount ? `${basicInfo.tankCount}통` : '-'}</span>
-              </div>
-              <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">Driver Level:</span>
-                <span className="w-4/5 text-gray-900">{basicInfo.driverLevel || '-'}</span>
               </div>
             </div>
           )}
