@@ -664,7 +664,7 @@ function ProductManagement() {
           </div>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'minmax(150px, 1fr) minmax(450px, 3fr) minmax(150px, 1fr) minmax(150px, 1fr)' }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'auto auto auto auto' }}>
         {/* Column 1: Categories */}
         <div>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -742,7 +742,7 @@ function ProductManagement() {
                                 >
                                   <HolderOutlined className="text-gray-400" />
                                 </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ width: '180px' }}>
                                   <FMInput
                                     value={category.name}
                                     onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
@@ -910,7 +910,7 @@ function ProductManagement() {
                                     >
                                       <HolderOutlined className="text-gray-400" />
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ width: '180px' }}>
                                       <FMInput
                                         value={product.name}
                                         onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
@@ -918,7 +918,7 @@ function ProductManagement() {
                                         maxLength={20}
                                       />
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ width: '180px' }}>
                                       <FMSelect
                                         value={product.orderUnit}
                                         onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
@@ -930,7 +930,7 @@ function ProductManagement() {
                                         isSearchable={false}
                                       />
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ width: '180px' }}>
                                       <FMInput
                                         type="number"
                                         value={product.unitWeight}
@@ -1063,7 +1063,7 @@ function ProductManagement() {
                                       >
                                         <HolderOutlined className="text-gray-400" />
                                       </div>
-                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ width: '180px' }}>
                                         <FMInput
                                           value={origin.name}
                                           onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
@@ -1192,7 +1192,7 @@ function ProductManagement() {
                                       >
                                         <HolderOutlined className="text-gray-400" />
                                       </div>
-                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ width: '180px' }}>
                                         <FMInput
                                           value={spec.name}
                                           onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
