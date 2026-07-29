@@ -25,7 +25,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { territories as initialTerritories, regions as initialRegions } from '../data/mockData';
 
 // Sortable Item Component
-function SortableItem({ id, children }) {
+function SortableItem({ id, children, disabled }) {
   const {
     attributes,
     listeners,
@@ -33,7 +33,7 @@ function SortableItem({ id, children }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({ id, disabled });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -616,10 +616,11 @@ function TerritoryManagement() {
                 <SortableContext
                   items={sortedTerritories.map(t => t.id)}
                   strategy={verticalListSortingStrategy}
+                  disabled={!editMode}
                 >
                   <div className="flex flex-col gap-2 max-h-[600px] overflow-auto">
                     {sortedTerritories.map(t => (
-                      <SortableItem key={t.id} id={t.id}>
+                      <SortableItem key={t.id} id={t.id} disabled={!editMode}>
                         {(attributes, listeners) => (
                           <div
                             onClick={() => !editMode && setSelectedTerritory(t)}
@@ -633,11 +634,15 @@ function TerritoryManagement() {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex flex-1 items-center gap-2">
-                                <HolderOutlined
-                                  {...attributes}
-                                  {...listeners}
-                                  className="cursor-grab text-base text-gray-400"
-                                />
+                                {editMode && (
+                                  <div
+                                    {...attributes}
+                                    {...listeners}
+                                    className="cursor-grab active:cursor-grabbing touch-none"
+                                  >
+                                    <HolderOutlined className="text-gray-400" />
+                                  </div>
+                                )}
                                 <div className="flex-1">
                                   {editMode ? (
                                     <div className="flex gap-2 items-center">
@@ -743,21 +748,26 @@ function TerritoryManagement() {
                       <SortableContext
                         items={selectedRegions.map(r => r.id)}
                         strategy={verticalListSortingStrategy}
+                        disabled={!editMode}
                       >
                         <div className="flex flex-col gap-2">
                           {selectedRegions.map(r => (
-                            <SortableItem key={r.id} id={r.id}>
+                            <SortableItem key={r.id} id={r.id} disabled={!editMode}>
                               {(attributes, listeners) => (
                                 <div className={`rounded-lg border border-gray-200 p-3 ${
                                   r.status === 'active' ? 'bg-white' : 'bg-gray-50'
                                 }`}>
                                   <div className="flex items-center justify-between">
                                     <div className="flex flex-1 items-center gap-2">
-                                      <HolderOutlined
-                                        {...attributes}
-                                        {...listeners}
-                                        className="cursor-grab text-base text-gray-400"
-                                      />
+                                      {editMode && (
+                                        <div
+                                          {...attributes}
+                                          {...listeners}
+                                          className="cursor-grab active:cursor-grabbing touch-none"
+                                        >
+                                          <HolderOutlined className="text-gray-400" />
+                                        </div>
+                                      )}
                                       <div className="flex-1">
                                         {editMode ? (
                                           <div className="flex gap-2 items-center">
