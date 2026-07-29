@@ -8,6 +8,7 @@ import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
+import { FMSwitch } from '../components/ui/FMSwitch';
 import toast from 'react-hot-toast';
 
 function BuyerDetail() {
@@ -315,14 +316,16 @@ function BuyerDetail() {
               </Form.Item>
 
               <Form.Item
-                name="status"
                 label="상태"
-                rules={[{ required: true, message: '상태를 선택해주세요' }]}
               >
-                <Select>
-                  <Select.Option value="active">활성</Select.Option>
-                  <Select.Option value="inactive">비활성</Select.Option>
-                </Select>
+                <FMSwitch
+                  checked={form.getFieldValue('status') === 'active'}
+                  onChange={(checked) => {
+                    form.setFieldsValue({ status: checked ? 'active' : 'inactive' });
+                  }}
+                  onLabel="활성"
+                  offLabel="비활성"
+                />
               </Form.Item>
             </>
           ) : (
@@ -630,12 +633,16 @@ function BuyerDetail() {
                     <span className="w-1/4 font-medium text-gray-700">세금계산서 이메일:</span>
                     <Input defaultValue={business.taxInvoiceEmail} className="w-3/4" />
                   </div>
-                  <div className="flex">
+                  <div className="flex items-center">
                     <span className="w-1/4 font-medium text-gray-700">상태:</span>
-                    <Select defaultValue={business.status} className="w-3/4">
-                      <Select.Option value="active">활성</Select.Option>
-                      <Select.Option value="inactive">비활성</Select.Option>
-                    </Select>
+                    <div className="w-3/4">
+                      <FMSwitch
+                        checked={business.status === 'active'}
+                        onChange={(checked) => {}}
+                        onLabel="활성"
+                        offLabel="비활성"
+                      />
+                    </div>
                   </div>
 
                   <div className="mt-6 pt-6 border-t border-gray-200">

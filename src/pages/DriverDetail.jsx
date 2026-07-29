@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, MinusCircleOutlined, UploadOutlined, FileImageOutlin
 import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
 import { driverDetails, claimHistory, driverTransactionDetails } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
+import { FMSwitch } from '../components/ui/FMSwitch';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -306,12 +307,14 @@ function DriverDetail() {
                 />
               </Form.Item>
 
-              <Form.Item name="status" label="상태">
-                <Select
-                  options={[
-                    { value: 'active', label: '활성' },
-                    { value: 'inactive', label: '비활성' }
-                  ]}
+              <Form.Item label="상태">
+                <FMSwitch
+                  checked={form.getFieldValue('status') === 'active'}
+                  onChange={(checked) => {
+                    form.setFieldsValue({ status: checked ? 'active' : 'inactive' });
+                  }}
+                  onLabel="활성"
+                  offLabel="비활성"
                 />
               </Form.Item>
             </>

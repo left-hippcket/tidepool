@@ -8,6 +8,7 @@ import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
+import { FMSwitch } from '../components/ui/FMSwitch';
 import toast from 'react-hot-toast';
 
 function SellerDetail() {
@@ -339,14 +340,18 @@ function SellerDetail() {
               </Form.Item>
 
               <Form.Item
-                name="status"
                 label="상태"
-                rules={[{ required: true, message: '상태를 선택해주세요' }]}
               >
-                <Select onChange={handleStatusChange}>
-                  <Select.Option value="active">활성</Select.Option>
-                  <Select.Option value="inactive">비활성</Select.Option>
-                </Select>
+                <FMSwitch
+                  checked={form.getFieldValue('status') === 'active'}
+                  onChange={(checked) => {
+                    const newStatus = checked ? 'active' : 'inactive';
+                    form.setFieldsValue({ status: newStatus });
+                    handleStatusChange(newStatus);
+                  }}
+                  onLabel="활성"
+                  offLabel="비활성"
+                />
               </Form.Item>
             </>
           ) : (
@@ -658,12 +663,18 @@ function SellerDetail() {
                     <span className="w-1/4 font-medium text-gray-700">상차지주소:</span>
                     <Input defaultValue={business.loadingAddress} className="w-3/4" />
                   </div>
-                  <div className="flex">
+                  <div className="flex items-center">
                     <span className="w-1/4 font-medium text-gray-700">상태:</span>
-                    <Select defaultValue={business.status} className="w-3/4">
-                      <Select.Option value="active">활성</Select.Option>
-                      <Select.Option value="inactive">비활성</Select.Option>
-                    </Select>
+                    <div className="w-3/4">
+                      <FMSwitch
+                        checked={business.status === 'active'}
+                        onChange={(checked) => {
+                          // 상태 변경 로직 (실제 구현 시 업데이트 필요)
+                        }}
+                        onLabel="활성"
+                        offLabel="비활성"
+                      />
+                    </div>
                   </div>
 
                   {business.bankAccounts && business.bankAccounts.length > 0 && (

@@ -5,6 +5,7 @@ import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
+import { FMSwitch } from '../components/ui/FMSwitch';
 import {
   DndContext,
   closestCenter,
@@ -676,14 +677,11 @@ function TerritoryManagement() {
                                         placeholder="권역명"
                                         className="flex-1"
                                       />
-                                      <FMSelect
-                                        value={t.status}
-                                        onChange={(value) => handleTerritoryFieldChange(t.id, 'status', value)}
-                                        options={[
-                                          { value: 'active', label: '활성' },
-                                          { value: 'inactive', label: '비활성' }
-                                        ]}
-                                        className="w-64"
+                                      <FMSwitch
+                                        checked={t.status === 'active'}
+                                        onChange={(checked) => handleTerritoryFieldChange(t.id, 'status', checked ? 'active' : 'inactive')}
+                                        onLabel="활성"
+                                        offLabel="비활성"
                                       />
                                     </div>
                                   ) : (
@@ -799,14 +797,11 @@ function TerritoryManagement() {
                                               placeholder="지역명"
                                               className="flex-1"
                                             />
-                                            <FMSelect
-                                              value={r.status}
-                                              onChange={(value) => handleRegionFieldChange(r.id, 'status', value)}
-                                              options={[
-                                                { value: 'active', label: '활성' },
-                                                { value: 'inactive', label: '비활성' }
-                                              ]}
-                                              className="w-64"
+                                            <FMSwitch
+                                              checked={r.status === 'active'}
+                                              onChange={(checked) => handleRegionFieldChange(r.id, 'status', checked ? 'active' : 'inactive')}
+                                              onLabel="활성"
+                                              offLabel="비활성"
                                             />
                                           </div>
                                         ) : (
