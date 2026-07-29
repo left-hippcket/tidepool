@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Modal } from 'antd';
-import { MinusCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { Plus, Edit2, Save, X } from 'lucide-react';
+import { Form, Input, Select, Modal, Upload, Image } from 'antd';
+import { MinusCircleOutlined, ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Plus, Edit2, Save, X, Upload as UploadIcon } from 'lucide-react';
 import { buyerGroups, buyerDetails, managers, territories, regions, productCategories, products } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
@@ -627,6 +627,32 @@ function BuyerDetail() {
                       <Select.Option value="inactive">비활성</Select.Option>
                     </Select>
                   </div>
+
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex">
+                      <span className="w-1/4 font-medium text-gray-700">사업자등록증:</span>
+                      <div className="w-3/4">
+                        <Upload
+                          beforeUpload={() => false}
+                          maxCount={1}
+                          accept="image/*,.pdf"
+                          defaultFileList={business.certificate ? [{
+                            uid: '-1',
+                            name: '사업자등록증.pdf',
+                            status: 'done',
+                          }] : []}
+                        >
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2.5 py-1 text-sm"
+                          >
+                            <UploadIcon className="h-4 w-4" />
+                            사업자등록증 첨부하기
+                          </button>
+                        </Upload>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -657,6 +683,36 @@ function BuyerDetail() {
                   <div className="flex">
                     <span className="w-1/4 font-medium text-gray-700">세금계산서 이메일:</span>
                     <span className="w-3/4 text-gray-900">{business.taxInvoiceEmail || '-'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/4 font-medium text-gray-700">사업자등록증:</span>
+                    <span className="w-3/4 text-gray-900">
+                      {business.certificate ? (
+                        <Image.PreviewGroup>
+                          <Image
+                            src="/images/business-certificate-sample.png"
+                            alt={`사업자등록증-${business.id}`}
+                            width={0}
+                            height={0}
+                            style={{ display: 'none' }}
+                            preview={{ mask: null }}
+                          />
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2.5 py-1 text-sm"
+                            onClick={() => {
+                              const img = document.querySelector(`img[alt="사업자등록증-${business.id}"]`);
+                              if (img) img.click();
+                            }}
+                          >
+                            <FileImageOutlined />
+                            사업자등록증 확인
+                          </button>
+                        </Image.PreviewGroup>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded border font-semibold bg-gray-100 border-gray-300 text-gray-600 px-2.5 py-1 text-sm">미첨부</span>
+                      )}
+                    </span>
                   </div>
                 </div>
               )}

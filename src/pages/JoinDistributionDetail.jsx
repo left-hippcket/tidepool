@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Modal } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Plus, Edit2 } from 'lucide-react';
+import { Form, Input, Select, Modal, Upload, Image } from 'antd';
+import { ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Plus, Edit2, Upload as UploadIcon } from 'lucide-react';
 import { joinGroups, joinDetails, managers, territories, regions } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMTagInput } from '../components/ui/FMTagInput';
@@ -391,7 +391,7 @@ function JoinDistributionDetail() {
                   </div>
 
                   {business.bankAccounts && business.bankAccounts.length > 0 && (
-                    <div className="mt-6">
+                    <div className="mt-6 pt-6 border-t border-gray-200">
                       <div className="mb-4 pb-2 border-b border-gray-200">
                         <h5 className="font-medium text-gray-700">은행계좌 정보</h5>
                       </div>
@@ -416,7 +416,7 @@ function JoinDistributionDetail() {
                               <Input placeholder="홍길동" defaultValue={account.holder} className="w-3/4" />
                             </div>
                             <div className="flex">
-                              <span className="w-1/4 font-medium text-gray-700">대표 계좌:</span>
+                              <span className="w-1/4 font-medium text-gray-700">대표계좌:</span>
                               <div className="w-3/4">
                                 <label className="flex items-center gap-2">
                                   <input
@@ -426,7 +426,7 @@ function JoinDistributionDetail() {
                                     disabled={business.bankAccounts.length === 1}
                                     className="h-4 w-4 border-gray-300"
                                   />
-                                  <span className="text-gray-600">대표 계좌로 설정</span>
+                                  <span className="text-gray-600">대표계좌로 설정</span>
                                 </label>
                               </div>
                             </div>
@@ -444,6 +444,32 @@ function JoinDistributionDetail() {
                       </div>
                     </div>
                   )}
+
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex">
+                      <span className="w-1/4 font-medium text-gray-700">사업자등록증:</span>
+                      <div className="w-3/4">
+                        <Upload
+                          beforeUpload={() => false}
+                          maxCount={1}
+                          accept="image/*,.pdf"
+                          defaultFileList={business.certificate ? [{
+                            uid: '-1',
+                            name: '사업자등록증.pdf',
+                            status: 'done',
+                          }] : []}
+                        >
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2.5 py-1 text-sm"
+                          >
+                            <UploadIcon className="h-4 w-4" />
+                            사업자등록증 첨부하기
+                          </button>
+                        </Upload>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -476,14 +502,46 @@ function JoinDistributionDetail() {
                       <span className="w-1/4 font-medium text-gray-700">은행계좌:</span>
                       <div className="w-3/4 space-y-1">
                         {business.bankAccounts.map((account, idx) => (
-                          <div key={idx} className="text-gray-900">
-                            {account.bank} {account.accountNumber} ({account.holder})
-                            {account.isPrimary && <span className="ml-2 text-blue-600">대표</span>}
+                          <div key={idx} className="flex items-center gap-2 text-gray-900">
+                            <span>{account.bank} {account.accountNumber} ({account.holder})</span>
+                            {account.isPrimary && (
+                              <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2.5 py-1 text-sm">대표계좌</span>
+                            )}
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
+                  <div className="flex">
+                    <span className="w-1/4 font-medium text-gray-700">사업자등록증:</span>
+                    <span className="w-3/4 text-gray-900">
+                      {business.certificate ? (
+                        <Image.PreviewGroup>
+                          <Image
+                            src="/images/business-certificate-sample.png"
+                            alt={`사업자등록증-${business.id}`}
+                            width={0}
+                            height={0}
+                            style={{ display: 'none' }}
+                            preview={{ mask: null }}
+                          />
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2.5 py-1 text-sm"
+                            onClick={() => {
+                              const img = document.querySelector(`img[alt="사업자등록증-${business.id}"]`);
+                              if (img) img.click();
+                            }}
+                          >
+                            <FileImageOutlined />
+                            사업자등록증 확인
+                          </button>
+                        </Image.PreviewGroup>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded border font-semibold bg-gray-100 border-gray-300 text-gray-600 px-2.5 py-1 text-sm">미첨부</span>
+                      )}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

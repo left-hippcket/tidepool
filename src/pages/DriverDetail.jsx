@@ -1,16 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card, Button, Tag, Form, Input, Select, Space, message, Modal,
-  Upload, Timeline, InputNumber, DatePicker, Table, Statistic, Image, Typography, Flex, Row, Col, Descriptions
-} from 'antd';
-
-const { Title, Text } = Typography;
-import {
-  ArrowLeftOutlined, EditOutlined, UploadOutlined, PlusOutlined,
-  MinusCircleOutlined, FileImageOutlined
-} from '@ant-design/icons';
+import { Form, Input, Select, Upload, InputNumber, DatePicker, Image, Modal } from 'antd';
+import { ArrowLeftOutlined, MinusCircleOutlined, UploadOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
 import { driverDetails, claimHistory, driverTransactionDetails } from '../data/mockData';
+import { FMButton } from '../components/ui/FMButton';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -26,20 +21,19 @@ function DriverDetail() {
   const driverData = driverDetails[id];
   const transactionData = driverTransactionDetails[id];
 
-  const [editingBasic, setEditingBasic] = useState(false);
-  const [editingSettlement, setEditingSettlement] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [claimModalVisible, setClaimModalVisible] = useState(false);
   const [editingClaimId, setEditingClaimId] = useState(null);
   const [claims, setClaims] = useState(claimHistory[id] || []);
   const [periodFilter, setPeriodFilter] = useState('최근 3개월');
 
   if (!driverData) {
-    return <div style={{ padding: 24 }}>드라이버를 찾을 수 없습니다.</div>;
+    return <div className="p-6">드라이버를 찾을 수 없습니다.</div>;
   }
 
   const { basicInfo, settlementInfo } = driverData;
 
-  // P2: 기간별 데이터 계산
+  // 기간별 데이터 계산
   const filteredPeriods = useMemo(() => {
     if (!transactionData) return [];
 
@@ -48,11 +42,11 @@ function DriverDetail() {
 
     switch (periodFilter) {
       case '최근 1개월':
-        return allPeriods.slice(-3); // 최근 3순
+        return allPeriods.slice(-3);
       case '최근 3개월':
-        return allPeriods.slice(-9); // 최근 9순
+        return allPeriods.slice(-9);
       case '최근 6개월':
-        return allPeriods.slice(-18); // 최근 18순
+        return allPeriods.slice(-18);
       case '이번달':
         const thisMonth = now.format('M월');
         return allPeriods.filter(p => p.period.startsWith(thisMonth));
@@ -64,9 +58,9 @@ function DriverDetail() {
           return quarterMonths.includes(month);
         });
       case '올해':
-        return allPeriods; // 모든 데이터 (샘플은 4월~6월)
+        return allPeriods;
       case '누적':
-        return allPeriods; // 모든 데이터
+        return allPeriods;
       default:
         return allPeriods.slice(-9);
     }
@@ -82,8 +76,7 @@ function DriverDetail() {
     return { totalFreight, totalTripCount, averageFreight };
   }, [filteredPeriods]);
 
-  // 기본 정보 수정
-  const handleBasicEdit = () => {
+  const handleEditMode = () => {
     form.setFieldsValue({
       name: basicInfo.name,
       phone: basicInfo.phone,
@@ -92,54 +85,8 @@ function DriverDetail() {
       driverLevel: basicInfo.driverLevel,
       status: basicInfo.status
     });
-    setEditingBasic(true);
-  };
 
-  const handleBasicSave = async () => {
-    try {
-      const values = await form.validateFields();
-
-      // 비활성화 확인
-      if (values.status === 'inactive' && basicInfo.status === 'active') {
-        Modal.confirm({
-          title: '드라이버 비활성화',
-          content: '이 드라이버를 비활성화하시겠습니까? 비활성화 후에는 신규 거래 시 선택할 수 없습니다.',
-          okText: '확인',
-          cancelText: '취소',
-          onOk: () => {
-            message.success('드라이버가 비활성화되었습니다.');
-            setEditingBasic(false);
-          }
-        });
-      } else if (values.status === 'active' && basicInfo.status === 'inactive') {
-        message.success('드라이버가 활성화되었습니다.');
-        setEditingBasic(false);
-      } else {
-        message.success('드라이버 정보가 수정되었습니다.');
-        setEditingBasic(false);
-      }
-    } catch (error) {
-      console.error('Validation failed:', error);
-    }
-  };
-
-  const handleBasicCancel = () => {
-    form.resetFields();
-    setEditingBasic(false);
-  };
-
-  // 정산사업자 수정
-  const handleSettlementEdit = () => {
-    if (!settlementInfo) {
-      settlementForm.setFieldsValue({
-        businessNumber: '',
-        businessName: '',
-        representative: '',
-        businessAddress: '',
-        taxType: undefined,
-        bankAccounts: [{ bank: '', accountNumber: '', holder: '' }]
-      });
-    } else {
+    if (settlementInfo) {
       settlementForm.setFieldsValue({
         businessNumber: settlementInfo.businessNumber,
         businessName: settlementInfo.businessName,
@@ -152,26 +99,55 @@ function DriverDetail() {
           holder: acc.holder
         }))
       });
+    } else {
+      settlementForm.setFieldsValue({
+        businessNumber: '',
+        businessName: '',
+        representative: '',
+        businessAddress: '',
+        taxType: undefined,
+        bankAccounts: [{ bank: '', accountNumber: '', holder: '' }]
+      });
     }
-    setEditingSettlement(true);
+
+    setEditMode(true);
   };
 
-  const handleSettlementSave = async () => {
+  const handleSave = async () => {
     try {
-      const values = await settlementForm.validateFields();
-      message.success('정산사업자 정보가 수정되었습니다.');
-      setEditingSettlement(false);
+      const basicValues = await form.validateFields();
+      const settlementValues = await settlementForm.validateFields();
+
+      if (basicValues.status === 'inactive' && basicInfo.status === 'active') {
+        Modal.confirm({
+          title: '드라이버 비활성화',
+          content: '이 드라이버를 비활성화하시겠습니까? 비활성화 후에는 신규 거래 시 선택할 수 없습니다.',
+          okText: '확인',
+          cancelText: '취소',
+          onOk: () => {
+            toast.success('드라이버가 비활성화되었습니다.');
+            setEditMode(false);
+          }
+        });
+      } else if (basicValues.status === 'active' && basicInfo.status === 'inactive') {
+        toast.success('드라이버가 활성화되었습니다.');
+        setEditMode(false);
+      } else {
+        toast.success('드라이버 정보가 수정되었습니다.');
+        setEditMode(false);
+      }
     } catch (error) {
       console.error('Validation failed:', error);
     }
   };
 
-  const handleSettlementCancel = () => {
+  const handleCancel = () => {
+    form.resetFields();
     settlementForm.resetFields();
-    setEditingSettlement(false);
+    setEditMode(false);
   };
 
-  // 이슈 히스토리 추가/수정
+  // 이슈 히스토리
   const handleClaimAdd = () => {
     claimForm.resetFields();
     claimForm.setFieldsValue({
@@ -195,9 +171,9 @@ function DriverDetail() {
     try {
       const values = await claimForm.validateFields();
       if (editingClaimId) {
-        message.success('이슈 히스토리가 수정되었습니다.');
+        toast.success('이슈 히스토리가 수정되었습니다.');
       } else {
-        message.success('이슈 히스토리가 등록되었습니다.');
+        toast.success('이슈 히스토리가 등록되었습니다.');
       }
       setClaimModalVisible(false);
       claimForm.resetFields();
@@ -214,44 +190,62 @@ function DriverDetail() {
       cancelText: '취소',
       onOk: () => {
         setClaims(prev => prev.filter(c => c.id !== claimId));
-        message.success('이슈 히스토리가 삭제되었습니다.');
+        toast.success('이슈 히스토리가 삭제되었습니다.');
       }
     });
   };
 
   return (
-    <div style={{ minHeight: '100vh', padding: '16px 24px', background: '#f5f5f5' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      {/* 헤더 */}
-      <div>
-        <Button
-          onClick={() => navigate('/driver')}
-          icon={<ArrowLeftOutlined />}
-          style={{ marginBottom: 16 }}
-        >
-          목록으로
-        </Button>
-        <Title level={2}>드라이버 상세</Title>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col gap-6 w-full">
+        {/* 헤더 */}
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <FMButton
+              variant="indigo"
+              icon={<ArrowLeftOutlined className="h-4 w-4" />}
+              href="/driver"
+            >
+              목록으로
+            </FMButton>
+            {!editMode && (
+              <button
+                onClick={handleEditMode}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+              >
+                <Edit2 className="h-4 w-4" />
+                수정 모드
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-gray-900">{basicInfo.name}</h2>
+            <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+              basicInfo.status === 'active'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-100 text-gray-700'
+            }`}>
+              {basicInfo.status === 'active' ? '활성' : '비활성'}
+            </span>
+          </div>
+        </div>
 
-      {/* 드라이버 기본 정보 */}
-      <Card
-        title="드라이버 기본 정보"
-        extra={
-          editingBasic ? (
-            <Space>
-              <Button onClick={handleBasicCancel}>취소</Button>
-              <Button type="primary" onClick={handleBasicSave}>저장</Button>
-            </Space>
-          ) : (
-            <Button icon={<EditOutlined />} onClick={handleBasicEdit}>수정</Button>
-          )
-        }
-        style={{ opacity: basicInfo.status === 'inactive' ? 0.6 : 1 }}
-      >
-        {editingBasic ? (
-          <Form form={form} layout="vertical">
-            <Row gutter={16}>
+        <Form
+          form={form}
+          layout="horizontal"
+          labelCol={{ flex: '20%' }}
+          wrapperCol={{ flex: '80%' }}
+          labelAlign="left"
+        >
+        {/* 드라이버 기본 정보 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">드라이버 기본 정보</h3>
+            <span className="text-xs text-gray-500">최근 수정일: 2026-07-29</span>
+          </div>
+
+          {editMode ? (
+            <>
               <Form.Item
                 name="name"
                 label="드라이버명"
@@ -322,62 +316,58 @@ function DriverDetail() {
                   ]}
                 />
               </Form.Item>
-            </Row>
-          </Form>
-        ) : (
-          <Descriptions bordered column={{ xs: 1, md: 2 }} size="middle">
-            <Descriptions.Item label="드라이버명">{basicInfo.name}</Descriptions.Item>
-            <Descriptions.Item label="전화번호">{basicInfo.phone || '-'}</Descriptions.Item>
-            <Descriptions.Item label="차종">{basicInfo.vehicleType || '-'}</Descriptions.Item>
-            <Descriptions.Item label="보유통수">{basicInfo.tankCount ? `${basicInfo.tankCount}통` : '-'}</Descriptions.Item>
-            <Descriptions.Item label="Driver Level">{basicInfo.driverLevel || '-'}</Descriptions.Item>
-            <Descriptions.Item label="상태">
-              {basicInfo.status === 'active' ? (
-                <Tag color="green">활성</Tag>
-              ) : (
-                <Tag color="default">비활성</Tag>
-              )}
-            </Descriptions.Item>
-          </Descriptions>
-        )}
-      </Card>
-
-      {/* 정산사업자 정보 */}
-      <Card
-        title="정산사업자 정보"
-        extra={
-          editingSettlement ? (
-            <Space>
-              <Button onClick={handleSettlementCancel}>취소</Button>
-              <Button type="primary" onClick={handleSettlementSave}>저장</Button>
-            </Space>
+            </>
           ) : (
-            <Button icon={<EditOutlined />} onClick={handleSettlementEdit}>
-              {settlementInfo ? '수정' : '등록'}
-            </Button>
-          )
-        }
-      >
-        {editingSettlement ? (
-          <Form form={settlementForm} layout="vertical">
-            <Row gutter={16}>
+            <div className="space-y-3">
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">드라이버명:</span>
+                <span className="w-4/5 text-gray-900">{basicInfo.name}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">전화번호:</span>
+                <span className="w-4/5 text-gray-900">{basicInfo.phone || '-'}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">차종:</span>
+                <span className="w-4/5 text-gray-900">{basicInfo.vehicleType || '-'}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">보유통수:</span>
+                <span className="w-4/5 text-gray-900">{basicInfo.tankCount ? `${basicInfo.tankCount}통` : '-'}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">Driver Level:</span>
+                <span className="w-4/5 text-gray-900">{basicInfo.driverLevel || '-'}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 정산사업자 정보 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">정산사업자 정보</h3>
+            <span className="text-xs text-gray-500">최근 수정일: 2026-07-28</span>
+          </div>
+
+          {editMode ? (
+            <>
+              <Form.Item label="ticker">
+                <Input value={basicInfo.ticker} disabled className="bg-gray-100" />
+              </Form.Item>
+
               <Form.Item
                 name="businessNumber"
                 label="사업자등록번호"
                 rules={[
                   { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
                 ]}
-                help={settlementInfo ? "사업자등록번호는 수정할 수 없습니다" : undefined}
               >
                 <Input
                   placeholder="123-45-67890"
                   disabled={!!settlementInfo}
                   className={settlementInfo ? "bg-gray-100" : ""}
                 />
-              </Form.Item>
-
-              <Form.Item label="ticker">
-                <Input value={basicInfo.ticker} disabled />
               </Form.Item>
 
               <Form.Item
@@ -412,327 +402,382 @@ function DriverDetail() {
                   ]}
                 />
               </Form.Item>
-            </Row>
 
-            <div style={{ marginTop: 16 }}>
-              <Text strong style={{ display: 'block', marginBottom: 8 }}>은행계좌정보</Text>
+              <div className="my-4 border-t border-gray-200"></div>
+              <h4 className="text-base font-semibold text-gray-900 mb-4">은행계좌 정보</h4>
+
               <Form.List name="bankAccounts">
                 {(fields, { add, remove }) => (
                   <>
-                    {fields.map((field, index) => (
-                      <div key={field.key} className="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-3">
-                        <Space align="start" style={{ width: '100%' }}>
-                          <Form.Item
-                            {...field}
-                            name={[field.name, 'bank']}
-                            label="은행명"
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Input placeholder="하나은행" />
-                          </Form.Item>
-                          <Form.Item
-                            {...field}
-                            name={[field.name, 'accountNumber']}
-                            label="계좌번호"
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Input placeholder="123-456789-01234" />
-                          </Form.Item>
-                          <Form.Item
-                            {...field}
-                            name={[field.name, 'holder']}
-                            label="예금주"
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Input placeholder="김만진" />
-                          </Form.Item>
+                    {fields.map(({ key, name, ...restField }, index) => (
+                      <div key={key} className="mb-6 last:mb-0">
+                        {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
+                        <div className="flex items-center gap-2 mb-4">
+                          <h5 className="text-sm font-medium text-gray-700">계좌 #{index + 1}</h5>
                           {fields.length > 1 && (
-                            <MinusCircleOutlined
-                              onClick={() => remove(field.name)}
-                              style={{ marginTop: 30 }}
-                            />
+                            <button
+                              type="button"
+                              onClick={() => remove(name)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <MinusCircleOutlined />
+                            </button>
                           )}
-                        </Space>
-                        {index === 0 && <Tag color="gold" style={{ marginTop: 8 }}>주사용 계좌</Tag>}
+                        </div>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'bank']}
+                          label="은행명"
+                          className="mb-4"
+                        >
+                          <Input placeholder="예: 하나은행" />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'accountNumber']}
+                          label="계좌번호"
+                          className="mb-4"
+                        >
+                          <Input placeholder="123-456789-01234" />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'holder']}
+                          label="예금주"
+                          className="mb-0"
+                        >
+                          <Input placeholder="김만진" />
+                        </Form.Item>
                       </div>
                     ))}
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      계좌 추가하기
-                    </Button>
+                    <div className="flex justify-end">
+                      <FMButton
+                        variant="green"
+                        icon={<Plus className="h-4 w-4" />}
+                        onClick={() => add()}
+                      >
+                        계좌 추가
+                      </FMButton>
+                    </div>
                   </>
                 )}
               </Form.List>
+
+              <div className="my-4 border-t border-gray-200"></div>
+
+              <Form.Item
+                name="certificate"
+                label="사업자등록증"
+                valuePropName="fileList"
+                getValueFromEvent={(e) => e?.fileList}
+              >
+                <Upload
+                  beforeUpload={() => false}
+                  maxCount={1}
+                  accept="image/*,.pdf"
+                >
+                  <FMButton
+                    variant="green"
+                    icon={<UploadIcon className="h-4 w-4" />}
+                  >
+                    사업자등록증 첨부하기
+                  </FMButton>
+                </Upload>
+              </Form.Item>
+            </>
+          ) : settlementInfo ? (
+            <div className="space-y-3">
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">ticker:</span>
+                <span className="w-4/5 text-gray-900">{basicInfo.ticker}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">사업자등록번호:</span>
+                <span className="w-4/5 text-gray-900">{settlementInfo.businessNumber}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">사업자등록상호:</span>
+                <span className="w-4/5 text-gray-900">{settlementInfo.businessName}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">대표자:</span>
+                <span className="w-4/5 text-gray-900">{settlementInfo.representative}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">사업자등록주소:</span>
+                <span className="w-4/5 text-gray-900">{settlementInfo.businessAddress}</span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">사업자 과세유형:</span>
+                <span className="w-4/5 text-gray-900">
+                  {settlementInfo.taxType === '과세' ? (
+                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">과세</span>
+                  ) : settlementInfo.taxType === '면세' ? (
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">면세</span>
+                  ) : '-'}
+                </span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">은행계좌:</span>
+                <span className="w-4/5 text-gray-900">
+                  <div className="space-y-1">
+                    {settlementInfo.bankAccounts.map((acc, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span>{acc.bank} {acc.accountNumber} ({acc.holder})</span>
+                        {acc.isPrimary && (
+                          <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2.5 py-1 text-sm">대표계좌</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">사업자등록증:</span>
+                <span className="w-4/5 text-gray-900">
+                  {settlementInfo.hasCertificate ? (
+                    <Image.PreviewGroup>
+                      <Image
+                        src="/images/business-certificate-sample.png"
+                        alt="사업자등록증-driver"
+                        width={0}
+                        height={0}
+                        style={{ display: 'none' }}
+                        preview={{ mask: null }}
+                      />
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2.5 py-1 text-sm"
+                        onClick={() => {
+                          const img = document.querySelector(`img[alt="사업자등록증-driver"]`);
+                          if (img) img.click();
+                        }}
+                      >
+                        <FileImageOutlined />
+                        사업자등록증 확인
+                      </button>
+                    </Image.PreviewGroup>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded border font-semibold bg-gray-100 border-gray-300 text-gray-600 px-2.5 py-1 text-sm">미첨부</span>
+                  )}
+                </span>
+              </div>
             </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-gray-500">정산사업자 정보가 등록되지 않았습니다.</p>
+            </div>
+          )}
+        </div>
+        </Form>
 
-            <Form.Item name="certificate" label="사업자등록증" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList} className="mt-4">
-              <Upload beforeUpload={() => false} maxCount={1} accept="image/*,.pdf">
-                <Button icon={<UploadOutlined />}>사업자등록증 첨부하기 (최대 10MB)</Button>
-              </Upload>
-            </Form.Item>
-          </Form>
-        ) : settlementInfo ? (
-          <Descriptions bordered column={{ xs: 1, md: 2 }} size="middle">
-            <Descriptions.Item label="사업자등록번호">{settlementInfo.businessNumber}</Descriptions.Item>
-            <Descriptions.Item label="ticker">{basicInfo.ticker}</Descriptions.Item>
-            <Descriptions.Item label="사업자등록상호">{settlementInfo.businessName}</Descriptions.Item>
-            <Descriptions.Item label="대표자">{settlementInfo.representative}</Descriptions.Item>
-            <Descriptions.Item label="사업자등록주소" span={2}>{settlementInfo.businessAddress}</Descriptions.Item>
-            <Descriptions.Item label="사업자 과세유형">
-              {settlementInfo.taxType === '과세' ? (
-                <Tag color="#1890FF">과세</Tag>
-              ) : settlementInfo.taxType === '면세' ? (
-                <Tag color="#52C41A">면세</Tag>
-              ) : (
-                '-'
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label="사업자등록증">
-                {settlementInfo.hasCertificate ? (
-                  <Image.PreviewGroup>
-                    <Image
-                      src="/images/business-certificate-sample.png"
-                      alt="사업자등록증-driver"
-                      width={0}
-                      height={0}
-                      style={{ display: 'none' }}
-                      preview={{
-                        mask: null
-                      }}
-                    />
-                    <Button
-                      size="small"
-                      icon={<FileImageOutlined />}
-                      type="primary"
-                      ghost
-                      onClick={() => {
-                        const img = document.querySelector(`img[alt="사업자등록증-driver"]`);
-                        if (img) img.click();
-                      }}
-                    >
-                      사업자등록증
-                    </Button>
-                  </Image.PreviewGroup>
-                ) : (
-                  <Tag>사업자등록증 미첨부</Tag>
-                )}
-            </Descriptions.Item>
-            <Descriptions.Item label="은행계좌정보" span={2}>
-              <Space direction="vertical" size="small">
-                {settlementInfo.bankAccounts.map((acc, idx) => (
-                  <Space key={idx} size="small">
-                    <Text>{acc.bank} {acc.accountNumber} ({acc.holder})</Text>
-                    {acc.isPrimary && <Tag color="gold">주사용</Tag>}
-                  </Space>
-                ))}
-              </Space>
-            </Descriptions.Item>
-          </Descriptions>
-        ) : (
-          <Text type="secondary">정산사업자 정보가 등록되지 않았습니다.</Text>
-        )}
-      </Card>
+        {/* 이슈 히스토리 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4 opacity-60">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-semibold text-gray-700">이슈 히스토리 (P2 예정)</h3>
+            </div>
+            <div className="flex items-center gap-4">
+              <FMButton
+                variant="secondary"
+                icon={<Plus className="h-4 w-4" />}
+                onClick={handleClaimAdd}
+              >
+                이력 추가
+              </FMButton>
+            </div>
+          </div>
 
-      {/* 이슈 히스토리 (P2) */}
-      <Card
-        title="이슈 히스토리 (P2 예정)"
-        extra={<Button icon={<PlusOutlined />} onClick={handleClaimAdd}>이력 추가</Button>}
-        style={{ opacity: 0.6, backgroundColor: '#F9FAFB', borderColor: '#D1D5DB' }}
-        headStyle={{ color: '#6B7280' }}
-      >
-        {claims.length > 0 ? (
-          <Timeline>
-            {claims.map((claim) => (
-              <Timeline.Item key={claim.id}>
-                <div className="mb-4">
+          {claims.length > 0 ? (
+            <div className="space-y-4">
+              {claims.map((claim) => (
+                <div key={claim.id} className="border-l-2 border-gray-300 pl-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <span className="text-sm font-medium text-gray-900">{claim.occurredAt.split(' ')[0]}</span>
                       <span className="text-xs text-gray-500 ml-2">작성자: {claim.author}</span>
                     </div>
-                    <Space>
-                      <Button size="small" onClick={() => handleClaimEdit(claim)}>수정</Button>
-                      <Button size="small" danger onClick={() => handleClaimDelete(claim.id)}>삭제</Button>
-                    </Space>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleClaimEdit(claim)}
+                        className="px-3 py-1 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-50"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleClaimDelete(claim.id)}
+                        className="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50"
+                      >
+                        삭제
+                      </button>
+                    </div>
                   </div>
                   <p className="text-sm text-gray-700 whitespace-pre-wrap">{claim.content}</p>
                 </div>
-              </Timeline.Item>
-            ))}
-          </Timeline>
-        ) : (
-          <p className="text-gray-500">등록된 이슈 히스토리가 없습니다.</p>
-        )}
-      </Card>
-
-      {/* P2: 거래 실적 */}
-      {transactionData && (
-        <div className="opacity-60">
-          {/* 기간 필터 */}
-          <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-300 p-4 mb-4">
-            <Space wrap>
-              {['최근 1개월', '최근 3개월', '최근 6개월', '이번달', '이번분기', '올해', '누적'].map((period) => (
-                <Button
-                  key={period}
-                  type={periodFilter === period ? 'primary' : 'default'}
-                  onClick={() => setPeriodFilter(period)}
-                  className={periodFilter === period ? '' : 'bg-gray-200 text-gray-600 border-gray-300'}
-                >
-                  {period}
-                </Button>
               ))}
-            </Space>
-          </div>
-
-          {/* 통합 지표 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <Card className="bg-gray-100 border-gray-300">
-              <Statistic
-                title={<span className="text-gray-500">운임 (총액)</span>}
-                value={metrics.totalFreight}
-                suffix="원"
-                valueStyle={{ color: '#9CA3AF' }}
-              />
-            </Card>
-            <Card className="bg-gray-100 border-gray-300">
-              <Statistic
-                title={<span className="text-gray-500">운송횟수</span>}
-                value={metrics.totalTripCount}
-                suffix="회"
-                valueStyle={{ color: '#9CA3AF' }}
-              />
-            </Card>
-            <Card className="bg-gray-100 border-gray-300">
-              <Statistic
-                title={<span className="text-gray-500">평균 운임</span>}
-                value={metrics.averageFreight}
-                suffix="원"
-                valueStyle={{ color: '#9CA3AF' }}
-              />
-            </Card>
-          </div>
-
-          {/* 거래 상세 테이블 */}
-          <Card
-            title={<span className="text-gray-500">거래 상세 내역 (P2 예정)</span>}
-            className="mb-4 bg-gray-50 border-gray-300"
-          >
-            <Table
-              dataSource={filteredPeriods}
-              rowKey="period"
-              pagination={false}
-              scroll={{ x: 800 }}
-              className="text-gray-500"
-              columns={[
-                {
-                  title: '기간',
-                  dataIndex: 'period',
-                  key: 'period',
-                  fixed: 'left',
-                  width: 100,
-                  render: (text) => <span className="text-gray-500">{text}</span>
-                },
-                {
-                  title: '운임',
-                  dataIndex: 'freight',
-                  key: 'freight',
-                  render: (val) => <span className="text-gray-500">{val.toLocaleString()}원</span>,
-                  width: 120
-                },
-                {
-                  title: '운송횟수',
-                  dataIndex: 'tripCount',
-                  key: 'tripCount',
-                  render: (val) => <span className="text-gray-500">{val}회</span>,
-                  width: 100
-                },
-                {
-                  title: '운송 셀러',
-                  dataIndex: 'sellers',
-                  key: 'sellers',
-                  width: 200,
-                  render: (text) => <span className="text-gray-500">{text}</span>
-                },
-                {
-                  title: '운송 바이어',
-                  dataIndex: 'buyers',
-                  key: 'buyers',
-                  width: 200,
-                  render: (text) => <span className="text-gray-500">{text}</span>
-                },
-                {
-                  title: '운송 품목',
-                  dataIndex: 'products',
-                  key: 'products',
-                  width: 150,
-                  render: (text) => <span className="text-gray-500">{text}</span>
-                }
-              ]}
-            />
-          </Card>
-
-          {/* 운임 차트 */}
-          <Card
-            title={<span className="text-gray-500">운임 추이 (P2 예정)</span>}
-            className="bg-gray-50 border-gray-300"
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={filteredPeriods}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#D1D5DB" />
-                <XAxis dataKey="period" tick={{ fill: '#6B7280' }} />
-                <YAxis tick={{ fill: '#6B7280' }} />
-                <Tooltip
-                  formatter={(value) => `${value.toLocaleString()}원`}
-                  contentStyle={{ backgroundColor: '#F3F4F6', border: '1px solid #D1D5DB' }}
-                />
-                <Legend wrapperStyle={{ color: '#6B7280' }} />
-                <Bar dataKey="freight" name="운임" fill="#9CA3AF" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
+            </div>
+          ) : (
+            <p className="text-gray-500">등록된 이슈 히스토리가 없습니다.</p>
+          )}
         </div>
-      )}
 
-      {/* 이슈 히스토리 추가/수정 모달 */}
-      <Modal
-        title={editingClaimId ? '이슈 히스토리 수정' : '이슈 히스토리 추가'}
-        open={claimModalVisible}
-        onOk={handleClaimSave}
-        onCancel={() => {
-          setClaimModalVisible(false);
-          claimForm.resetFields();
-        }}
-        okText="저장"
-        cancelText="취소"
-        width={600}
-      >
-        <Form form={claimForm} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item
-            name="occurredAt"
-            label="발생일"
-            rules={[{ required: true, message: '발생일을 선택해주세요' }]}
-          >
-            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
-          </Form.Item>
+        {/* 거래 실적 (P2) */}
+        {transactionData && (
+          <div className="opacity-60 space-y-4">
+            {/* 기간 필터 */}
+            <div className="rounded-xl border border-gray-300 bg-gray-50 p-4">
+              <div className="flex flex-wrap gap-2">
+                {['최근 1개월', '최근 3개월', '최근 6개월', '이번달', '이번분기', '올해', '누적'].map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setPeriodFilter(period)}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      periodFilter === period
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-600 border border-gray-300 hover:bg-gray-300'
+                    }`}
+                  >
+                    {period}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          <Form.Item
-            name="content"
-            label="내용"
-            rules={[
-              { required: true, message: '내용을 입력해주세요' },
-              { max: 500, message: '최대 500자' }
-            ]}
-          >
-            <TextArea rows={5} placeholder="이슈 내용을 입력하세요" />
-          </Form.Item>
+            {/* 통합 지표 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="rounded-xl border border-gray-300 bg-gray-100 p-5">
+                <div className="text-sm text-gray-500 mb-1">운임 (총액)</div>
+                <div className="text-2xl font-semibold text-gray-400">{metrics.totalFreight.toLocaleString()}원</div>
+              </div>
+              <div className="rounded-xl border border-gray-300 bg-gray-100 p-5">
+                <div className="text-sm text-gray-500 mb-1">운송횟수</div>
+                <div className="text-2xl font-semibold text-gray-400">{metrics.totalTripCount}회</div>
+              </div>
+              <div className="rounded-xl border border-gray-300 bg-gray-100 p-5">
+                <div className="text-sm text-gray-500 mb-1">평균 운임</div>
+                <div className="text-2xl font-semibold text-gray-400">{metrics.averageFreight.toLocaleString()}원</div>
+              </div>
+            </div>
 
-          <Form.Item name="images" label="이미지" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList}>
-            <Upload beforeUpload={() => false} maxCount={5} accept="image/*,.pdf" listType="picture">
-              <Button icon={<UploadOutlined />}>이미지 첨부 (최대 5개, 10MB)</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
-      </Space>
+            {/* 거래 상세 테이블 */}
+            <div className="rounded-xl border border-gray-300 bg-gray-50 p-6">
+              <h4 className="text-base font-semibold text-gray-500 mb-4">거래 상세 내역 (P2 예정)</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead className="bg-gray-100">
+                    <tr className="border-b border-gray-300">
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">기간</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운임</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송횟수</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송 셀러</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송 바이어</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송 품목</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPeriods.map((item) => (
+                      <tr key={item.period} className="border-b border-gray-200">
+                        <td className="px-4 py-3 text-sm text-gray-500">{item.period}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">{item.freight.toLocaleString()}원</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">{item.tripCount}회</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">{item.sellers}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">{item.buyers}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">{item.products}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* 운임 차트 */}
+            <div className="rounded-xl border border-gray-300 bg-gray-50 p-6">
+              <h4 className="text-base font-semibold text-gray-500 mb-4">운임 추이 (P2 예정)</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={filteredPeriods}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D1D5DB" />
+                  <XAxis dataKey="period" tick={{ fill: '#6B7280' }} />
+                  <YAxis tick={{ fill: '#6B7280' }} />
+                  <Tooltip
+                    formatter={(value) => `${value.toLocaleString()}원`}
+                    contentStyle={{ backgroundColor: '#F3F4F6', border: '1px solid #D1D5DB' }}
+                  />
+                  <Legend wrapperStyle={{ color: '#6B7280' }} />
+                  <Bar dataKey="freight" name="운임" fill="#9CA3AF" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {/* 하단 버튼 */}
+        {editMode && (
+          <div className="border-t border-gray-200 pt-6">
+            <div className="grid grid-cols-2 gap-4">
+              <FMButton
+                variant="secondary"
+                onClick={handleCancel}
+                className="w-full"
+              >
+                취소
+              </FMButton>
+              <FMButton
+                variant="primary"
+                onClick={handleSave}
+                className="w-full"
+              >
+                저장
+              </FMButton>
+            </div>
+          </div>
+        )}
+
+        {/* 이슈 히스토리 모달 */}
+        <Modal
+          title={editingClaimId ? '이슈 히스토리 수정' : '이슈 히스토리 추가'}
+          open={claimModalVisible}
+          onOk={handleClaimSave}
+          onCancel={() => {
+            setClaimModalVisible(false);
+            claimForm.resetFields();
+          }}
+          okText="저장"
+          cancelText="취소"
+          width={600}
+        >
+          <Form form={claimForm} layout="vertical" style={{ marginTop: 16 }}>
+            <Form.Item
+              name="occurredAt"
+              label="발생일"
+              rules={[{ required: true, message: '발생일을 선택해주세요' }]}
+            >
+              <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item
+              name="content"
+              label="내용"
+              rules={[
+                { required: true, message: '내용을 입력해주세요' },
+                { max: 500, message: '최대 500자' }
+              ]}
+            >
+              <TextArea rows={5} placeholder="이슈 내용을 입력하세요" />
+            </Form.Item>
+
+            <Form.Item name="images" label="이미지" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList}>
+              <Upload beforeUpload={() => false} maxCount={5} accept="image/*,.pdf" listType="picture">
+                <FMButton variant="secondary" icon={<UploadOutlined />}>
+                  이미지 첨부 (최대 5개, 10MB)
+                </FMButton>
+              </Upload>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
     </div>
   );
 }
