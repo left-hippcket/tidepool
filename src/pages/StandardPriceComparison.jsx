@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Line } from '@ant-design/charts';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
-import { productCategories } from '../data/mockData';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMMultiSelect } from '../components/ui/FMMultiSelect';
 import { FMButton } from '../components/ui/FMButton';
@@ -34,6 +33,16 @@ function StandardPriceComparison({ activeTab }) {
     };
     loadData();
   }, []);
+
+  // 실제 데이터에서 품목분류 목록 추출
+  const productCategories = useMemo(() => {
+    const uniqueCategories = [...new Set(
+      allPriceData.map(d => ({ id: d.categoryId, name: d.categoryName }))
+        .filter(c => c.name)
+        .map(c => JSON.stringify(c))
+    )].map(s => JSON.parse(s));
+    return uniqueCategories;
+  }, [allPriceData]);
 
   // 실제 데이터에서 품목 목록 추출
   const products = useMemo(() => {
