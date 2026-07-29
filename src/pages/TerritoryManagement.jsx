@@ -576,7 +576,7 @@ function TerritoryManagement() {
                 <h3 className="text-base font-semibold text-gray-900">사업권역 ({sortedTerritories.length})</h3>
                 {!editMode && !isAddingTerritory && (
                   <FMButton
-                    variant="primary"
+                    variant="green"
                     icon={<PlusOutlined className="h-4 w-4" />}
                     onClick={handleAddTerritory}
                   >
@@ -691,7 +691,7 @@ function TerritoryManagement() {
                 </h3>
                 {!editMode && selectedTerritory && !isAddingRegion && (
                   <FMButton
-                    variant="primary"
+                    variant="green"
                     icon={<PlusOutlined className="h-4 w-4" />}
                     onClick={handleAddRegion}
                     disabled={selectedTerritory?.status === 'inactive'}
