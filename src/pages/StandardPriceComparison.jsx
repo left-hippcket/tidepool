@@ -240,7 +240,7 @@ function StandardPriceComparison({ activeTab }) {
           <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
           <div className="flex flex-col gap-4">
             {/* 첫 번째 줄 */}
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-wrap gap-3 items-center">
               {/* FMSelectSimple - 품목분류 */}
               <FMSelectSimple
                 value={selectedCategory}
@@ -250,7 +250,7 @@ function StandardPriceComparison({ activeTab }) {
                   ...productCategories.map(cat => ({ value: cat.id, label: cat.name }))
                 ]}
                 placeholder="품목분류"
-                className="w-40 flex-shrink-0"
+                className="w-40 min-w-[160px]"
               />
 
               {/* FMSelectSimple - 품목 */}
@@ -262,7 +262,7 @@ function StandardPriceComparison({ activeTab }) {
                   ...(selectedCategory ? products.filter(p => p.categoryId === selectedCategory).map(p => ({ value: p.id, label: p.name })) : [])
                 ]}
                 placeholder="품목"
-                className="w-32 flex-shrink-0"
+                className="w-32 min-w-[128px]"
               />
 
               {/* FMMultiSelect - 규격 (다중 선택) */}
@@ -275,7 +275,7 @@ function StandardPriceComparison({ activeTab }) {
               />
 
               {/* 직관적인 기간 선택 UI */}
-              <div className="flex-[2] flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 min-w-[360px]">
+              <div className="flex-1 flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 min-w-[360px]">
                 <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
                 <input
                   type="date"
