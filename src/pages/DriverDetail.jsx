@@ -201,13 +201,23 @@ function DriverDetail() {
         {/* 헤더 */}
         <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
-            <FMButton
-              variant="indigo"
-              icon={<ArrowLeftOutlined className="h-4 w-4" />}
-              href="/driver"
-            >
-              목록으로
-            </FMButton>
+            {editMode ? (
+              <FMButton
+                variant="indigo"
+                icon={<ArrowLeftOutlined className="h-4 w-4" />}
+                onClick={handleCancel}
+              >
+                상세페이지
+              </FMButton>
+            ) : (
+              <FMButton
+                variant="indigo"
+                icon={<ArrowLeftOutlined className="h-4 w-4" />}
+                href="/driver"
+              >
+                목록으로
+              </FMButton>
+            )}
             {!editMode && (
               <button
                 onClick={handleEditMode}
@@ -528,7 +538,7 @@ function DriverDetail() {
                       <div key={idx} className="flex items-center gap-2">
                         <span>{acc.bank} {acc.accountNumber} ({acc.holder})</span>
                         {acc.isPrimary && (
-                          <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2.5 py-1 text-sm">대표계좌</span>
+                          <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2 py-0.5 text-xs">대표계좌</span>
                         )}
                       </div>
                     ))}
@@ -550,7 +560,7 @@ function DriverDetail() {
                       />
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2.5 py-1 text-sm"
+                        className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2 py-0.5 text-xs"
                         onClick={() => {
                           const img = document.querySelector(`img[alt="사업자등록증-driver"]`);
                           if (img) img.click();
@@ -561,7 +571,7 @@ function DriverDetail() {
                       </button>
                     </Image.PreviewGroup>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded border font-semibold bg-gray-100 border-gray-300 text-gray-600 px-2.5 py-1 text-sm">미첨부</span>
+                    <span className="inline-flex items-center gap-1 rounded border font-semibold bg-gray-100 border-gray-300 text-gray-600 px-2 py-0.5 text-xs">미첨부</span>
                   )}
                 </span>
               </div>
