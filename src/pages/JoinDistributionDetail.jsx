@@ -453,7 +453,7 @@ function JoinDistributionDetail() {
                       <div className="flex justify-end mt-4 pt-4 border-t border-gray-200">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100"
+                          className="inline-flex items-center gap-1 rounded-lg border border-green-600 bg-green-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-green-700"
                         >
                           <Plus className="h-3.5 w-3.5" />
                           계좌 추가

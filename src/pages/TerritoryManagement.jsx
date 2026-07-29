@@ -546,23 +546,7 @@ function TerritoryManagement() {
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900">사업권역 관리</h2>
           <div className="flex flex-wrap gap-2">
-            {editMode ? (
-              <>
-                <FMButton
-                  variant="primary"
-                  icon={<SaveOutlined className="h-4 w-4" />}
-                  onClick={handleSaveAll}
-                >
-                  저장
-                </FMButton>
-                <FMButton
-                  variant="secondary"
-                  onClick={handleCancelEdit}
-                >
-                  취소
-                </FMButton>
-              </>
-            ) : (
+            {!editMode && (
               <>
                 <FMButton
                   variant="secondary"
@@ -583,20 +567,6 @@ function TerritoryManagement() {
           </div>
         </div>
 
-        {editMode && (
-          <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-4">
-            <div className="flex items-center">
-              <svg className="mr-4 h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                <path d="M12 16v-4" strokeWidth="2" strokeLinecap="round" />
-                <path d="M12 8h.01" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <div className="font-medium text-blue-700">
-                여러 항목을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다.
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* 왼쪽: 사업권역 목록 */}
@@ -832,6 +802,28 @@ function TerritoryManagement() {
             </div>
           </div>
         </div>
+
+        {/* 하단 버튼 (수정 모드일 때만 표시) */}
+        {editMode && (
+          <div className="mt-8 border-t border-gray-200 pt-6">
+            <div className="grid grid-cols-2 gap-4">
+              <FMButton
+                variant="secondary"
+                onClick={handleCancelEdit}
+                className="w-full"
+              >
+                취소
+              </FMButton>
+              <FMButton
+                variant="primary"
+                onClick={handleSaveAll}
+                className="w-full"
+              >
+                저장
+              </FMButton>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
