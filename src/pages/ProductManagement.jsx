@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
+import { FMSwitch } from '../components/ui/FMSwitch';
 import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
 
 import {
@@ -629,7 +630,7 @@ function ProductManagement() {
                   }`}
                 >
                   {editMode ? (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <FMInput
                         value={category.name}
                         onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
@@ -637,15 +638,11 @@ function ProductManagement() {
                         maxLength={20}
                         className="flex-1"
                       />
-                      <FMSelect
-                        value={category.status}
-                        onChange={(value) => handleCategoryFieldChange(category.id, 'status', value)}
-                        options={[
-                          { value: 'active', label: '활성' },
-                          { value: 'inactive', label: '비활성' }
-                        ]}
-                        isSearchable={false}
-                        style={{ width: '110px', flexShrink: 0 }}
+                      <FMSwitch
+                        checked={category.status === 'active'}
+                        onChange={(checked) => handleCategoryFieldChange(category.id, 'status', checked ? 'active' : 'inactive')}
+                        onLabel="활성"
+                        offLabel="비활성"
                       />
                     </div>
                   ) : (
@@ -802,15 +799,11 @@ function ProductManagement() {
                             min="0.1"
                             style={{ width: '70px', flexShrink: 0 }}
                           />
-                          <FMSelect
-                            value={product.status}
-                            onChange={(value) => handleProductFieldChange(product.id, 'status', value)}
-                            options={[
-                              { value: 'active', label: '활성' },
-                              { value: 'inactive', label: '비활성' }
-                            ]}
-                            isSearchable={false}
-                            style={{ width: '110px', flexShrink: 0 }}
+                          <FMSwitch
+                            checked={product.status === 'active'}
+                            onChange={(checked) => handleProductFieldChange(product.id, 'status', checked ? 'active' : 'inactive')}
+                            onLabel="활성"
+                            offLabel="비활성"
                           />
                         </div>
                       ) : (
@@ -910,15 +903,11 @@ function ProductManagement() {
                               maxLength={20}
                               className="flex-1"
                             />
-                            <FMSelect
-                              value={origin.status}
-                              onChange={(value) => handleOriginFieldChange(origin.id, 'status', value)}
-                              options={[
-                                { value: 'active', label: '활성' },
-                                { value: 'inactive', label: '비활성' }
-                              ]}
-                              isSearchable={false}
-                              style={{ width: '110px', flexShrink: 0 }}
+                            <FMSwitch
+                              checked={origin.status === 'active'}
+                              onChange={(checked) => handleOriginFieldChange(origin.id, 'status', checked ? 'active' : 'inactive')}
+                              onLabel="활성"
+                              offLabel="비활성"
                             />
                           </div>
                         ) : (
@@ -1016,16 +1005,11 @@ function ProductManagement() {
                               maxLength={20}
                               className="flex-1"
                             />
-                            <FMSelect
-                              value={spec.status}
-                              onChange={(value) => handleSpecFieldChange(spec.id, 'status', value)}
-                              isSearchable={false}
-                              style={{ width: '110px', flexShrink: 0 }}
-                              options={[
-                                { value: 'active', label: '활성' },
-                                { value: 'inactive', label: '비활성' }
-                              ]}
-                              className="w-32"
+                            <FMSwitch
+                              checked={spec.status === 'active'}
+                              onChange={(checked) => handleSpecFieldChange(spec.id, 'status', checked ? 'active' : 'inactive')}
+                              onLabel="활성"
+                              offLabel="비활성"
                             />
                           </div>
                         ) : (
