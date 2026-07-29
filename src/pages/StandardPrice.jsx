@@ -25,6 +25,7 @@ function StandardPrice() {
   const [showLatestOnly, setShowLatestOnly] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [pageSize, setPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -168,6 +169,18 @@ function StandardPrice() {
       return parseSpec(a.spec) - parseSpec(b.spec);
     });
   }, [dataSource, selectedCategory, selectedProduct, selectedOrigin, dateRange, showLatestOnly]);
+
+  // 필터 변경 시 첫 페이지로 리셋
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedProduct, selectedOrigin, dateRange, showLatestOnly, pageSize]);
+
+  // 페이지네이션 계산
+  const totalPages = Math.ceil((editMode ? editingDataSource : displayData).length / pageSize);
+  const paginatedData = (editMode ? editingDataSource : displayData).slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   // CSV 다운로드
   const handleCSVDownload = () => {
@@ -436,7 +449,7 @@ function StandardPrice() {
                 </tr>
               </thead>
               <tbody>
-                {(editMode ? editingDataSource : displayData).slice(0, pageSize).map((row, index) => (
+                {paginatedData.map((row, index) => (
                   <tr key={row.id || row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {editMode ? (
@@ -514,8 +527,10 @@ function StandardPrice() {
 
           {/* 페이지네이션 */}
           <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-gray-600">총 {displayData.length}건</div>
-            <div className="flex gap-2">
+            <div className="text-sm text-gray-600">
+              {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, (editMode ? editingDataSource : displayData).length)} / 총 {(editMode ? editingDataSource : displayData).length}건
+            </div>
+            <div className="flex items-center gap-2">
               <select
                 value={pageSize}
                 onChange={(e) => setPageSize(parseInt(e.target.value))}
@@ -526,6 +541,23 @@ function StandardPrice() {
                 <option value={50}>50개씩</option>
                 <option value={100}>100개씩</option>
               </select>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                이전
+              </button>
+              <span className="text-sm text-gray-600">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                다음
+              </button>
             </div>
           </div>
         </>
