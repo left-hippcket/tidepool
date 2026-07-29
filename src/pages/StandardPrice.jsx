@@ -550,42 +550,45 @@ function StandardPrice() {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((row, index) => (
-                  <tr key={row.id || row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.applyDate}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.categoryName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.productName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.originName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.spec}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[140px]">
-                          <FMInput
-                            type="text"
-                            value={row.price?.toString() || ''}
-                            onChange={(value) => handleFieldChange(index, 'price', parseInt(value) || 0)}
-                            isCurrency={true}
-                          />
-                        </div>
-                      ) : (
-                        `${row.price.toLocaleString()}원`
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.source}</td>
-                    {editMode && (
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          onClick={() => handleDeleteRow(index)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
-                          title="이 행 삭제"
-                        >
-                          <DeleteOutlined className="h-3 w-3" />
-                          삭제
-                        </button>
+                {paginatedData.map((row, localIndex) => {
+                  const globalIndex = (currentPage - 1) * pageSize + localIndex;
+                  return (
+                    <tr key={row.id || row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-gray-900">{row.applyDate}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{row.categoryName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{row.productName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{row.originName}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{row.spec}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {editMode ? (
+                          <div className="w-full min-w-[140px]">
+                            <FMInput
+                              type="text"
+                              value={row.price?.toString() || ''}
+                              onChange={(value) => handleFieldChange(globalIndex, 'price', parseInt(value) || 0)}
+                              isCurrency={true}
+                            />
+                          </div>
+                        ) : (
+                          `${row.price.toLocaleString()}원`
+                        )}
                       </td>
-                    )}
-                  </tr>
-                ))}
+                      <td className="px-4 py-3 text-sm text-gray-900">{row.source}</td>
+                      {editMode && (
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => handleDeleteRow(globalIndex)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                            title="이 행 삭제"
+                          >
+                            <DeleteOutlined className="h-3 w-3" />
+                            삭제
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
