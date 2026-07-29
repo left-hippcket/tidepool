@@ -31,9 +31,9 @@ export function FMSelectSimple({ value, onChange, options, placeholder = "선택
   };
 
   return (
-    <div className={`flex w-full flex-col gap-1 ${className}`}>
+    <div className={label ? `flex w-full flex-col gap-1 ${className}` : className}>
       {label && <span className="block text-sm text-gray-600 text-left font-medium">{label}</span>}
-      <div ref={containerRef} className="relative w-full">
+      <div ref={containerRef} className={label ? "relative w-full" : "relative"}>
         {/* Select Button */}
         <button
           type="button"
