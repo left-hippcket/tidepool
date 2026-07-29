@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
@@ -13,9 +13,8 @@ function StandardPrice() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('1');
   const [dataSource, setDataSource] = useState([]);
-  const [editMode, setEditMode] = useState(false);
-  const [editingDataSource, setEditingDataSource] = useState([]);
-  const [originalDataSource, setOriginalDataSource] = useState([]);
+  const [editingRowId, setEditingRowId] = useState(null);
+  const [editingRowData, setEditingRowData] = useState(null);
 
   // 필터 상태 - 디폴트 값 설정
   const [selectedCategory, setSelectedCategory] = useState('누운고기');
@@ -188,8 +187,8 @@ function StandardPrice() {
   }, [selectedCategory, selectedProduct, selectedOrigin, selectedSpec, dateRange, showLatestOnly, pageSize]);
 
   // 페이지네이션 계산
-  const totalPages = Math.ceil((editMode ? editingDataSource : displayData).length / pageSize);
-  const paginatedData = (editMode ? editingDataSource : displayData).slice(
+  const totalPages = Math.ceil(displayData.length / pageSize);
+  const paginatedData = displayData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -230,95 +229,117 @@ function StandardPrice() {
     }
   };
 
-  const handleFieldChange = (index, field, value) => {
-    const newData = [...editingDataSource];
-    newData[index] = {
-      ...newData[index],
-      [field]: value
-    };
-    setEditingDataSource(newData);
-  };
-
   const handleRegister = () => {
     navigate('/standard-price/register');
   };
 
-  const handleEnterEditMode = () => {
-    setOriginalDataSource([...displayData]);
-    setEditingDataSource([...displayData]);
-    setEditMode(true);
-    toast('수정 모드입니다. 여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요.');
+  // 중복 검증 함수
+  const isDuplicateEntry = (editedRow, allData, currentRowId) => {
+    return allData.some(row =>
+      row.id !== currentRowId &&
+      row.applyDate === editedRow.applyDate &&
+      row.categoryName === editedRow.categoryName &&
+      row.productName === editedRow.productName &&
+      row.originName === editedRow.originName &&
+      row.spec === editedRow.spec
+    );
   };
 
-  const handleSaveAll = () => {
-    const updatedDataSource = dataSource.map(item => {
-      const editedItem = editingDataSource.find(e => e.key === item.key || e.id === item.id);
-      return editedItem || item;
-    });
+  // 사용 가능한 규격 목록 가져오기
+  const getAvailableSpecs = (row) => {
+    // 같은 날짜+분류+품목+원산지 조합에서 이미 사용 중인 규격
+    const usedSpecs = dataSource
+      .filter(item =>
+        item.id !== row.id &&
+        item.applyDate === row.applyDate &&
+        item.categoryName === row.categoryName &&
+        item.productName === row.productName &&
+        item.originName === row.originName
+      )
+      .map(item => item.spec);
 
-    setDataSource(updatedDataSource);
-    setEditMode(false);
-    setEditingDataSource([]);
-    setOriginalDataSource([]);
-    toast.success('모든 변경사항이 저장되었습니다.');
-  };
+    // 해당 품목의 모든 규격 목록에서 사용 중인 것 제외
+    const allSpecsForProduct = [...new Set(
+      dataSource
+        .filter(d => d.productName === row.productName)
+        .map(d => d.spec)
+        .filter(Boolean)
+    )];
 
-  const handleCancelEdit = () => {
-    const hasChanges = JSON.stringify(editingDataSource) !== JSON.stringify(originalDataSource);
-    if (hasChanges) {
-      if (window.confirm('변경사항을 취소하시겠습니까?\n저장하지 않은 변경사항은 모두 사라집니다.')) {
-        setEditMode(false);
-        setEditingDataSource([]);
-        setOriginalDataSource([]);
-        toast('변경사항이 취소되었습니다.');
-      }
-    } else {
-      setEditMode(false);
-      setEditingDataSource([]);
-      setOriginalDataSource([]);
+    // 사용 중인 규격 제외하고 반환
+    const available = allSpecsForProduct.filter(spec => !usedSpecs.includes(spec));
+
+    // 현재 선택된 규격이 목록에 없으면 추가 (수정 중인 행의 현재 값은 항상 표시)
+    if (row.spec && !available.includes(row.spec)) {
+      available.unshift(row.spec);
     }
+
+    return available;
+  };
+
+  // 행 수정 시작
+  const handleEditRow = (row) => {
+    setEditingRowId(row.id);
+    setEditingRowData({ ...row });
+  };
+
+  // 필드 변경
+  const handleFieldChange = (field, value) => {
+    const updatedRow = {
+      ...editingRowData,
+      [field]: value
+    };
+
+    // 규격 변경 시 즉시 중복 체크
+    if (field === 'spec') {
+      const isDuplicate = isDuplicateEntry(updatedRow, dataSource, editingRowId);
+      if (isDuplicate) {
+        toast.error('이미 같은 조합(날짜+분류+품목+원산지+규격)이 존재합니다.');
+        return;
+      }
+    }
+
+    setEditingRowData(updatedRow);
+  };
+
+  // 행 저장
+  const handleSaveRow = () => {
+    // 최종 중복 검증
+    const isDuplicate = isDuplicateEntry(editingRowData, dataSource, editingRowId);
+
+    if (isDuplicate) {
+      toast.error('저장할 수 없습니다. 이미 같은 조합이 존재합니다.');
+      return;
+    }
+
+    // 데이터 업데이트
+    const updatedData = dataSource.map(item =>
+      item.id === editingRowId ? editingRowData : item
+    );
+
+    setDataSource(updatedData);
+    setEditingRowId(null);
+    setEditingRowData(null);
+    toast.success('저장되었습니다.');
+  };
+
+  // 행 수정 취소
+  const handleCancelEdit = () => {
+    setEditingRowId(null);
+    setEditingRowData(null);
   };
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">표준가격 관리</h2>
-        <div className="flex flex-wrap gap-2">
-          {editMode ? (
-            <>
-              <FMButton
-                onClick={handleSaveAll}
-                variant="primary"
-                icon={<SaveOutlined className="h-4 w-4" />}
-              >
-                저장
-              </FMButton>
-              <FMButton
-                onClick={handleCancelEdit}
-                variant="secondary"
-              >
-                취소
-              </FMButton>
-            </>
-          ) : (
-            <>
-              <FMButton
-                onClick={handleEnterEditMode}
-                variant="secondary"
-                icon={<EditOutlined className="h-4 w-4" />}
-              >
-                수정 모드
-              </FMButton>
-              <FMButton
-                onClick={handleRegister}
-                variant="primary"
-                icon={<PlusOutlined className="h-4 w-4" />}
-              >
-                표준가격 등록
-              </FMButton>
-            </>
-          )}
-        </div>
+        <FMButton
+          onClick={handleRegister}
+          variant="primary"
+          icon={<PlusOutlined className="h-4 w-4" />}
+        >
+          표준가격 등록
+        </FMButton>
       </div>
 
       {/* 탭 */}
@@ -349,22 +370,8 @@ function StandardPrice() {
 
       {activeTab === '1' && (
         <>
-          {editMode && (
-            <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-4">
-              <div className="flex items-center">
-                <svg className="mr-4 h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                  <path d="M12 16v-4" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M12 8h.01" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                <div className="font-medium text-blue-700">
-                  여러 행을 수정한 후 상단의 저장 버튼을 클릭하세요. 취소 버튼을 누르면 모든 변경사항이 취소됩니다.
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!editMode && (
+          {/* 조회 필터 */}
+          {(
             <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
               <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
 
@@ -501,81 +508,129 @@ function StandardPrice() {
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>규격</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 160 }}>표준가격</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700" style={{ width: 140 }}>가격출처</th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700" style={{ width: 140 }}>액션</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((row, index) => (
-                  <tr key={row.id || row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <input
-                          type="date"
-                          value={row.applyDate}
-                          onChange={(e) => handleFieldChange(index, 'applyDate', e.target.value)}
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
-                        />
-                      ) : (
-                        row.applyDate
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.categoryName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.productName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.originName}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[120px]">
-                          <FMSelectSimple
-                            value={row.spec}
-                            onChange={(value) => handleFieldChange(index, 'spec', value)}
-                            options={(() => {
-                              const specs = specifications
-                                .filter(s => s.productId === row.productId && s.status === 'active')
-                                .map(s => ({ value: s.name, label: s.name }));
+                {paginatedData.map((row, index) => {
+                  const isEditing = editingRowId === row.id;
+                  const rowData = isEditing ? editingRowData : row;
 
-                              // 현재 선택된 값이 options에 없으면 추가
-                              if (row.spec && !specs.find(s => s.value === row.spec)) {
-                                specs.unshift({ value: row.spec, label: row.spec });
-                              }
+                  return (
+                    <tr
+                      key={row.id || row.key}
+                      className={`border-b border-gray-100 transition-colors ${
+                        isEditing
+                          ? 'bg-blue-50 ring-2 ring-blue-200'
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      {/* 적용일자 */}
+                      <td className="px-4 py-3 text-sm">
+                        {isEditing ? (
+                          <input
+                            type="date"
+                            value={rowData.applyDate}
+                            onChange={(e) => handleFieldChange('applyDate', e.target.value)}
+                            className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                          />
+                        ) : (
+                          <span className="text-gray-900">{row.applyDate}</span>
+                        )}
+                      </td>
 
-                              return specs;
-                            })()}
-                            placeholder="규격"
-                          />
-                        </div>
-                      ) : (
-                        row.spec
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[140px]">
-                          <FMInput
-                            type="text"
-                            value={row.price?.toString() || ''}
-                            onChange={(value) => handleFieldChange(index, 'price', parseInt(value) || 0)}
-                            isCurrency={true}
-                          />
-                        </div>
-                      ) : (
-                        `${row.price.toLocaleString()}원`
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {editMode ? (
-                        <div className="w-full min-w-[120px]">
-                          <FMInput
-                            type="text"
-                            value={row.source}
-                            onChange={(value) => handleFieldChange(index, 'source', value)}
-                            placeholder="출처"
-                          />
-                        </div>
-                      ) : (
-                        row.source
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      {/* 품목분류 - 읽기 전용 */}
+                      <td className="px-4 py-3 text-sm text-gray-900">{rowData.categoryName}</td>
+
+                      {/* 품목 - 읽기 전용 */}
+                      <td className="px-4 py-3 text-sm text-gray-900">{rowData.productName}</td>
+
+                      {/* 원산지 - 읽기 전용 */}
+                      <td className="px-4 py-3 text-sm text-gray-900">{rowData.originName}</td>
+
+                      {/* 규격 */}
+                      <td className="px-4 py-3 text-sm">
+                        {isEditing ? (
+                          <div className="w-full min-w-[120px]">
+                            <FMSelectSimple
+                              value={rowData.spec}
+                              onChange={(value) => handleFieldChange('spec', value)}
+                              options={getAvailableSpecs(rowData).map(s => ({
+                                value: s,
+                                label: s
+                              }))}
+                              placeholder="규격"
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-gray-900">{row.spec}</span>
+                        )}
+                      </td>
+
+                      {/* 가격 */}
+                      <td className="px-4 py-3 text-sm">
+                        {isEditing ? (
+                          <div className="w-full min-w-[140px]">
+                            <FMInput
+                              type="text"
+                              value={rowData.price?.toString() || ''}
+                              onChange={(e) => handleFieldChange('price', parseInt(e.target.value.replace(/,/g, '')) || 0)}
+                              isCurrency={true}
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-gray-900">{row.price.toLocaleString()}원</span>
+                        )}
+                      </td>
+
+                      {/* 출처 */}
+                      <td className="px-4 py-3 text-sm">
+                        {isEditing ? (
+                          <div className="w-full min-w-[120px]">
+                            <FMInput
+                              type="text"
+                              value={rowData.source}
+                              onChange={(e) => handleFieldChange('source', e.target.value)}
+                              placeholder="출처"
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-gray-900">{row.source}</span>
+                        )}
+                      </td>
+
+                      {/* 액션 */}
+                      <td className="px-4 py-3 text-sm">
+                        {isEditing ? (
+                          <div className="flex gap-2 justify-center">
+                            <button
+                              onClick={handleSaveRow}
+                              className="rounded-lg border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                            >
+                              저장
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                              취소
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex justify-center">
+                            <button
+                              onClick={() => handleEditRow(row)}
+                              disabled={editingRowId !== null}
+                              className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              수정
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -583,7 +638,7 @@ function StandardPrice() {
           {/* 페이지네이션 */}
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-gray-600">
-              {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, (editMode ? editingDataSource : displayData).length)} / 총 {(editMode ? editingDataSource : displayData).length}건
+              {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, displayData.length)} / 총 {displayData.length}건
             </div>
             <div className="flex items-center gap-2">
               <select
