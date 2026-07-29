@@ -714,14 +714,43 @@ function TransactionLedger() {
         {/* 기간 설정 */}
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="flex flex-wrap items-center gap-3">
+            <FMButton
+              onClick={() => handleQuickDate('today')}
+              variant="secondary"
+              className="whitespace-nowrap px-3 py-1.5"
+            >
+              오늘
+            </FMButton>
+            <FMButton
+              onClick={() => handleQuickDate('yesterday')}
+              variant="secondary"
+              className="whitespace-nowrap px-3 py-1.5"
+            >
+              어제
+            </FMButton>
+            <FMButton
+              onClick={() => handleQuickDate('7days')}
+              variant="secondary"
+              className="whitespace-nowrap px-3 py-1.5"
+            >
+              최근 7일
+            </FMButton>
+            <FMButton
+              onClick={() => handleQuickDate('30days')}
+              variant="secondary"
+              className="whitespace-nowrap px-3 py-1.5"
+            >
+              최근 30일
+            </FMButton>
+
             {/* 직관적인 기간 선택 UI */}
-            <div className="flex-1 flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 min-w-[360px]">
+            <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 w-[320px]">
               <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
               <input
                 type="date"
                 value={dateRange[0]?.format('YYYY-MM-DD')}
                 onChange={(e) => setDateRange([dayjs(e.target.value), dateRange[1]])}
-                className="flex-1 text-sm outline-none"
+                className="text-sm outline-none w-[100px]"
               />
               <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -731,38 +760,9 @@ function TransactionLedger() {
                 type="date"
                 value={dateRange[1]?.format('YYYY-MM-DD')}
                 onChange={(e) => setDateRange([dateRange[0], dayjs(e.target.value)])}
-                className="flex-1 text-sm outline-none"
+                className="text-sm outline-none w-[100px]"
               />
             </div>
-
-            <FMButton
-              onClick={() => handleQuickDate('today')}
-              variant="secondary"
-              className="whitespace-nowrap"
-            >
-              오늘
-            </FMButton>
-            <FMButton
-              onClick={() => handleQuickDate('yesterday')}
-              variant="secondary"
-              className="whitespace-nowrap"
-            >
-              어제
-            </FMButton>
-            <FMButton
-              onClick={() => handleQuickDate('7days')}
-              variant="secondary"
-              className="whitespace-nowrap"
-            >
-              최근 7일
-            </FMButton>
-            <FMButton
-              onClick={() => handleQuickDate('30days')}
-              variant="secondary"
-              className="whitespace-nowrap"
-            >
-              최근 30일
-            </FMButton>
           </div>
         </div>
 
