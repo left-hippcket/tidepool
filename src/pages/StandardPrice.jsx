@@ -230,66 +230,67 @@ function StandardPrice() {
     }
   };
 
-  // 중복 검증 함수 - 수정 중인 데이터 내부에서 중복 체크
-  const isDuplicateInEditingData = (editedRow, editingData, currentIndex) => {
-    return editingData.some((row, idx) => {
-      if (idx === currentIndex) return false; // 자기 자신 제외
-      return (
-        row.applyDate === editedRow.applyDate &&
-        row.categoryName === editedRow.categoryName &&
-        row.productName === editedRow.productName &&
-        row.originName === editedRow.originName &&
-        row.spec === editedRow.spec
-      );
-    });
-  };
+  // 특정 행에서 선택 가능한 규격 목록 가져오기
+  const getAvailableSpecsForRow = (currentRow, currentIndex) => {
+    const currentRowId = currentRow.id || currentRow.key;
 
-  // 중복 검증 함수 - 전체 원본 데이터와 비교 (수정되지 않은 다른 데이터 포함)
-  const isDuplicateWithOriginalData = (editedRow, currentRowId) => {
-    return dataSource.some((row) => {
-      // 현재 수정 중인 행은 제외
-      if (row.id === currentRowId || row.key === currentRowId) return false;
+    // 1. 수정 중인 데이터에서 이미 사용 중인 규격 찾기
+    const usedSpecsInEditing = editingDataSource
+      .filter((row, idx) => {
+        if (idx === currentIndex) return false; // 자기 자신 제외
+        return (
+          row.applyDate === currentRow.applyDate &&
+          row.categoryName === currentRow.categoryName &&
+          row.productName === currentRow.productName &&
+          row.originName === currentRow.originName
+        );
+      })
+      .map(row => row.spec);
 
-      // 수정 중인 데이터에 있는 행도 제외 (이미 위에서 체크함)
-      const isBeingEdited = editingDataSource.some(e => e.id === row.id || e.key === row.key);
-      if (isBeingEdited) return false;
+    // 2. 원본 데이터(수정되지 않은)에서 이미 사용 중인 규격 찾기
+    const editingIds = editingDataSource.map(e => e.id || e.key);
+    const usedSpecsInOriginal = dataSource
+      .filter(row => {
+        // 수정 중인 행은 제외
+        if (editingIds.includes(row.id || row.key)) return false;
 
-      return (
-        row.applyDate === editedRow.applyDate &&
-        row.categoryName === editedRow.categoryName &&
-        row.productName === editedRow.productName &&
-        row.originName === editedRow.originName &&
-        row.spec === editedRow.spec
-      );
-    });
+        return (
+          row.applyDate === currentRow.applyDate &&
+          row.categoryName === currentRow.categoryName &&
+          row.productName === currentRow.productName &&
+          row.originName === currentRow.originName
+        );
+      })
+      .map(row => row.spec);
+
+    // 3. 모든 사용 중인 규격 합치기
+    const allUsedSpecs = [...new Set([...usedSpecsInEditing, ...usedSpecsInOriginal])];
+
+    // 4. 해당 품목의 전체 규격 목록에서 사용 중인 것 제외
+    const allSpecsForProduct = [...new Set(
+      dataSource
+        .filter(d => d.productName === currentRow.productName)
+        .map(d => d.spec)
+        .filter(Boolean)
+    )];
+
+    // 사용 가능한 규격 = 전체 규격 - 사용 중인 규격
+    const availableSpecs = allSpecsForProduct.filter(spec => !allUsedSpecs.includes(spec));
+
+    // 현재 선택된 규격은 항상 포함 (수정 전 값)
+    if (currentRow.spec && !availableSpecs.includes(currentRow.spec)) {
+      availableSpecs.unshift(currentRow.spec);
+    }
+
+    return availableSpecs;
   };
 
   const handleFieldChange = (index, field, value) => {
     const newData = [...editingDataSource];
-    const updatedRow = {
+    newData[index] = {
       ...newData[index],
       [field]: value
     };
-
-    // 원산지나 규격 변경 시 중복 체크
-    if (field === 'originName' || field === 'spec') {
-      // 1. 수정 중인 데이터 내부에서 중복 체크
-      const duplicateInEditing = isDuplicateInEditingData(updatedRow, editingDataSource, index);
-      if (duplicateInEditing) {
-        toast.error('수정 중인 데이터 내에 이미 같은 조합(날짜+분류+품목+원산지+규격)이 존재합니다.');
-        return;
-      }
-
-      // 2. 전체 원본 데이터와 중복 체크
-      const currentRowId = newData[index].id || newData[index].key;
-      const duplicateWithOriginal = isDuplicateWithOriginalData(updatedRow, currentRowId);
-      if (duplicateWithOriginal) {
-        toast.error('저장된 데이터에 이미 같은 조합(날짜+분류+품목+원산지+규격)이 존재합니다.');
-        return;
-      }
-    }
-
-    newData[index] = updatedRow;
     setEditingDataSource(newData);
   };
 
@@ -658,18 +659,10 @@ function StandardPrice() {
                           <FMSelectSimple
                             value={row.spec}
                             onChange={(value) => handleFieldChange(index, 'spec', value)}
-                            options={(() => {
-                              const specs = specifications
-                                .filter(s => s.productId === row.productId && s.status === 'active')
-                                .map(s => ({ value: s.name, label: s.name }));
-
-                              // 현재 선택된 값이 options에 없으면 추가
-                              if (row.spec && !specs.find(s => s.value === row.spec)) {
-                                specs.unshift({ value: row.spec, label: row.spec });
-                              }
-
-                              return specs;
-                            })()}
+                            options={getAvailableSpecsForRow(row, index).map(spec => ({
+                              value: spec,
+                              label: spec
+                            }))}
                             placeholder="규격"
                           />
                         </div>
