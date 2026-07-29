@@ -368,8 +368,8 @@ function StandardPrice() {
             <div className="mb-4 rounded-xl border border-gray-200 bg-white p-5">
               <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
 
-              {/* 첫 번째 줄: 필터 셀렉트 박스들 */}
-              <div className="flex gap-3 items-start mb-3">
+              {/* 모든 필터 요소를 한 줄로 */}
+              <div className="flex gap-3 items-start">
                 {/* FMSelectSimple - 품목분류 */}
                 <FMSelectSimple
                   label="품목분류"
@@ -385,7 +385,7 @@ function StandardPrice() {
                     ...categoryFilters.map(c => ({ value: c.value, label: c.text }))
                   ]}
                   placeholder="검색 & 선택"
-                  className="flex-1"
+                  className="w-40"
                 />
 
                 {/* FMSelectSimple - 품목 */}
@@ -402,7 +402,7 @@ function StandardPrice() {
                     ...availableProducts.map(p => ({ value: p, label: p }))
                   ]}
                   placeholder="검색 & 선택"
-                  className="flex-1"
+                  className="w-32"
                 />
 
                 {/* FMSelectSimple - 원산지 */}
@@ -418,7 +418,7 @@ function StandardPrice() {
                     ...availableOrigins.map(o => ({ value: o, label: o }))
                   ]}
                   placeholder="검색 & 선택"
-                  className="flex-1"
+                  className="w-32"
                 />
 
                 {/* FMSelectSimple - 규격 */}
@@ -431,14 +431,11 @@ function StandardPrice() {
                     ...availableSpecs.map(s => ({ value: s, label: s }))
                   ]}
                   placeholder="검색 & 선택"
-                  className="flex-1"
+                  className="w-32"
                 />
-              </div>
 
-              {/* 두 번째 줄: 기간, 옵션, 다운로드 */}
-              <div className="flex gap-3 items-start">
                 {/* 기간 선택 */}
-                <div className="flex w-full flex-col gap-1 flex-[2]">
+                <div className="flex w-full flex-col gap-1 flex-1 min-w-[360px]">
                   <span className="block text-sm text-gray-600 text-left font-medium">기간</span>
                   <div className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2">
                     <span className="text-xs text-gray-600 whitespace-nowrap">시작일:</span>
@@ -462,7 +459,7 @@ function StandardPrice() {
                 </div>
 
                 {/* 품목별 최신 가격만 체크박스 */}
-                <div className="flex w-full flex-col gap-1 flex-1">
+                <div className="flex w-full flex-col gap-1">
                   <span className="block text-sm text-gray-600 text-left font-medium">&nbsp;</span>
                   <label className="flex items-center gap-2 whitespace-nowrap h-[42px] px-3">
                     <input
@@ -476,7 +473,7 @@ function StandardPrice() {
                 </div>
 
                 {/* CSV 다운로드 버튼 */}
-                <div className="flex w-full flex-col gap-1 flex-1">
+                <div className="flex w-full flex-col gap-1">
                   <span className="block text-sm text-gray-600 text-left font-medium">&nbsp;</span>
                   <FMButton
                     onClick={handleCSVDownload}
