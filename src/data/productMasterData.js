@@ -1,8 +1,8 @@
 // 품목분류 데이터
 export const productCategories = [
-  { id: 1, icon: '🐟', name: '누운고기', itemCount: 3, status: 'active', createdAt: '2024-01-15' },
-  { id: 2, icon: '🦈', name: '뜬고기', itemCount: 18, status: 'active', createdAt: '2024-01-16' },
-  { id: 3, icon: '🐟', name: '연어', itemCount: 1, status: 'active', createdAt: '2024-01-17' },
+  { id: 1, icon: '🐟', name: '누운고기', itemCount: 4, status: 'active', createdAt: '2024-01-15' },
+  { id: 2, icon: '🦈', name: '뜬고기', itemCount: 19, status: 'active', createdAt: '2024-01-16' },
+  { id: 3, icon: '🐟', name: '연어', itemCount: 2, status: 'active', createdAt: '2024-01-17' },
 ];
 
 // 품목 데이터
@@ -10,6 +10,7 @@ export const products = [
   { id: 1, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '넙치', orderUnit: '통', unitWeight: 250, originCount: 6, specCount: 37, status: 'active' },
   { id: 2, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '강도다리', orderUnit: '통', unitWeight: 250, originCount: 1, specCount: 22, status: 'active' },
   { id: 3, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '찰광어', orderUnit: '통', unitWeight: 230, originCount: 1, specCount: 11, status: 'active' },
+  { id: 23, categoryId: 1, categoryName: '누운고기', categoryIcon: '🐟', name: '미정', orderUnit: '통', unitWeight: 1, originCount: 1, specCount: 1, status: 'active' },
   { id: 4, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '방어', orderUnit: '통', unitWeight: 90, originCount: 2, specCount: 27, status: 'active' },
   { id: 5, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '잿방어', orderUnit: '통', unitWeight: 100, originCount: 1, specCount: 1, status: 'active' },
   { id: 6, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '도미', orderUnit: '통', unitWeight: 80, originCount: 2, specCount: 14, status: 'active' },
@@ -28,7 +29,9 @@ export const products = [
   { id: 19, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '참민어', orderUnit: '통', unitWeight: 80, originCount: 1, specCount: 1, status: 'active' },
   { id: 20, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '부시리', orderUnit: '통', unitWeight: 80, originCount: 1, specCount: 1, status: 'active' },
   { id: 21, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '문어', orderUnit: '통', unitWeight: 150, originCount: 1, specCount: 1, status: 'active' },
+  { id: 24, categoryId: 2, categoryName: '뜬고기', categoryIcon: '🦈', name: '미정', orderUnit: '통', unitWeight: 1, originCount: 1, specCount: 1, status: 'active' },
   { id: 22, categoryId: 3, categoryName: '연어', categoryIcon: '🐟', name: '연어HOG', orderUnit: '박스', unitWeight: 20, originCount: 1, specCount: 1, status: 'active' },
+  { id: 25, categoryId: 3, categoryName: '연어', categoryIcon: '🐟', name: '미정', orderUnit: '박스', unitWeight: 1, originCount: 1, specCount: 1, status: 'active' },
 ];
 
 // 원산지 데이터
@@ -85,6 +88,12 @@ export const origins = [
   { id: 29, productId: 21, productName: '문어', name: '국산', status: 'active', createdAt: '2024-03-01' },
   // 연어HOG (productId: 22)
   { id: 30, productId: 22, productName: '연어HOG', name: '수입', status: 'active', createdAt: '2024-03-02' },
+  // 누운고기 - 미정 (productId: 23)
+  { id: 31, productId: 23, productName: '미정', name: '미정', status: 'active', createdAt: '2024-03-03' },
+  // 뜬고기 - 미정 (productId: 24)
+  { id: 32, productId: 24, productName: '미정', name: '미정', status: 'active', createdAt: '2024-03-04' },
+  // 연어 - 미정 (productId: 25)
+  { id: 33, productId: 25, productName: '미정', name: '미정', status: 'active', createdAt: '2024-03-05' },
 ];
 
 // 규격 데이터
@@ -272,4 +281,13 @@ export const specifications = [
 
   // 연어HOG (productId: 22)
   { id: 140, productId: 22, productName: '연어HOG', name: '6~7kg', status: 'active', createdAt: '2024-06-20' },
+
+  // 누운고기 - 미정 (productId: 23)
+  { id: 141, productId: 23, productName: '미정', name: '미정', status: 'active', createdAt: '2024-06-21' },
+
+  // 뜬고기 - 미정 (productId: 24)
+  { id: 142, productId: 24, productName: '미정', name: '미정', status: 'active', createdAt: '2024-06-22' },
+
+  // 연어 - 미정 (productId: 25)
+  { id: 143, productId: 25, productName: '미정', name: '미정', status: 'active', createdAt: '2024-06-23' },
 ];
