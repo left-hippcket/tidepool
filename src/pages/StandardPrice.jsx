@@ -359,7 +359,7 @@ function StandardPrice() {
               </FMButton>
               <FMButton
                 onClick={handleRegister}
-                variant="primary"
+                variant="green"
                 icon={<PlusOutlined className="h-4 w-4" />}
               >
                 표준가격 등록
