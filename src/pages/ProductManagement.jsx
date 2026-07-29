@@ -909,33 +909,36 @@ function ProductManagement() {
                                     >
                                       <HolderOutlined className="text-gray-400" />
                                     </div>
-                                    <FMInput
-                                      value={product.name}
-                                      onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
-                                      placeholder="품목명"
-                                      maxLength={20}
-                                      className="flex-1 min-w-0"
-                                    />
-                                    <FMSelect
-                                      value={product.orderUnit}
-                                      onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
-                                      options={[
-                                        { value: '통', label: '통' },
-                                        { value: '박스', label: '박스' },
-                                        { value: 'kg', label: 'kg' }
-                                      ]}
-                                      isSearchable={false}
-                                      style={{ width: '75px', minWidth: '75px', flexShrink: 0 }}
-                                    />
-                                    <FMInput
-                                      type="number"
-                                      value={product.unitWeight}
-                                      onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
-                                      placeholder="중량"
-                                      step="0.1"
-                                      min="0.1"
-                                      style={{ width: '65px', flexShrink: 0 }}
-                                    />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <FMInput
+                                        value={product.name}
+                                        onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
+                                        placeholder="품목명"
+                                        maxLength={20}
+                                      />
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <FMSelect
+                                        value={product.orderUnit}
+                                        onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
+                                        options={[
+                                          { value: '통', label: '통' },
+                                          { value: '박스', label: '박스' },
+                                          { value: 'kg', label: 'kg' }
+                                        ]}
+                                        isSearchable={false}
+                                      />
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <FMInput
+                                        type="number"
+                                        value={product.unitWeight}
+                                        onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
+                                        placeholder="중량"
+                                        step="0.1"
+                                        min="0.1"
+                                      />
+                                    </div>
                                   </div>
                                   <div className="flex-shrink-0">
                                     <FMSwitch
