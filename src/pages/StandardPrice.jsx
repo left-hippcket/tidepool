@@ -351,10 +351,7 @@ function StandardPrice() {
                     setSelectedProduct(null);
                     setSelectedOrigin(null);
                   }}
-                  options={[
-                    { value: '', label: '품목분류' },
-                    ...categoryFilters.map(c => ({ value: c.value, label: c.text }))
-                  ]}
+                  options={categoryFilters.map(c => ({ value: c.value, label: c.text }))}
                   placeholder="품목분류"
                   className="flex-1"
                 />
@@ -366,10 +363,7 @@ function StandardPrice() {
                     setSelectedProduct(value);
                     setSelectedOrigin(null);
                   }}
-                  options={[
-                    { value: '', label: '품목' },
-                    ...availableProducts.map(p => ({ value: p, label: p }))
-                  ]}
+                  options={availableProducts.map(p => ({ value: p, label: p }))}
                   placeholder="품목"
                   className="flex-1"
                 />
@@ -378,10 +372,7 @@ function StandardPrice() {
                 <FMSelectSimple
                   value={selectedOrigin}
                   onChange={(value) => setSelectedOrigin(value)}
-                  options={[
-                    { value: '', label: '원산지' },
-                    ...availableOrigins.map(o => ({ value: o, label: o }))
-                  ]}
+                  options={availableOrigins.map(o => ({ value: o, label: o }))}
                   placeholder="원산지"
                   className="flex-1"
                 />
