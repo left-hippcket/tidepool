@@ -32,7 +32,7 @@ function DriverDetail() {
     return <div className="p-6">드라이버를 찾을 수 없습니다.</div>;
   }
 
-  const { basicInfo, settlementInfo } = driverData;
+  const { basicInfo, settlementInfo, settlementBusinesses } = driverData;
 
   // 기간별 데이터 계산
   const filteredPeriods = useMemo(() => {
@@ -86,27 +86,49 @@ function DriverDetail() {
       status: basicInfo.status
     });
 
-    if (settlementInfo) {
+    // 정산사업자 정보 로드 (배열 형태 또는 레거시 단일 정보)
+    if (settlementBusinesses && settlementBusinesses.length > 0) {
       settlementForm.setFieldsValue({
-        businessNumber: settlementInfo.businessNumber,
-        businessName: settlementInfo.businessName,
-        representative: settlementInfo.representative,
-        businessAddress: settlementInfo.businessAddress,
-        taxType: settlementInfo.taxType,
-        bankAccounts: settlementInfo.bankAccounts.map(acc => ({
-          bank: acc.bank,
-          accountNumber: acc.accountNumber,
-          holder: acc.holder
+        settlementBusinesses: settlementBusinesses.map(business => ({
+          settlementBusinessName: business.settlementBusinessName || '',
+          ticker: business.ticker || basicInfo.ticker,
+          businessNumber: business.businessNumber || '',
+          businessName: business.businessName || '',
+          representative: business.representative || '',
+          businessAddress: business.businessAddress || '',
+          taxType: business.taxType || undefined,
+          bankAccounts: business.bankAccounts?.map(acc => ({
+            bank: acc.bank,
+            accountNumber: acc.accountNumber,
+            holder: acc.holder
+          })) || [{}]
         }))
+      });
+    } else if (settlementInfo) {
+      // 레거시 단일 정산사업자 정보
+      settlementForm.setFieldsValue({
+        settlementBusinesses: [{
+          settlementBusinessName: basicInfo.name,
+          ticker: basicInfo.ticker,
+          businessNumber: settlementInfo.businessNumber,
+          businessName: settlementInfo.businessName,
+          representative: settlementInfo.representative,
+          businessAddress: settlementInfo.businessAddress,
+          taxType: settlementInfo.taxType,
+          bankAccounts: settlementInfo.bankAccounts.map(acc => ({
+            bank: acc.bank,
+            accountNumber: acc.accountNumber,
+            holder: acc.holder
+          }))
+        }]
       });
     } else {
       settlementForm.setFieldsValue({
-        businessNumber: '',
-        businessName: '',
-        representative: '',
-        businessAddress: '',
-        taxType: undefined,
-        bankAccounts: [{ bank: '', accountNumber: '', holder: '' }]
+        settlementBusinesses: [{
+          settlementBusinessName: '',
+          ticker: basicInfo.ticker,
+          bankAccounts: [{}]
+        }]
       });
     }
 
@@ -348,143 +370,293 @@ function DriverDetail() {
           </div>
 
           {editMode ? (
-            <>
-              <Form.Item label="ticker">
-                <Input value={basicInfo.ticker} disabled className="bg-gray-100" />
-              </Form.Item>
-
-              <Form.Item
-                name="businessNumber"
-                label="사업자등록번호"
-                rules={[
-                  { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
-                ]}
-              >
-                <Input
-                  placeholder="123-45-67890"
-                  disabled={!!settlementInfo}
-                  className={settlementInfo ? "bg-gray-100" : ""}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="businessName"
-                label="사업자등록상호"
-                rules={[{ max: 50, message: '최대 50자' }]}
-              >
-                <Input placeholder="만진수산" />
-              </Form.Item>
-
-              <Form.Item
-                name="representative"
-                label="대표자"
-                rules={[{ max: 10, message: '최대 10자' }]}
-              >
-                <Input placeholder="김만진" />
-              </Form.Item>
-
-              <Form.Item
-                name="businessAddress"
-                label="사업자등록주소"
-                rules={[{ max: 100, message: '최대 100자' }]}
-              >
-                <Input placeholder="경기도 수지구 동천동 230-3" />
-              </Form.Item>
-
-              <Form.Item name="taxType" label="사업자 과세유형">
-                <Select
-                  options={[
-                    { value: '과세', label: '과세' },
-                    { value: '면세', label: '면세' }
-                  ]}
-                />
-              </Form.Item>
-
-              <div className="my-4 border-t border-gray-200"></div>
-              <h4 className="text-base font-semibold text-gray-900 mb-4">은행계좌 정보</h4>
-
-              <Form.List name="bankAccounts">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }, index) => (
-                      <div key={key} className="mb-6 last:mb-0">
-                        {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
-                        <div className="flex items-center gap-2 mb-4">
-                          <h5 className="text-sm font-medium text-gray-700">계좌 #{index + 1}</h5>
-                          {fields.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => remove(name)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <MinusCircleOutlined />
-                            </button>
-                          )}
-                        </div>
-
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'bank']}
-                          label="은행명"
-                          className="mb-4"
-                        >
-                          <Input placeholder="예: 하나은행" />
-                        </Form.Item>
-
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'accountNumber']}
-                          label="계좌번호"
-                          className="mb-4"
-                        >
-                          <Input placeholder="123-456789-01234" />
-                        </Form.Item>
-
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'holder']}
-                          label="예금주"
-                          className="mb-0"
-                        >
-                          <Input placeholder="김만진" />
-                        </Form.Item>
+            <Form.List name="settlementBusinesses">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, ...restField }, index) => (
+                    <div key={key} className="mb-6 last:mb-0">
+                      {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-base font-semibold text-gray-900">정산사업자 #{index + 1}</h4>
+                        {fields.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => remove(name)}
+                            className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
+                          >
+                            <MinusCircleOutlined />
+                            <span>삭제</span>
+                          </button>
+                        )}
                       </div>
-                    ))}
-                    <div className="flex justify-end">
-                      <FMButton
-                        variant="green"
-                        icon={<Plus className="h-4 w-4" />}
-                        onClick={() => add()}
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'settlementBusinessName']}
+                        label="정산사업자명"
+                        rules={[
+                          { required: true, message: '정산사업자명을 입력해주세요' },
+                          { max: 50, message: '최대 50자' }
+                        ]}
                       >
-                        계좌 추가
-                      </FMButton>
+                        <Input placeholder="예: 정훈" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'ticker']}
+                        label="ticker"
+                        rules={[
+                          { required: true, message: 'ticker를 입력해주세요' },
+                          { max: 10, message: '최대 10자' },
+                          { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+                        ]}
+                      >
+                        <Input placeholder="예: JH01" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'businessNumber']}
+                        label="사업자등록번호"
+                        rules={[
+                          { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
+                        ]}
+                      >
+                        <Input placeholder="123-45-67890" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'businessName']}
+                        label="사업자등록상호"
+                        rules={[{ max: 50, message: '최대 50자' }]}
+                      >
+                        <Input placeholder="만진수산" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'representative']}
+                        label="대표자"
+                        rules={[{ max: 10, message: '최대 10자' }]}
+                      >
+                        <Input placeholder="김만진" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'businessAddress']}
+                        label="사업자등록주소"
+                        rules={[{ max: 100, message: '최대 100자' }]}
+                      >
+                        <Input placeholder="경기도 수지구 동천동 230-3" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'taxType']}
+                        label="사업자 과세유형"
+                      >
+                        <Select
+                          placeholder="선택"
+                          options={[
+                            { value: '과세', label: '과세' },
+                            { value: '면세', label: '면세' }
+                          ]}
+                        />
+                      </Form.Item>
+
+                      <div className="my-4 border-t border-gray-200"></div>
+                      <h5 className="text-sm font-semibold text-gray-900 mb-4">은행계좌 정보</h5>
+
+                      <Form.List name={[name, 'bankAccounts']}>
+                        {(bankFields, { add: addBank, remove: removeBank }) => (
+                          <>
+                            {bankFields.map(({ key: bankKey, name: bankName, ...bankRestField }, bankIndex) => (
+                              <div key={bankKey} className="mb-4 last:mb-0">
+                                {bankIndex > 0 && <div className="my-4 border-t border-gray-100"></div>}
+                                <div className="flex items-center gap-2 mb-3">
+                                  <h6 className="text-xs font-medium text-gray-700">계좌 #{bankIndex + 1}</h6>
+                                  {bankFields.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeBank(bankName)}
+                                      className="text-red-500 hover:text-red-700 text-xs"
+                                    >
+                                      <MinusCircleOutlined />
+                                    </button>
+                                  )}
+                                </div>
+
+                                <Form.Item
+                                  {...bankRestField}
+                                  name={[bankName, 'bank']}
+                                  label="은행명"
+                                  className="mb-3"
+                                >
+                                  <Input placeholder="예: 하나은행" />
+                                </Form.Item>
+
+                                <Form.Item
+                                  {...bankRestField}
+                                  name={[bankName, 'accountNumber']}
+                                  label="계좌번호"
+                                  className="mb-3"
+                                >
+                                  <Input placeholder="123-456789-01234" />
+                                </Form.Item>
+
+                                <Form.Item
+                                  {...bankRestField}
+                                  name={[bankName, 'holder']}
+                                  label="예금주"
+                                  className="mb-0"
+                                >
+                                  <Input placeholder="김만진" />
+                                </Form.Item>
+                              </div>
+                            ))}
+                            <div className="flex justify-end">
+                              <FMButton
+                                variant="green"
+                                icon={<Plus className="h-4 w-4" />}
+                                onClick={() => addBank()}
+                              >
+                                계좌 추가
+                              </FMButton>
+                            </div>
+                          </>
+                        )}
+                      </Form.List>
+
+                      <div className="my-4 border-t border-gray-200"></div>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'certificate']}
+                        label="사업자등록증"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => e?.fileList}
+                      >
+                        <Upload
+                          beforeUpload={() => false}
+                          maxCount={1}
+                          accept="image/*,.pdf"
+                        >
+                          <FMButton
+                            variant="green"
+                            icon={<UploadIcon className="h-4 w-4" />}
+                          >
+                            사업자등록증 첨부하기
+                          </FMButton>
+                        </Upload>
+                      </Form.Item>
                     </div>
-                  </>
-                )}
-              </Form.List>
+                  ))}
+                  <div className="flex justify-end mt-4">
+                    <FMButton
+                      variant="green"
+                      icon={<Plus className="h-4 w-4" />}
+                      onClick={() => add()}
+                    >
+                      정산사업자 추가
+                    </FMButton>
+                  </div>
+                </>
+              )}
+            </Form.List>
+          ) : (settlementBusinesses && settlementBusinesses.length > 0) ? (
+            <div className="space-y-6">
+              {settlementBusinesses.map((business, index) => (
+                <div key={index} className="space-y-3">
+                  {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
+                  <h4 className="text-base font-semibold text-gray-900 mb-3">정산사업자 #{index + 1}</h4>
 
-              <div className="my-4 border-t border-gray-200"></div>
-
-              <Form.Item
-                name="certificate"
-                label="사업자등록증"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => e?.fileList}
-              >
-                <Upload
-                  beforeUpload={() => false}
-                  maxCount={1}
-                  accept="image/*,.pdf"
-                >
-                  <FMButton
-                    variant="green"
-                    icon={<UploadIcon className="h-4 w-4" />}
-                  >
-                    사업자등록증 첨부하기
-                  </FMButton>
-                </Upload>
-              </Form.Item>
-            </>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">정산사업자명:</span>
+                    <span className="w-4/5 text-gray-900">{business.settlementBusinessName || '-'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">ticker:</span>
+                    <span className="w-4/5 text-gray-900">{business.ticker || basicInfo.ticker}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">사업자등록번호:</span>
+                    <span className="w-4/5 text-gray-900">{business.businessNumber || '-'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">사업자등록상호:</span>
+                    <span className="w-4/5 text-gray-900">{business.businessName || '-'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">대표자:</span>
+                    <span className="w-4/5 text-gray-900">{business.representative || '-'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">사업자등록주소:</span>
+                    <span className="w-4/5 text-gray-900">{business.businessAddress || '-'}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">사업자 과세유형:</span>
+                    <span className="w-4/5 text-gray-900">
+                      {business.taxType === '과세' ? (
+                        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">과세</span>
+                      ) : business.taxType === '면세' ? (
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">면세</span>
+                      ) : '-'}
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">은행계좌:</span>
+                    <span className="w-4/5 text-gray-900">
+                      <div className="space-y-1">
+                        {business.bankAccounts && business.bankAccounts.length > 0 ? (
+                          business.bankAccounts.map((acc, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span>{acc.bank} {acc.accountNumber} ({acc.holder})</span>
+                              {acc.isPrimary && (
+                                <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2 py-0.5 text-xs">대표계좌</span>
+                              )}
+                            </div>
+                          ))
+                        ) : '-'}
+                      </div>
+                    </span>
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/5 font-medium text-gray-700">사업자등록증:</span>
+                    <span className="w-4/5 text-gray-900">
+                      {business.hasCertificate ? (
+                        <Image.PreviewGroup>
+                          <Image
+                            src="/images/business-certificate-sample.png"
+                            alt={`사업자등록증-driver-${index}`}
+                            width={0}
+                            height={0}
+                            style={{ display: 'none' }}
+                            preview={{ mask: null }}
+                          />
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 rounded border font-semibold bg-blue-100 border-blue-300 text-blue-600 px-2 py-0.5 text-xs"
+                            onClick={() => {
+                              const img = document.querySelector(`img[alt="사업자등록증-driver-${index}"]`);
+                              if (img) img.click();
+                            }}
+                          >
+                            <FileImageOutlined />
+                            사업자등록증 확인
+                          </button>
+                        </Image.PreviewGroup>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded border font-semibold bg-gray-100 border-gray-300 text-gray-600 px-2 py-0.5 text-xs">미첨부</span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : settlementInfo ? (
             <div className="space-y-3">
               <div className="flex">
