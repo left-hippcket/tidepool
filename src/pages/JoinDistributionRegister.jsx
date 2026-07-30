@@ -359,7 +359,7 @@ function JoinDistributionRegister() {
               rules={[
                 { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
               ]}
-              extra="⭐ 사업자등록번호를 먼저 입력하시면 기존 사업자 여부를 자동으로 확인합니다."
+              extra={<span className="text-blue-500">⭐ 사업자등록번호를 먼저 입력하시면 기존 사업자 여부를 자동으로 확인합니다.</span>}
             >
               <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
             </Form.Item>
