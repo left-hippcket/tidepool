@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Upload, Image, Modal } from 'antd';
+import { Form, Input, Select, Upload, Image, Modal, Radio } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
 import { driverDetails } from '../data/mockData';
@@ -368,13 +368,10 @@ function DriverDetail() {
                         name={[name, 'taxType']}
                         label="사업자 과세유형"
                       >
-                        <Select
-                          placeholder="선택"
-                          options={[
-                            { value: '과세', label: '과세' },
-                            { value: '면세', label: '면세' }
-                          ]}
-                        />
+                        <Radio.Group>
+                          <Radio value="과세">과세</Radio>
+                          <Radio value="면세">면세</Radio>
+                        </Radio.Group>
                       </Form.Item>
 
                       <div className="flex items-center mb-4">

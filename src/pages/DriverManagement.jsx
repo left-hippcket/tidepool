@@ -142,6 +142,7 @@ function DriverManagement() {
               <tr className="border-b border-gray-200">
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">드라이버명</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">정산사업자명</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">과세유형</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">정산사업자정보</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자등록증</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">전화번호</th>
@@ -160,6 +161,9 @@ function DriverManagement() {
 
                 // 정산사업자명
                 const settlementBusinessName = activeSettlement?.settlementBusinessName || '-';
+
+                // 과세유형
+                const taxType = activeSettlement?.taxType;
 
                 // 정산사업자정보 완성도 체크
                 const hasCompleteBusinessInfo = activeSettlement &&
@@ -192,6 +196,15 @@ function DriverManagement() {
                       </button>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">{settlementBusinessName}</td>
+                    <td className="px-4 py-3 text-center">
+                      {taxType === '과세' ? (
+                        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">과세</span>
+                      ) : taxType === '면세' ? (
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">면세</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       {hasCompleteBusinessInfo ? (
                         <Check className="h-5 w-5 text-gray-500 mx-auto" />

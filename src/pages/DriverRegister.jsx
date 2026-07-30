@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Upload } from 'antd';
+import { Form, Input, Select, Upload, Radio } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { Upload as UploadIcon, Plus } from 'lucide-react';
 import { businessRegistry } from '../data/mockData';
@@ -114,7 +114,7 @@ function DriverRegister() {
               <Input placeholder="010-1234-5678" />
             </Form.Item>
 
-            <Form.Item name="vehicleType" label="차종">
+            <Form.Item name="vehicleType" label="차종" initialValue="5.0톤">
               <Select
                 placeholder="차종 선택"
                 onChange={handleVehicleTypeChange}
@@ -233,13 +233,10 @@ function DriverRegister() {
                         name={[name, 'taxType']}
                         label="사업자 과세유형"
                       >
-                        <Select
-                          placeholder="선택"
-                          options={[
-                            { value: '과세', label: '과세' },
-                            { value: '면세', label: '면세' }
-                          ]}
-                        />
+                        <Radio.Group>
+                          <Radio value="과세">과세</Radio>
+                          <Radio value="면세">면세</Radio>
+                        </Radio.Group>
                       </Form.Item>
 
                       <div className="flex items-center mb-4">
