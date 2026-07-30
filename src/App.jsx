@@ -243,28 +243,18 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#fff',
-          fontSize: collapsed ? 16 : 20,
-          fontWeight: 'bold',
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          gap: '12px'
+          padding: '0 16px'
         }}>
-          {collapsed ? (
-            <img
-              src="/images/logo.png"
-              alt="Logo"
-              style={{ width: 32, height: 32, borderRadius: '50%' }}
-            />
-          ) : (
-            <>
-              <img
-                src="/images/logo.png"
-                alt="Logo"
-                style={{ width: 32, height: 32, borderRadius: '50%' }}
-              />
-              <span>Fish Master</span>
-            </>
-          )}
+          <img
+            src="/images/logo.png"
+            alt="Fish Master Logo"
+            style={{
+              height: collapsed ? '22px' : '29px',
+              width: 'auto',
+              objectFit: 'contain'
+            }}
+          />
         </div>
         <Menu
           theme="dark"
