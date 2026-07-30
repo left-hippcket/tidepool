@@ -182,14 +182,9 @@ function App() {
       label: '기타 데이터',
       children: [
         { key: '/territory', label: '사업권역' },
-        {
-          type: 'group',
-          label: '표준가격',
-          children: [
-            { key: '/standard-price?tab=1', label: 'ㄴ 조회/등록' },
-            { key: '/standard-price?tab=2', label: 'ㄴ 추세 비교' },
-          ],
-        },
+        { key: 'standard-price-label', label: '표준가격', disabled: true },
+        { key: '/standard-price?tab=1', label: '  ㄴ 조회/등록' },
+        { key: '/standard-price?tab=2', label: '  ㄴ 추세 비교' },
       ],
     },
   ];
