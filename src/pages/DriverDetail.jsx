@@ -364,8 +364,16 @@ function DriverDetail() {
             </div>
           )}
         </div>
+        </Form>
 
         {/* 정산사업자 정보 */}
+        <Form
+          form={settlementForm}
+          layout="horizontal"
+          labelCol={{ flex: '20%' }}
+          wrapperCol={{ flex: '80%' }}
+          labelAlign="left"
+        >
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">정산사업자 정보</h3>
