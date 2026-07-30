@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { Check, X } from 'lucide-react';
 import { drivers, driverDetails } from '../data/mockData';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMButton } from '../components/ui/FMButton';
@@ -139,78 +140,100 @@ function DriverManagement() {
           <table className="w-full border-collapse">
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200">
-                <th
-                  className="px-4 py-3 text-left text-sm font-medium text-gray-700 cursor-pointer select-none"
-                  onClick={() => handleSort('name')}
-                >
-                  드라이버명 {renderSortIcon('name')}
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-sm font-medium text-gray-700 cursor-pointer select-none"
-                  onClick={() => handleSort('vehicleType')}
-                >
-                  차종 {renderSortIcon('vehicleType')}
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">보유통수</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">전화번호</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">정산사업자</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">과세유형</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">드라이버명</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">정산사업자명</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">정산사업자정보</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자등록증</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">전화번호</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">차종</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상태</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상세</th>
               </tr>
             </thead>
             <tbody>
               {sortedDrivers.map((record) => {
                 const detail = driverDetails[record.id];
-                const hasCertificate = detail?.settlementInfo?.hasCertificate;
+
+                // 활성 정산사업자 찾기
+                const activeSettlement = detail?.settlementBusinesses?.find(b => b.status === 'active')
+                  || detail?.settlementInfo;
+
+                // 정산사업자명
+                const settlementBusinessName = activeSettlement?.settlementBusinessName || '-';
+
+                // 정산사업자정보 완성도 체크
+                const hasCompleteBusinessInfo = activeSettlement &&
+                  activeSettlement.businessNumber &&
+                  activeSettlement.businessName &&
+                  activeSettlement.representative &&
+                  activeSettlement.businessAddress;
+
+                // 사업자등록증
+                const hasCertificate = activeSettlement?.hasCertificate;
+
+                // 전화번호
+                const phone = detail?.basicInfo?.phone || record.phone;
+
+                // 차종
+                const vehicleType = detail?.basicInfo?.vehicleType || record.vehicleType;
 
                 return (
                   <tr
                     key={record.id}
-                    className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                      record.status === 'inactive' ? 'opacity-50' : ''
-                    }`}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/driver/${record.id}`)}
                   >
                     <td className="px-4 py-3 text-sm">
                       <button
-                        onClick={() => navigate(`/driver/${record.id}`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/driver/${record.id}`); }}
                         className="text-blue-600 hover:text-blue-700 font-medium"
                       >
                         {record.name}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{record.vehicleType}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{record.tankCount}통</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{record.phone}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{record.settlementBusiness || '-'}</td>
-                    <td className="px-4 py-3 text-sm">
-                      {!record.taxType && (
-                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700">
-                          미등록
-                        </span>
-                      )}
-                      {record.taxType === '과세' && (
-                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700">
-                          과세
-                        </span>
-                      )}
-                      {record.taxType === '면세' && (
-                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-700">
-                          면세
-                        </span>
+                    <td className="px-4 py-3 text-sm text-gray-900">{settlementBusinessName}</td>
+                    <td className="px-4 py-3 text-center">
+                      {hasCompleteBusinessInfo ? (
+                        <Check className="h-5 w-5 text-gray-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={hasCertificate || false}
-                        disabled
-                        className="h-4 w-4"
-                      />
+                      {hasCertificate ? (
+                        <Check className="h-5 w-5 text-gray-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {phone ? (
+                        <span className="text-sm text-gray-900">{phone}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {vehicleType ? (
+                        <span className="text-sm text-gray-900">{vehicleType}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                          record.status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {record.status === 'active' ? '활성' : '비활성'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => navigate(`/driver/${record.id}`)}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/driver/${record.id}`); }}
                         className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                       >
                         상세
