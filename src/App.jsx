@@ -42,7 +42,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false); // 초기 상태: 항상 펼쳐진 상태
-  const [openKeys, setOpenKeys] = useState(['partners', 'product', 'ledger', 'data', 'standard-price-menu']); // 모든 서브메뉴 펼침
+  const [openKeys, setOpenKeys] = useState(['partners', 'product', 'ledger', 'data']); // 모든 서브메뉴 펼침
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -183,11 +183,11 @@ function App() {
       children: [
         { key: '/territory', label: '사업권역' },
         {
-          key: 'standard-price-menu',
+          type: 'group',
           label: '표준가격',
           children: [
-            { key: '/standard-price?tab=1', label: '조회/등록' },
-            { key: '/standard-price?tab=2', label: '추세 비교' },
+            { key: '/standard-price?tab=1', label: 'ㄴ 조회/등록' },
+            { key: '/standard-price?tab=2', label: 'ㄴ 추세 비교' },
           ],
         },
       ],
@@ -211,7 +211,7 @@ function App() {
       return ['partners'];
     }
     if (location.pathname === '/territory' || location.pathname === '/standard-price') {
-      return ['data', 'standard-price-menu'];
+      return ['data'];
     }
     if (location.pathname === '/product' || location.pathname === '/product-list') {
       return ['product'];
