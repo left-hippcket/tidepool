@@ -125,7 +125,7 @@ function DriverRegister() {
               />
             </Form.Item>
 
-            <Form.Item name="tankCount" label="보유통수">
+            <Form.Item name="tankCount" label="보유통수" initialValue={10}>
               <Select
                 placeholder="보유통수 선택"
                 options={[
