@@ -279,154 +279,224 @@ export const sellerGroups = [
 // 바이어 그룹 데이터
 export const buyerGroups = [
   {
-    id: 1,
-    name: '소라 그룹',
-    businessCount: 3,
-    salesPerson: '최용환',
-    mainCategory: '누운고기',
-    territory: '수도권',
-    region: '노량진',
-    totalSales: 3250000000,
-    sales3M: 780000000,
-    sales1M: 265000000,
-    lastTradeDate: '2024-07-13',
-    status: 'active',
-    hasCertificate: true
+    "id": 1,
+    "name": "소라그룹",
+    "businessCount": 2,
+    "salesPerson": "최용환",
+    "salesPersons": [
+      "최용환",
+      "고영석"
+    ],
+    "mainCategory": "누운고기,연어",
+    "mainProducts": [
+      "넙치",
+      "강도다리",
+      "연어HOG"
+    ],
+    "territory": "수도권",
+    "region": "하남/미사리",
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 2,
-    name: '대일 그룹',
-    businessCount: 2,
-    salesPerson: '노원진',
-    mainCategory: '뜬고기',
-    territory: '수도권',
-    region: '하남/미사리',
-    totalSales: 2890000000,
-    sales3M: 690000000,
-    sales1M: 235000000,
-    lastTradeDate: '2024-07-14',
-    status: 'active',
-    hasCertificate: true
+    "id": 2,
+    "name": "대일그룹",
+    "businessCount": 2,
+    "salesPerson": "고영석",
+    "salesPersons": [
+      "고영석",
+      "노원진"
+    ],
+    "mainCategory": "누운고기,뜬고기",
+    "mainProducts": [
+      "넙치",
+      "강도다리",
+      "도미",
+      "점성어"
+    ],
+    "territory": "수도권",
+    "region": "인천",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 3,
-    name: '명성횟집 그룹',
-    businessCount: 2,
-    salesPerson: '고영석',
-    mainCategory: '누운고기',
-    territory: '수도권',
-    region: '경기남부',
-    totalSales: 2450000000,
-    sales3M: 620000000,
-    sales1M: 210000000,
-    lastTradeDate: '2024-07-12',
-    status: 'active',
-    hasCertificate: true
+    "id": 3,
+    "name": "해양그룹",
+    "businessCount": 2,
+    "salesPerson": "이시호",
+    "salesPersons": [
+      "이시호"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치",
+      "강도다리"
+    ],
+    "territory": "경상권",
+    "region": "대구",
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 4,
-    name: '대박 그룹',
-    businessCount: 1,
-    salesPerson: '노원진',
-    mainCategory: '뜬고기',
-    territory: '수도권',
-    region: '경기북부',
-    totalSales: 2180000000,
-    sales3M: 560000000,
-    sales1M: 192000000,
-    lastTradeDate: '2024-07-11',
-    status: 'active',
-    hasCertificate: true
+    "id": 4,
+    "name": "영광그룹",
+    "businessCount": 2,
+    "salesPerson": "최용환",
+    "salesPersons": [
+      "최용환"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "수도권",
+    "region": "하남/미사리",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 5,
-    name: '부산횟집연합',
-    businessCount: 4,
-    salesPerson: '이시호',
-    mainCategory: '누운고기',
-    territory: '경상권',
-    region: '부산',
-    totalSales: 1950000000,
-    sales3M: 510000000,
-    sales1M: 175000000,
-    lastTradeDate: '2024-07-10',
-    status: 'active',
-    hasCertificate: true
+    "id": 5,
+    "name": "굿모닝씨푸드",
+    "businessCount": 1,
+    "salesPerson": "고영석",
+    "salesPersons": [
+      "고영석",
+      "노원진"
+    ],
+    "mainCategory": "누운고기,뜬고기",
+    "mainProducts": [
+      "넙치",
+      "강도다리",
+      "농어",
+      "점성어"
+    ],
+    "territory": "수도권",
+    "region": "노량진",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 6,
-    name: '대구수산',
-    businessCount: 2,
-    salesPerson: '이시호',
-    mainCategory: '뜬고기',
-    territory: '경상권',
-    region: '대구',
-    totalSales: 1720000000,
-    sales3M: 460000000,
-    sales1M: 158000000,
-    lastTradeDate: '2024-07-13',
-    status: 'active',
-    hasCertificate: false
+    "id": 6,
+    "name": "(인천)세희유통",
+    "businessCount": 1,
+    "salesPerson": "고영석",
+    "salesPersons": [
+      "고영석",
+      "노원진"
+    ],
+    "mainCategory": "누운고기,뜬고기",
+    "mainProducts": [
+      "넙치",
+      "강도다리",
+      "농어",
+      "점성어"
+    ],
+    "territory": "수도권",
+    "region": "인천",
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 7,
-    name: '인천횟집',
-    businessCount: 1,
-    salesPerson: '최용환',
-    mainCategory: '누운고기',
-    territory: '수도권',
-    region: '인천',
-    totalSales: 1480000000,
-    sales3M: 410000000,
-    sales1M: 142000000,
-    lastTradeDate: '2024-07-14',
-    status: 'active',
-    hasCertificate: true
+    "id": 7,
+    "name": "완도전복",
+    "businessCount": 1,
+    "salesPerson": "고영석",
+    "salesPersons": [
+      "고영석"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "수도권",
+    "region": "인천",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 8,
-    name: '제주유통',
-    businessCount: 2,
-    salesPerson: '박현재',
-    mainCategory: '뜬고기',
-    territory: '제주권',
-    region: '제주',
-    totalSales: 1320000000,
-    sales3M: 370000000,
-    sales1M: 128000000,
-    lastTradeDate: '2024-07-09',
-    status: 'active',
-    hasCertificate: true
+    "id": 8,
+    "name": "어부수산",
+    "businessCount": 1,
+    "salesPerson": "노원진",
+    "salesPersons": [
+      "노원진"
+    ],
+    "mainCategory": "뜬고기",
+    "mainProducts": [
+      "도미",
+      "농어",
+      "점성어"
+    ],
+    "territory": "수도권",
+    "region": "인천",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 9,
-    name: '강원활어',
-    businessCount: 1,
-    salesPerson: '고영석',
-    mainCategory: '뜬고기',
-    territory: '강원권',
-    region: '강원',
-    totalSales: 1150000000,
-    sales3M: 330000000,
-    sales1M: 115000000,
-    lastTradeDate: '2024-07-12',
-    status: 'active',
-    hasCertificate: true
+    "id": 9,
+    "name": "바다로수산",
+    "businessCount": 1,
+    "salesPerson": "고영석",
+    "salesPersons": [
+      "고영석"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "수도권",
+    "region": "인천",
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true
   },
   {
-    id: 10,
-    name: '대전수산시장',
-    businessCount: 3,
-    salesPerson: '노원진',
-    mainCategory: '누운고기',
-    territory: '충청권',
-    region: '대전',
-    totalSales: 980000000,
-    sales3M: 290000000,
-    sales1M: 102000000,
-    lastTradeDate: '2024-07-11',
-    status: 'active',
-    hasCertificate: false
+    "id": 10,
+    "name": "나인씨월드",
+    "businessCount": 1,
+    "salesPerson": "최용환",
+    "salesPersons": [
+      "최용환",
+      "노원진"
+    ],
+    "mainCategory": "누운고기,뜬고기",
+    "mainProducts": [
+      "넙치",
+      "강도다리",
+      "농어",
+      "점성어"
+    ],
+    "territory": "수도권",
+    "region": "노량진",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
+  },
+  {
+    "id": 11,
+    "name": "백두회수산",
+    "businessCount": 1,
+    "salesPerson": "최용환",
+    "salesPersons": [
+      "최용환"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "충청권",
+    "region": "충남",
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true
   }
 ];
 
@@ -1059,226 +1129,422 @@ export const sellerDetails = {
 
 // 바이어 상세 정보 (소속 사업자 및 키맨 정보)
 export const buyerDetails = {
-  1: { // 소라 그룹
-    keymen: [
-      { name: '최소라', role: '대표', phone: '010-5678-9012' },
-      { name: '김영수', role: '구매담당', phone: '010-6789-0123' }
+  "1": {
+    "keymen": [
+      {
+        "name": "임종오",
+        "phone": "010-3779-5470",
+        "role": "대표"
+      }
     ],
-    kakaoGroupName: '[노량진]소라수산 거래방',
-    paymentCycle: '기본 미수 3천만원, 초과분 월 2회 정산',
-    complaintIntensity: '강함',
-    mainSuppliers: '해금 그룹, 통영수산 그룹',
-    priorityFactors: ['로스', '살밥', '단가', '색깔', '외관', '평체', '기타'],
-    arrivalPricePolicy: '상차단가 + 800원',
-    businesses: [
+    "kakaoGroupName": "[하남] 소라수산 거래(판매) 단톡방",
+    "paymentCycle": "알아서 제때 잘 줌. 2천만원 넘으면 대표에게만 연락. 단톡방 메세지 금지",
+    "complaintIntensity": "강함",
+    "mainSuppliers": [
+      "상무",
+      "피시파더"
+    ],
+    "priorityFactors": {
+      "priority1": "로스",
+      "priority2": "살밥",
+      "priority3": "단가",
+      "priority4": "색깔",
+      "priority5": "평체",
+      "priority6": "외관",
+      "priority7": "기타"
+    },
+    "arrivalPricePolicy": 800,
+    "businesses": [
       {
-        id: 301,
-        businessNumber: '678-90-12345',
-        businessName: '소라수산',
-        representative: '최소라',
-        businessAddress: '서울시 동작구 노량진로 123',
-        buyerName: '소라본점',
-        buyerId: 'SR01',
-        unloadingAddress: '서울시 동작구 노량진수산시장 A동 12호',
-        taxInvoiceEmail: 'sora@email.com',
-        status: 'active',
-        hasCertificate: true
+        "buyerName": "소라수산",
+        "buyerId": "SR",
+        "businessNumber": "293-88-02840",
+        "businessName": "주식회사 소라수산",
+        "representative": "임정우",
+        "businessAddress": "경기도 하남시 안터로 40-3, 에이4동 202호(풍산동)",
+        "unloadingAddress": "경기도 하남시 안터로 40-3, 에이4동 202호(풍산동)",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": true,
+        "status": "active"
       },
       {
-        id: 302,
-        businessNumber: '789-01-23456',
-        businessName: '소라진조',
-        representative: '최소라',
-        businessAddress: '서울시 동작구 노량진로 125',
-        buyerName: '소라2호점',
-        buyerId: 'SR02',
-        unloadingAddress: '서울시 동작구 노량진수산시장 B동 5호',
-        taxInvoiceEmail: 'sora2@email.com',
-        status: 'active',
-        hasCertificate: true
-      },
-      {
-        id: 303,
-        businessNumber: '890-12-34567',
-        businessName: '소라유통',
-        representative: '김영수',
-        businessAddress: '서울시 동작구 노량진로 127',
-        buyerName: '소라3호점',
-        buyerId: 'SR03',
-        unloadingAddress: '서울시 동작구 노량진수산시장 C동 8호',
-        taxInvoiceEmail: 'sora3@email.com',
-        status: 'active',
-        hasCertificate: true
+        "buyerName": "소라진조",
+        "buyerId": "SRJJ",
+        "businessNumber": "126-17-31079",
+        "businessName": "소라 진조미식품",
+        "representative": "임종호",
+        "businessAddress": "경기도 하남시 인터로 40-3",
+        "unloadingAddress": "경기도 하남시 인터로 40-3",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": false,
+        "status": "active"
       }
     ]
   },
-  2: { // 대일 그룹
-    keymen: [
-      { name: '이대일', position: '대표', phone: '010-7890-1234' }
-    ],
-    kakaoGroupName: '[미사리]대일횟집 거래방',
-    paymentCycle: '기본 미수 2천만원, 초과분 주 1회 정산',
-    complaintIntensity: '보통',
-    mainSuppliers: '거제양식, 제주활어',
-    priorityFactors: ['단가', '살밥', '로스', '색깔', '외관', '평체', '기타'],
-    arrivalPricePolicy: '상차단가 + 700원',
-    businesses: [
+  "2": {
+    "keymen": [
       {
-        id: 401,
-        businessNumber: '901-23-45678',
-        businessName: '대일수산',
-        representative: '이대일',
-        businessAddress: '경기도 하남시 미사강변동로 456',
-        buyerName: '대일본점',
-        buyerId: 'DI01',
-        unloadingAddress: '경기도 하남시 미사강변동로 456',
-        taxInvoiceEmail: 'daeil@email.com',
-        status: 'active',
-        hasCertificate: true
+        "name": "김상남",
+        "phone": "010-5278-0347",
+        "role": "사무장"
+      }
+    ],
+    "kakaoGroupName": "[인천] 대일유통 거래(판매) 단톡방",
+    "paymentCycle": "주 1~2회 정도로 알아서 잘 입금함",
+    "complaintIntensity": "매우강함",
+    "mainSuppliers": [
+      "피시파더",
+      "믿음"
+    ],
+    "priorityFactors": {
+      "priority1": "평체",
+      "priority2": "살밥",
+      "priority3": "로스",
+      "priority4": "외관",
+      "priority5": "단가"
+    },
+    "arrivalPricePolicy": 800,
+    "businesses": [
+      {
+        "buyerName": "대일수산",
+        "buyerId": "DISS",
+        "businessNumber": "786-99-00622",
+        "businessName": "대일수산물유통",
+        "representative": "김상남외 2인",
+        "businessAddress": "인천광역시 중구 연안부두로 109, 제17호(항동7가)",
+        "unloadingAddress": "인천광역시 중구 연안부두로 109, 제17호(항동7가)",
+        "taxInvoiceEmail": null,
+        "hasCertificate": true,
+        "status": "active"
       },
       {
-        id: 402,
-        businessNumber: '012-34-56789',
-        businessName: '대일유통',
-        representative: '이대일',
-        businessAddress: '경기도 하남시 미사강변동로 458',
-        buyerName: '대일2호점',
-        buyerId: 'DI02',
-        unloadingAddress: '경기도 하남시 미사강변동로 458',
-        taxInvoiceEmail: 'daeil2@email.com',
-        status: 'active',
-        hasCertificate: true
+        "buyerName": "대일유통",
+        "buyerId": "DIYT",
+        "businessNumber": "121-99-20705",
+        "businessName": "대일유통",
+        "representative": "박경서외 2인",
+        "businessAddress": "인천광역시 중구 연안부두로 109, 제17호(항동7가)",
+        "unloadingAddress": "인천광역시 중구 연안부두로 109, 제17호(항동7가)",
+        "taxInvoiceEmail": null,
+        "hasCertificate": true,
+        "status": "inactive"
       }
     ]
   },
-  3: { // 명성횟집 그룹
-    keymen: [
-      { name: '박명성', position: '대표', phone: '010-1111-2222' },
-      { name: '이명숙', position: '실장', phone: '010-2222-3333' }
-    ],
-    kakaoGroupName: '[용인]명성횟집 거래방',
-    paymentCycle: '기본 미수 5천만원, 초과분 월 1회 정산',
-    complaintIntensity: '매우강함',
-    mainSuppliers: '해금 그룹, 갑운 그룹',
-    priorityFactors: ['살밥', '색깔', '로스', '단가', '외관', '평체', '기타'],
-    arrivalPricePolicy: '상차단가 + 900원',
-    businesses: [
+  "3": {
+    "keymen": [
       {
-        id: 501,
-        businessNumber: '123-45-67891',
-        businessName: '명성횟집',
-        representative: '박명성',
-        businessAddress: '경기도 용인시 수지구 성복동 123',
-        buyerName: '명성본점',
-        buyerId: 'MS01',
-        unloadingAddress: '경기도 용인시 수지구 성복동 123',
-        taxInvoiceEmail: 'myungsung@email.com',
-        status: 'active',
-        hasCertificate: true
+        "name": "진은우",
+        "phone": "010-4040-0650",
+        "role": "대표"
+      }
+    ],
+    "kakaoGroupName": "[대구] 해양수산 거래(판매) 단톡방",
+    "paymentCycle": "월초에 미수 갚고, 월말에 쌓이는 패턴 / 2주 정도마다 입금",
+    "complaintIntensity": "보통",
+    "mainSuppliers": [
+      "신화유통"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": 900,
+    "businesses": [
+      {
+        "buyerName": "진주수산",
+        "buyerId": "JJSS",
+        "businessNumber": "425-91-01579",
+        "businessName": "진주수산",
+        "representative": "진승희",
+        "businessAddress": "대구광역시 북구 동변로18길 37(동변동)",
+        "unloadingAddress": "대구광역시 북구 동변로18길 37(동변동)",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": true,
+        "status": "active"
       },
       {
-        id: 502,
-        businessNumber: '234-56-78902',
-        businessName: '명성2호',
-        representative: '박명성',
-        businessAddress: '경기도 용인시 수지구 죽전동 456',
-        buyerName: '명성2호점',
-        buyerId: 'MS02',
-        unloadingAddress: '경기도 용인시 수지구 죽전동 456',
-        taxInvoiceEmail: 'myungsung2@email.com',
-        status: 'active',
-        hasCertificate: true
+        "buyerName": "해양수산",
+        "buyerId": "HYSS",
+        "businessNumber": "404-91-03696",
+        "businessName": "해양종합수산",
+        "representative": "진은우",
+        "businessAddress": "대구광역시 북구 동변로18길 37(동변동)",
+        "unloadingAddress": "대구광역시 북구 동변로18길 37(동변동)",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": false,
+        "status": "active"
       }
     ]
   },
-  4: { // 대박 그룹 (사업자 1개)
-    keymen: [
-      { name: '김대박', position: '대표', phone: '010-3333-4444' }
-    ],
-    kakaoGroupName: '[경기남부]대박수산 거래방',
-    paymentCycle: '기본 미수 1천만원, 초과분 즉시 정산',
-    complaintIntensity: '약함',
-    mainSuppliers: '통영수산, 제주활어',
-    priorityFactors: ['단가', '로스', '살밥', '평체', '색깔', '외관', '기타'],
-    arrivalPricePolicy: '상차단가 + 700원',
-    businesses: [
+  "4": {
+    "keymen": [
       {
-        id: 601,
-        businessNumber: '345-67-89013',
-        businessName: '대박수산',
-        representative: '김대박',
-        businessAddress: '경기도 수원시 팔달구 인계동 789',
-        buyerName: '대박수산',
-        buyerId: 'DB01',
-        unloadingAddress: '경기도 수원시 팔달구 인계동 789',
-        taxInvoiceEmail: 'daebak@email.com',
-        status: 'active',
-        hasCertificate: true
-      }
-    ]
-  },
-  6: { // 대구수산 (사업자 2개)
-    keymen: [
-      { name: '최대구', position: '대표', phone: '010-4444-5555' }
-    ],
-    kakaoGroupName: '[대구]대구수산 거래방',
-    paymentCycle: '기본 미수 3천만원, 초과분 월 2회 정산',
-    complaintIntensity: '보통',
-    mainSuppliers: '부산양식, 통영수산',
-    priorityFactors: ['로스', '단가', '살밥', '색깔', '외관', '평체', '기타'],
-    arrivalPricePolicy: '상차단가 + 800원',
-    businesses: [
-      {
-        id: 701,
-        businessNumber: '456-78-90124',
-        businessName: '대구수산본점',
-        representative: '최대구',
-        businessAddress: '대구광역시 북구 칠성동 234',
-        buyerName: '대구본점',
-        buyerId: 'DG01',
-        unloadingAddress: '대구광역시 북구 칠성동 234',
-        taxInvoiceEmail: 'daegu@email.com',
-        status: 'active',
-        hasCertificate: true
+        "name": "가낙현",
+        "phone": "010-4113-8966",
+        "role": "대표"
       },
       {
-        id: 702,
-        businessNumber: '567-89-01235',
-        businessName: '대구수산지점',
-        representative: '최대구',
-        businessAddress: '대구광역시 중구 동성로 567',
-        buyerName: '대구2호점',
-        buyerId: 'DG02',
-        unloadingAddress: '대구광역시 중구 동성로 567',
-        taxInvoiceEmail: 'daegu2@email.com',
-        status: 'active',
-        hasCertificate: false
+        "name": "김아무개",
+        "phone": "010-7458-2223",
+        "role": "사무장"
+      }
+    ],
+    "kakaoGroupName": "[하남] 영광수산 거래(판매) 단톡방",
+    "paymentCycle": "2주 정도 미수 깔고 감",
+    "complaintIntensity": "매우강함",
+    "mainSuppliers": [
+      "진유통",
+      "동주유통"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": 900,
+    "businesses": [
+      {
+        "buyerName": "영광수산",
+        "buyerId": "YGSS",
+        "businessNumber": "666-86-00503",
+        "businessName": "어업회사법인 영광수산 주식회사",
+        "representative": "가낙현",
+        "businessAddress": "서울특별시 강동구 초광로294번길 144(삼일동)",
+        "unloadingAddress": "서울특별시 강동구 초광로294번길 144(삼일동)",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": true,
+        "status": "active"
+      },
+      {
+        "buyerName": "YG씨푸드",
+        "buyerId": "YGSFD",
+        "businessNumber": "544-88-03126",
+        "businessName": "주식회사 와이지씨푸드",
+        "representative": "가낙현",
+        "businessAddress": "경기도 하남시 초이로44번길 75, 1층(초이동)",
+        "unloadingAddress": "경기도 하남시 초이로44번길 75, 1층(초이동)",
+        "taxInvoiceEmail": null,
+        "hasCertificate": true,
+        "status": "active"
       }
     ]
   },
-  7: { // 인천횟집 (사업자 1개)
-    keymen: [
-      { name: '정인천', position: '대표', phone: '010-5555-6666' }
-    ],
-    kakaoGroupName: '[인천]인천활어센터 거래방',
-    paymentCycle: '기본 미수 2천만원, 초과분 주 1회 정산',
-    complaintIntensity: '강함',
-    mainSuppliers: '인천양식, 해금 그룹',
-    priorityFactors: ['살밥', '로스', '색깔', '단가', '외관', '평체', '기타'],
-    arrivalPricePolicy: '상차단가 + 700원',
-    businesses: [
+  "5": {
+    "keymen": [
       {
-        id: 801,
-        businessNumber: '678-90-12346',
-        businessName: '인천활어센터',
-        representative: '정인천',
-        businessAddress: '인천광역시 남동구 구월동 890',
-        buyerName: '인천활어',
-        buyerId: 'IC01',
-        unloadingAddress: '인천광역시 남동구 구월동 890',
-        taxInvoiceEmail: 'incheon@email.com',
-        status: 'active',
-        hasCertificate: true
+        "name": "김명식",
+        "phone": "010-2343-2334",
+        "role": "대표"
+      },
+      {
+        "name": "최사무",
+        "phone": "010-5235-9824",
+        "role": "사무장"
+      }
+    ],
+    "kakaoGroupName": "[노량진] 굿모닝씨푸드 결제 단톡방",
+    "paymentCycle": "월말 마감, 익월 5일 결제",
+    "complaintIntensity": "보통",
+    "mainSuppliers": [
+      "피시파더"
+    ],
+    "priorityFactors": {
+      "priority1": "가격"
+    },
+    "arrivalPricePolicy": null,
+    "businesses": [
+      {
+        "buyerName": "굿모닝씨푸드",
+        "buyerId": "GMN",
+        "businessNumber": "538-86-02676",
+        "businessName": "주식회사 굿모닝씨푸드",
+        "representative": "김명식",
+        "businessAddress": "서울특별시 동작구 노들로 674, 지하1층 가공처리장 8호",
+        "unloadingAddress": "서울특별시 동작구 노들로 674, 지하1층 가공처리장 8호",
+        "taxInvoiceEmail": null,
+        "hasCertificate": true,
+        "status": "active"
+      }
+    ]
+  },
+  "6": {
+    "keymen": [
+      {
+        "name": "김세영",
+        "phone": "010-4324-2532",
+        "role": "대표"
+      }
+    ],
+    "kakaoGroupName": "피시파더/(인천)세희유통 단톡방",
+    "paymentCycle": "매주 독촉하지 않으면 안줌. 미수 5천 유지 목표로 계속 추심",
+    "complaintIntensity": "낮음",
+    "mainSuppliers": [
+      "ING",
+      "피시파더"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": null,
+    "businesses": [
+      {
+        "buyerName": "(인천)세희유통",
+        "buyerId": "SH3",
+        "businessNumber": "121-81-80668",
+        "businessName": "주식회사 세희유통",
+        "representative": "김세영",
+        "businessAddress": "인천광역시 중구 항동7가 65-33",
+        "unloadingAddress": "인천광역시 중구 항동7가 65-33",
+        "taxInvoiceEmail": null,
+        "hasCertificate": false,
+        "status": "active"
+      }
+    ]
+  },
+  "7": {
+    "keymen": [
+      {
+        "name": "김용범",
+        "phone": "010-4443-7744",
+        "role": "사무장"
+      }
+    ],
+    "kakaoGroupName": "[인천] 완도전복 거래(판매) 단톡방",
+    "paymentCycle": "주 1회 완납",
+    "complaintIntensity": "보통",
+    "mainSuppliers": [
+      "피시파더"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": 900,
+    "businesses": [
+      {
+        "buyerName": "완도전복",
+        "buyerId": "WDJB",
+        "businessNumber": "121-86-25485",
+        "businessName": "주식회사 완도전복",
+        "representative": "김용범",
+        "businessAddress": "인천 중구 연안부두로 115번길 17(항동7가)",
+        "unloadingAddress": "인천 중구 연안부두로 115번길 17(항동7가)",
+        "taxInvoiceEmail": null,
+        "hasCertificate": true,
+        "status": "active"
+      }
+    ]
+  },
+  "8": {
+    "keymen": [
+      {
+        "name": "최정환",
+        "phone": "010-9932-3834",
+        "role": "상무"
+      }
+    ],
+    "kakaoGroupName": "[인천] 어부수산 거래(판매) 단톡방",
+    "paymentCycle": "미수 2천깔고 약 5천 넘어가면 한번씩 입금함",
+    "complaintIntensity": "강함",
+    "mainSuppliers": [
+      "믿음",
+      "진"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": null,
+    "businesses": [
+      {
+        "buyerName": "어부수산",
+        "buyerId": "UBSS",
+        "businessNumber": "413-86-02343",
+        "businessName": "주식회사 어부수산유통",
+        "representative": "조미연",
+        "businessAddress": "인천광역시 중구 연안부두로 115번길 8",
+        "unloadingAddress": "인천광역시 중구 연안부두로 115번길 8",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": true,
+        "status": "active"
+      }
+    ]
+  },
+  "9": {
+    "keymen": [
+      {
+        "name": "박정식",
+        "phone": "010-9842-9874",
+        "role": "대표"
+      }
+    ],
+    "kakaoGroupName": "[인천] 바다로수산 거래(판매) 단톡방",
+    "paymentCycle": "미수 5천 쌓이면 완납",
+    "complaintIntensity": null,
+    "mainSuppliers": [
+      "섬유통"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": 800,
+    "businesses": [
+      {
+        "buyerName": "바다로수산",
+        "buyerId": "BDRSS",
+        "businessNumber": "297-88-02217",
+        "businessName": "주식회사 바다로수산",
+        "representative": "정기혁",
+        "businessAddress": "인천광역시 중구 연안부두로 97",
+        "unloadingAddress": "인천광역시 중구 연안부두로 97",
+        "taxInvoiceEmail": null,
+        "hasCertificate": false,
+        "status": "active"
+      }
+    ]
+  },
+  "10": {
+    "keymen": [
+      {
+        "name": "김병한",
+        "phone": "010-2343-2343",
+        "role": "대표"
+      }
+    ],
+    "kakaoGroupName": "[노량진]나인씨월드 거래(판매) 단톡방",
+    "paymentCycle": "납품 후 4일 이내 완납",
+    "complaintIntensity": "보통",
+    "mainSuppliers": [],
+    "priorityFactors": {},
+    "arrivalPricePolicy": 800,
+    "businesses": [
+      {
+        "buyerName": "나인씨월드",
+        "buyerId": "NISWD",
+        "businessNumber": "899-81-00471",
+        "businessName": "주식회사 나인씨월드",
+        "representative": "김병한",
+        "businessAddress": "서울특별시 동작구 노들로 674, 지하 1층 7,8호(노량진동, 활어보관장)",
+        "unloadingAddress": "서울특별시 동작구 노들로 674, 지하 1층 7,8호(노량진동, 활어보관장)",
+        "taxInvoiceEmail": null,
+        "hasCertificate": true,
+        "status": "active"
+      }
+    ]
+  },
+  "11": {
+    "keymen": [
+      {
+        "name": "백경식",
+        "phone": "010-2342-3242",
+        "role": "사무장"
+      }
+    ],
+    "kakaoGroupName": "[세종] 백두회수산 거래(판매) 단톡방",
+    "paymentCycle": "납품 후 일주일 이내 일부 입금(미수 1천씩 깔고 감0",
+    "complaintIntensity": "보통",
+    "mainSuppliers": [
+      "세은",
+      "믿음"
+    ],
+    "priorityFactors": {},
+    "arrivalPricePolicy": 800,
+    "businesses": [
+      {
+        "buyerName": "백두회수산",
+        "buyerId": "BDHSS",
+        "businessNumber": "483-94-01732",
+        "businessName": "백두회수산",
+        "representative": "박종열",
+        "businessAddress": "세종특별자치시 고운서4길 7,1층일부(고운동)",
+        "unloadingAddress": "세종특별자치시 고운서4길 7,1층일부(고운동)",
+        "taxInvoiceEmail": "fifabuyer@tidepool.kr",
+        "hasCertificate": true,
+        "status": "active"
       }
     ]
   }
