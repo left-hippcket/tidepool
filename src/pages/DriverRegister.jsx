@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { Upload as UploadIcon, Plus } from 'lucide-react';
 import { businessRegistry } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
+import { FMSwitch } from '../components/ui/FMSwitch';
 import toast from 'react-hot-toast';
 
 function DriverRegister() {
@@ -241,36 +242,41 @@ function DriverRegister() {
                         />
                       </Form.Item>
 
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'status']}
-                        label="정산사업자 상태"
-                        initialValue="active"
-                        rules={[
-                          { required: true, message: '상태를 선택해주세요' }
-                        ]}
-                      >
-                        <Select
-                          placeholder="선택"
-                          options={[
-                            { value: 'active', label: '활성' },
-                            { value: 'inactive', label: '비활성' }
-                          ]}
-                          onChange={(value) => {
-                            const businesses = form.getFieldValue('settlementBusinesses') || [];
-                            if (value === 'active') {
-                              // 다른 사업자를 모두 비활성화
-                              businesses.forEach((b, idx) => {
-                                if (idx !== index) {
-                                  businesses[idx] = { ...b, status: 'inactive' };
+                      <div className="flex items-center mb-4">
+                        <span className="w-1/5 font-medium text-gray-700">정산사업자 상태:</span>
+                        <div className="w-4/5">
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'status']}
+                            initialValue="active"
+                            noStyle
+                          >
+                            <FMSwitch
+                              checked={form.getFieldValue(['settlementBusinesses', index, 'status']) === 'active'}
+                              onChange={(checked) => {
+                                const businesses = form.getFieldValue('settlementBusinesses') || [];
+                                if (checked) {
+                                  // 다른 사업자를 모두 비활성화
+                                  businesses.forEach((b, idx) => {
+                                    if (idx !== index) {
+                                      businesses[idx] = { ...b, status: 'inactive' };
+                                    } else {
+                                      businesses[idx] = { ...b, status: 'active' };
+                                    }
+                                  });
+                                  form.setFieldsValue({ settlementBusinesses: businesses });
+                                  toast.success('다른 정산사업자가 자동으로 비활성화되었습니다.');
+                                } else {
+                                  businesses[index] = { ...businesses[index], status: 'inactive' };
+                                  form.setFieldsValue({ settlementBusinesses: businesses });
                                 }
-                              });
-                              form.setFieldsValue({ settlementBusinesses: businesses });
-                              toast.success('다른 정산사업자가 자동으로 비활성화되었습니다.');
-                            }
-                          }}
-                        />
-                      </Form.Item>
+                              }}
+                              onLabel="활성"
+                              offLabel="비활성"
+                            />
+                          </Form.Item>
+                        </div>
+                      </div>
 
                       <div className="my-4 border-t border-gray-200"></div>
                       <h5 className="text-sm font-semibold text-gray-900 mb-4">은행계좌 정보</h5>
