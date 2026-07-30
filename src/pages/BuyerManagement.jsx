@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
+import { Check, X } from 'lucide-react';
 import { buyerGroups, buyerDetails, managers, territories, regions } from '../data/mockData';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMButton } from '../components/ui/FMButton';
@@ -189,61 +190,128 @@ function BuyerManagement() {
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200">
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">바이어그룹명</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">사업자수</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">담당영업사원</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">주요품목분류</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">사업권역</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">상세지역</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(누적)</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(최근 3개월)</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(최근 1개월)</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">최근거래일</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">품목분류</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">영업담당자</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자정보</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자등록증</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">카톡단톡방</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">넙치도착단가</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">메인소싱처</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상태</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상세</th>
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((record) => (
-                <tr
-                  key={record.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => handleViewDetail(record)}
-                >
-                  <td className="px-4 py-3 text-sm">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      {record.name}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.businessCount}개</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.salesPerson}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.mainCategory}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.territory}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.region}</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.totalSales / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.sales3M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.sales1M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.lastTradeDate}</td>
-                  <td className="px-4 py-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={record.hasCertificate}
-                      disabled
-                      className="h-4 w-4"
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      상세
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {currentItems.map((record) => {
+                const detail = buyerDetails[record.id];
+
+                // 사업자정보 완성도 체크
+                const hasCompleteBusinessInfo = detail?.businesses?.every(b =>
+                  b.businessNumber && b.businessName && b.representative && b.businessAddress
+                ) || false;
+
+                // 사업자등록증 체크
+                const hasCertificate = detail?.businesses?.every(b => b.hasCertificate) || false;
+
+                // 카톡단톡방
+                const kakaoGroup = detail?.kakaoGroupName || null;
+
+                // 넙치도착단가
+                const hasNunwoon = record.mainCategory?.includes('누운고기');
+                const arrivalPrice = detail?.arrivalPricePolicy;
+                let arrivalPriceDisplay = '해당없음';
+                if (hasNunwoon) {
+                  if (arrivalPrice) {
+                    // "상차단가 + 800원" -> "+800원" 형태로 변환
+                    const match = arrivalPrice.match(/\+\s*(\d+)원/);
+                    arrivalPriceDisplay = match ? `+${match[1]}원` : arrivalPrice;
+                  } else {
+                    arrivalPriceDisplay = null; // X 표시
+                  }
+                }
+
+                // 메인소싱처
+                const mainSuppliers = detail?.mainSuppliers?.split(',').map(s => s.trim()) || [];
+
+                return (
+                  <tr
+                    key={record.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => handleViewDetail(record)}
+                  >
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
+                        className="text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        {record.name}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{record.mainCategory}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{record.salesPerson}</td>
+                    <td className="px-4 py-3 text-center">
+                      {hasCompleteBusinessInfo ? (
+                        <Check className="h-5 w-5 text-gray-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {hasCertificate ? (
+                        <Check className="h-5 w-5 text-gray-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {kakaoGroup ? (
+                        <span className="text-sm text-gray-900">{kakaoGroup}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {arrivalPriceDisplay === '해당없음' ? (
+                        <span className="text-sm text-gray-500">해당없음</span>
+                      ) : arrivalPriceDisplay ? (
+                        <span className="text-sm text-gray-900">{arrivalPriceDisplay}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {mainSuppliers.length > 0 ? (
+                        <span className="text-sm text-gray-900">
+                          {mainSuppliers.length === 1
+                            ? mainSuppliers[0]
+                            : `${mainSuppliers[0]} 외`}
+                        </span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                          record.status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {record.status === 'active' ? '활성' : '비활성'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
+                        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      >
+                        상세
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
