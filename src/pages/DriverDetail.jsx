@@ -1,81 +1,28 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Upload, InputNumber, DatePicker, Image, Modal } from 'antd';
-import { ArrowLeftOutlined, MinusCircleOutlined, UploadOutlined, FileImageOutlined } from '@ant-design/icons';
+import { Form, Input, Select, Upload, Image, Modal } from 'antd';
+import { ArrowLeftOutlined, MinusCircleOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
-import { driverDetails, claimHistory, driverTransactionDetails } from '../data/mockData';
+import { driverDetails } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
 import toast from 'react-hot-toast';
-import dayjs from 'dayjs';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-const { TextArea } = Input;
 
 function DriverDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [settlementForm] = Form.useForm();
-  const [claimForm] = Form.useForm();
 
   const driverData = driverDetails[id];
-  const transactionData = driverTransactionDetails[id];
 
   const [editMode, setEditMode] = useState(false);
-  const [claimModalVisible, setClaimModalVisible] = useState(false);
-  const [editingClaimId, setEditingClaimId] = useState(null);
-  const [claims, setClaims] = useState(claimHistory[id] || []);
-  const [periodFilter, setPeriodFilter] = useState('최근 3개월');
 
   if (!driverData) {
     return <div className="p-6">드라이버를 찾을 수 없습니다.</div>;
   }
 
   const { basicInfo, settlementInfo, settlementBusinesses } = driverData;
-
-  // 기간별 데이터 계산
-  const filteredPeriods = useMemo(() => {
-    if (!transactionData) return [];
-
-    const allPeriods = transactionData.periods;
-    const now = dayjs();
-
-    switch (periodFilter) {
-      case '최근 1개월':
-        return allPeriods.slice(-3);
-      case '최근 3개월':
-        return allPeriods.slice(-9);
-      case '최근 6개월':
-        return allPeriods.slice(-18);
-      case '이번달':
-        const thisMonth = now.format('M월');
-        return allPeriods.filter(p => p.period.startsWith(thisMonth));
-      case '이번분기':
-        const thisQuarter = Math.ceil(now.month() / 3);
-        const quarterMonths = [thisQuarter * 3 - 2, thisQuarter * 3 - 1, thisQuarter * 3];
-        return allPeriods.filter(p => {
-          const month = parseInt(p.period);
-          return quarterMonths.includes(month);
-        });
-      case '올해':
-        return allPeriods;
-      case '누적':
-        return allPeriods;
-      default:
-        return allPeriods.slice(-9);
-    }
-  }, [transactionData, periodFilter]);
-
-  const metrics = useMemo(() => {
-    if (!filteredPeriods.length) return { totalFreight: 0, totalTripCount: 0, averageFreight: 0 };
-
-    const totalFreight = filteredPeriods.reduce((sum, p) => sum + p.freight, 0);
-    const totalTripCount = filteredPeriods.reduce((sum, p) => sum + p.tripCount, 0);
-    const averageFreight = totalTripCount > 0 ? Math.round(totalFreight / totalTripCount) : 0;
-
-    return { totalFreight, totalTripCount, averageFreight };
-  }, [filteredPeriods]);
 
   const handleEditMode = () => {
     form.setFieldsValue({
@@ -170,54 +117,6 @@ function DriverDetail() {
     form.resetFields();
     settlementForm.resetFields();
     setEditMode(false);
-  };
-
-  // 이슈 히스토리
-  const handleClaimAdd = () => {
-    claimForm.resetFields();
-    claimForm.setFieldsValue({
-      occurredAt: dayjs(),
-      content: ''
-    });
-    setEditingClaimId(null);
-    setClaimModalVisible(true);
-  };
-
-  const handleClaimEdit = (claim) => {
-    claimForm.setFieldsValue({
-      occurredAt: dayjs(claim.occurredAt.split(' ')[0], 'YYYY-MM-DD'),
-      content: claim.content
-    });
-    setEditingClaimId(claim.id);
-    setClaimModalVisible(true);
-  };
-
-  const handleClaimSave = async () => {
-    try {
-      const values = await claimForm.validateFields();
-      if (editingClaimId) {
-        toast.success('이슈 히스토리가 수정되었습니다.');
-      } else {
-        toast.success('이슈 히스토리가 등록되었습니다.');
-      }
-      setClaimModalVisible(false);
-      claimForm.resetFields();
-    } catch (error) {
-      console.error('Validation failed:', error);
-    }
-  };
-
-  const handleClaimDelete = (claimId) => {
-    Modal.confirm({
-      title: '이력 삭제',
-      content: '이 이력을 삭제하시겠습니까?',
-      okText: '확인',
-      cancelText: '취소',
-      onOk: () => {
-        setClaims(prev => prev.filter(c => c.id !== claimId));
-        toast.success('이슈 히스토리가 삭제되었습니다.');
-      }
-    });
   };
 
   return (
@@ -798,145 +697,6 @@ function DriverDetail() {
         </div>
         </Form>
 
-        {/* 이슈 히스토리 */}
-        <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4 opacity-60">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-semibold text-gray-700">이슈 히스토리 (P2 예정)</h3>
-            </div>
-            <div className="flex items-center gap-4">
-              <FMButton
-                variant="secondary"
-                icon={<Plus className="h-4 w-4" />}
-                onClick={handleClaimAdd}
-              >
-                이력 추가
-              </FMButton>
-            </div>
-          </div>
-
-          {claims.length > 0 ? (
-            <div className="space-y-4">
-              {claims.map((claim) => (
-                <div key={claim.id} className="border-l-2 border-gray-300 pl-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-medium text-gray-900">{claim.occurredAt.split(' ')[0]}</span>
-                      <span className="text-xs text-gray-500 ml-2">작성자: {claim.author}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleClaimEdit(claim)}
-                        className="px-3 py-1 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-50"
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => handleClaimDelete(claim.id)}
-                        className="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50"
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{claim.content}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">등록된 이슈 히스토리가 없습니다.</p>
-          )}
-        </div>
-
-        {/* 거래 실적 (P2) */}
-        {transactionData && (
-          <div className="opacity-60 space-y-4">
-            {/* 기간 필터 */}
-            <div className="rounded-xl border border-gray-300 bg-gray-50 p-4">
-              <div className="flex flex-wrap gap-2">
-                {['최근 1개월', '최근 3개월', '최근 6개월', '이번달', '이번분기', '올해', '누적'].map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => setPeriodFilter(period)}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      periodFilter === period
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-600 border border-gray-300 hover:bg-gray-300'
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 통합 지표 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="rounded-xl border border-gray-300 bg-gray-100 p-5">
-                <div className="text-sm text-gray-500 mb-1">운임 (총액)</div>
-                <div className="text-2xl font-semibold text-gray-400">{metrics.totalFreight.toLocaleString()}원</div>
-              </div>
-              <div className="rounded-xl border border-gray-300 bg-gray-100 p-5">
-                <div className="text-sm text-gray-500 mb-1">운송횟수</div>
-                <div className="text-2xl font-semibold text-gray-400">{metrics.totalTripCount}회</div>
-              </div>
-              <div className="rounded-xl border border-gray-300 bg-gray-100 p-5">
-                <div className="text-sm text-gray-500 mb-1">평균 운임</div>
-                <div className="text-2xl font-semibold text-gray-400">{metrics.averageFreight.toLocaleString()}원</div>
-              </div>
-            </div>
-
-            {/* 거래 상세 테이블 */}
-            <div className="rounded-xl border border-gray-300 bg-gray-50 p-6">
-              <h4 className="text-base font-semibold text-gray-500 mb-4">거래 상세 내역 (P2 예정)</h4>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead className="bg-gray-100">
-                    <tr className="border-b border-gray-300">
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">기간</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운임</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송횟수</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송 셀러</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송 바이어</th>
-                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">운송 품목</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPeriods.map((item) => (
-                      <tr key={item.period} className="border-b border-gray-200">
-                        <td className="px-4 py-3 text-sm text-gray-500">{item.period}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{item.freight.toLocaleString()}원</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{item.tripCount}회</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{item.sellers}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{item.buyers}</td>
-                        <td className="px-4 py-3 text-sm text-gray-500">{item.products}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* 운임 차트 */}
-            <div className="rounded-xl border border-gray-300 bg-gray-50 p-6">
-              <h4 className="text-base font-semibold text-gray-500 mb-4">운임 추이 (P2 예정)</h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={filteredPeriods}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D1D5DB" />
-                  <XAxis dataKey="period" tick={{ fill: '#6B7280' }} />
-                  <YAxis tick={{ fill: '#6B7280' }} />
-                  <Tooltip
-                    formatter={(value) => `${value.toLocaleString()}원`}
-                    contentStyle={{ backgroundColor: '#F3F4F6', border: '1px solid #D1D5DB' }}
-                  />
-                  <Legend wrapperStyle={{ color: '#6B7280' }} />
-                  <Bar dataKey="freight" name="운임" fill="#9CA3AF" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
-
         {/* 하단 버튼 */}
         {editMode && (
           <div className="border-t border-gray-200 pt-6">
@@ -958,49 +718,6 @@ function DriverDetail() {
             </div>
           </div>
         )}
-
-        {/* 이슈 히스토리 모달 */}
-        <Modal
-          title={editingClaimId ? '이슈 히스토리 수정' : '이슈 히스토리 추가'}
-          open={claimModalVisible}
-          onOk={handleClaimSave}
-          onCancel={() => {
-            setClaimModalVisible(false);
-            claimForm.resetFields();
-          }}
-          okText="저장"
-          cancelText="취소"
-          width={600}
-        >
-          <Form form={claimForm} layout="vertical" style={{ marginTop: 16 }}>
-            <Form.Item
-              name="occurredAt"
-              label="발생일"
-              rules={[{ required: true, message: '발생일을 선택해주세요' }]}
-            >
-              <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="content"
-              label="내용"
-              rules={[
-                { required: true, message: '내용을 입력해주세요' },
-                { max: 500, message: '최대 500자' }
-              ]}
-            >
-              <TextArea rows={5} placeholder="이슈 내용을 입력하세요" />
-            </Form.Item>
-
-            <Form.Item name="images" label="이미지" valuePropName="fileList" getValueFromEvent={(e) => e?.fileList}>
-              <Upload beforeUpload={() => false} maxCount={5} accept="image/*,.pdf" listType="picture">
-                <FMButton variant="secondary" icon={<UploadOutlined />}>
-                  이미지 첨부 (최대 5개, 10MB)
-                </FMButton>
-              </Upload>
-            </Form.Item>
-          </Form>
-        </Modal>
       </div>
     </div>
   );
