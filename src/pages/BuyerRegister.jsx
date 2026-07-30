@@ -14,6 +14,7 @@ import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
 import toast from 'react-hot-toast';
+import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
 
 function BuyerRegister() {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ function BuyerRegister() {
   const [availableProducts, setAvailableProducts] = useState([]);
   const [selectedTerritory, setSelectedTerritory] = useState(null);
   const [availableRegions, setAvailableRegions] = useState([]);
+  const [tickerReadOnly, setTickerReadOnly] = useState(false);
+  const [tickerValidationStatus, setTickerValidationStatus] = useState(null);
 
   // URL 쿼리 파라미터 처리
   useEffect(() => {
@@ -95,6 +98,7 @@ function BuyerRegister() {
     const value = e.target.value;
 
     if (/^\d{3}-\d{2}-\d{5}$/.test(value)) {
+      // 1. 국세청 DB 조회
       const businessInfo = businessRegistry[value];
 
       if (businessInfo) {
@@ -104,13 +108,68 @@ function BuyerRegister() {
           businessAddress: businessInfo.businessAddress,
         });
         toast.success('등록된 사업자 정보를 불러왔습니다.');
-      } else {
-        form.setFieldsValue({
-          businessName: undefined,
-          representative: undefined,
-          businessAddress: undefined,
-        });
       }
+
+      // 2. 자사 DB에서 기존 등록 사업자 조회
+      const existingPartners = findPartnerByBusinessNumber(value);
+
+      if (existingPartners.length > 0) {
+        const partner = existingPartners[0];
+        const typeNames = {
+          seller: '셀러',
+          buyer: '바이어',
+          driver: '드라이버',
+          join: '조인유통'
+        };
+
+        // 기존 사업자 발견 안내
+        toast.info(
+          `기존에 등록된 사업자입니다. (${typeNames[partner.type]}: ${partner.groupName || partner.name} / Ticker: ${partner.ticker})`,
+          { duration: 5000 }
+        );
+
+        // Ticker 자동 채움 + 읽기 전용
+        form.setFieldsValue({
+          buyerId: partner.ticker,
+          buyerName: form.getFieldValue('buyerName') || partner.name,
+        });
+
+        // Ticker 읽기 전용 설정
+        setTickerReadOnly(true);
+
+        // Ticker 검증 상태 설정
+        setTickerValidationStatus({
+          status: 'info',
+          message: `기존 사업자와 동일한 ticker를 사용합니다. (${typeNames[partner.type]}: ${partner.groupName || partner.name})`
+        });
+      } else {
+        // 신규 사업자
+        setTickerReadOnly(false);
+      }
+    }
+  };
+
+  // Ticker 입력 시 중복 검사
+  const handleTickerChange = (e) => {
+    const ticker = e.target.value;
+    if (!ticker) {
+      setTickerValidationStatus(null);
+      return;
+    }
+
+    const businessNumber = form.getFieldValue('businessNumber');
+    const validation = validateTicker(ticker, businessNumber);
+
+    setTickerValidationStatus(validation);
+
+    if (!validation.valid) {
+      if (validation.error === 'TICKER_DUPLICATE_NO_BUSINESS_NUMBER') {
+        toast.error('중복된 ticker입니다. 사업자등록번호를 먼저 입력해주세요.', { duration: 4000 });
+      } else if (validation.error === 'TICKER_DUPLICATE_DIFFERENT_BUSINESS') {
+        toast.error(validation.message, { duration: 4000 });
+      }
+    } else if (validation.info === 'SAME_BUSINESS') {
+      toast.success(validation.message, { duration: 4000 });
     }
   };
 
@@ -139,13 +198,10 @@ function BuyerRegister() {
     try {
       const values = await form.validateFields();
 
-      // ticker 중복 체크
-      const existingTicker = buyerGroups.find(g =>
-        g.ticker === values.ticker && (!selectedGroup || g.id !== selectedGroup.id)
-      );
-
-      if (existingTicker) {
-        toast.error('이미 다른 사업자가 사용중인 ticker입니다. 변경 후 재입력 해주세요');
+      // Ticker 검증
+      const validation = validateTicker(values.buyerId, values.businessNumber);
+      if (!validation.valid) {
+        toast.error(validation.message, { duration: 5000 });
         return;
       }
 
@@ -500,6 +556,17 @@ function BuyerRegister() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
 
             <Form.Item
+              name="businessNumber"
+              label="사업자등록번호"
+              rules={[
+                { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
+              ]}
+              extra="⭐ 사업자등록번호를 먼저 입력하시면 기존 사업자 여부를 자동으로 확인합니다."
+            >
+              <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
+            </Form.Item>
+
+            <Form.Item
               name="buyerName"
               label="바이어명"
               rules={[
@@ -513,24 +580,31 @@ function BuyerRegister() {
 
             <Form.Item
               name="buyerId"
-              label="ticker (ticker)"
+              label="Ticker"
               rules={[
-                { required: true, message: 'ticker를 입력해주세요' },
+                { required: true, message: 'Ticker를 입력해주세요' },
                 { max: 10, message: '최대 10자' },
                 { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
               ]}
+              validateStatus={
+                tickerValidationStatus
+                  ? tickerValidationStatus.valid
+                    ? 'success'
+                    : 'error'
+                  : undefined
+              }
+              help={tickerValidationStatus?.message}
             >
-              <Input placeholder="DBBK01" />
-            </Form.Item>
-
-            <Form.Item
-              name="businessNumber"
-              label="사업자등록번호"
-              rules={[
-                { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
-              ]}
-            >
-              <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
+              <Input
+                placeholder="DBBK01"
+                disabled={tickerReadOnly}
+                onChange={handleTickerChange}
+                suffix={
+                  tickerReadOnly ? (
+                    <span className="text-xs text-gray-500">🔒 자동</span>
+                  ) : null
+                }
+              />
             </Form.Item>
 
             <Form.Item

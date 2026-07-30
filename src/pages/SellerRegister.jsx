@@ -15,6 +15,7 @@ import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
 
 function SellerRegister() {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ function SellerRegister() {
   const [availableProducts, setAvailableProducts] = useState([]);
   const [selectedTerritory, setSelectedTerritory] = useState(null);
   const [availableRegions, setAvailableRegions] = useState([]);
+  const [tickerReadOnly, setTickerReadOnly] = useState({});
+  const [tickerValidationStatus, setTickerValidationStatus] = useState({});
 
   // URL 쿼리 파라미터 처리
   useEffect(() => {
@@ -75,29 +78,110 @@ function SellerRegister() {
   };
 
   // 사업자등록번호 입력 시 자동 채우기
-  const handleBusinessNumberChange = (e) => {
+  const handleBusinessNumberChange = (businessIndex, e) => {
     const value = e.target.value;
 
     // 형식이 완성되면 (XXX-XX-XXXXX) DB 조회
     if (/^\d{3}-\d{2}-\d{5}$/.test(value)) {
+      // 1. 국세청 DB 조회
       const businessInfo = businessRegistry[value];
+      const businesses = form.getFieldValue('businesses') || [];
+      const currentBusiness = businesses[businessIndex] || {};
 
       if (businessInfo) {
         // 등록된 사업자 정보가 있으면 자동으로 채우기
-        form.setFieldsValue({
+        const updatedBusinesses = [...businesses];
+        updatedBusinesses[businessIndex] = {
+          ...currentBusiness,
           businessName: businessInfo.businessName,
           representative: businessInfo.representative,
           businessAddress: businessInfo.businessAddress,
-        });
+        };
+        form.setFieldsValue({ businesses: updatedBusinesses });
         toast.success('등록된 사업자 정보를 불러왔습니다.');
-      } else {
-        // 등록된 정보가 없으면 필드 초기화
-        form.setFieldsValue({
-          businessName: undefined,
-          representative: undefined,
-          businessAddress: undefined,
-        });
       }
+
+      // 2. 자사 DB에서 기존 등록 사업자 조회
+      const existingPartners = findPartnerByBusinessNumber(value);
+
+      if (existingPartners.length > 0) {
+        const partner = existingPartners[0];
+        const typeNames = {
+          seller: '셀러',
+          buyer: '바이어',
+          driver: '드라이버',
+          join: '조인유통'
+        };
+
+        // 기존 사업자 발견 안내
+        toast.info(
+          `기존에 등록된 사업자입니다. (${typeNames[partner.type]}: ${partner.groupName || partner.name} / Ticker: ${partner.ticker})`,
+          { duration: 5000 }
+        );
+
+        // Ticker 자동 채움 + 읽기 전용
+        const updatedBusinesses = [...businesses];
+        updatedBusinesses[businessIndex] = {
+          ...updatedBusinesses[businessIndex],
+          ticker: partner.ticker,
+          sellerName: currentBusiness.sellerName || partner.name,
+        };
+        form.setFieldsValue({ businesses: updatedBusinesses });
+
+        // Ticker 읽기 전용 설정
+        setTickerReadOnly(prev => ({
+          ...prev,
+          [businessIndex]: true
+        }));
+
+        // Ticker 검증 상태 설정
+        setTickerValidationStatus(prev => ({
+          ...prev,
+          [businessIndex]: {
+            status: 'info',
+            message: `기존 사업자와 동일한 ticker를 사용합니다. (${typeNames[partner.type]}: ${partner.groupName || partner.name})`
+          }
+        }));
+      } else {
+        // 신규 사업자
+        setTickerReadOnly(prev => ({
+          ...prev,
+          [businessIndex]: false
+        }));
+      }
+    }
+  };
+
+  // Ticker 입력 시 중복 검사
+  const handleTickerChange = (businessIndex, e) => {
+    const ticker = e.target.value;
+    if (!ticker) {
+      setTickerValidationStatus(prev => ({
+        ...prev,
+        [businessIndex]: null
+      }));
+      return;
+    }
+
+    const businesses = form.getFieldValue('businesses') || [];
+    const currentBusiness = businesses[businessIndex] || {};
+    const businessNumber = currentBusiness.businessNumber;
+
+    const validation = validateTicker(ticker, businessNumber);
+
+    setTickerValidationStatus(prev => ({
+      ...prev,
+      [businessIndex]: validation
+    }));
+
+    if (!validation.valid) {
+      if (validation.error === 'TICKER_DUPLICATE_NO_BUSINESS_NUMBER') {
+        toast.error('중복된 ticker입니다. 사업자등록번호를 먼저 입력해주세요.', { duration: 4000 });
+      } else if (validation.error === 'TICKER_DUPLICATE_DIFFERENT_BUSINESS') {
+        toast.error(validation.message, { duration: 4000 });
+      }
+    } else if (validation.info === 'SAME_BUSINESS') {
+      toast.success(validation.message, { duration: 4000 });
     }
   };
 
@@ -106,18 +190,18 @@ function SellerRegister() {
     try {
       const values = await form.validateFields();
 
-      // ticker 중복 체크 (간단 구현 - 실제로는 4개 유형 전체 체크)
-      const existingTicker = sellerGroups.find(g =>
-        g.ticker === values.ticker && (!selectedGroup || g.id !== selectedGroup.id)
-      );
+      // 모든 사업자의 ticker 검증
+      if (values.businesses && values.businesses.length > 0) {
+        for (let i = 0; i < values.businesses.length; i++) {
+          const business = values.businesses[i];
+          const validation = validateTicker(business.ticker, business.businessNumber);
 
-      if (existingTicker) {
-        toast.error('이미 다른 사업자가 사용중인 ticker입니다. 변경 후 재입력 해주세요');
-        return;
+          if (!validation.valid) {
+            toast.error(`사업자 #${i + 1}: ${validation.message}`, { duration: 5000 });
+            return;
+          }
+        }
       }
-
-      // 사업자등록번호 중복 체크
-      // TODO: 실제 구현 필요
 
       if (registrationType === 'new') {
         toast.success(`셀러 그룹 '${values.groupName}'이 등록되었습니다.`);
@@ -491,6 +575,21 @@ function SellerRegister() {
 
                       <Form.Item
                         {...businessField}
+                        name={[businessField.name, 'businessNumber']}
+                        label="사업자등록번호"
+                        rules={[
+                          { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
+                        ]}
+                        extra="⭐ 사업자등록번호를 먼저 입력하시면 기존 사업자 여부를 자동으로 확인합니다."
+                      >
+                        <Input
+                          placeholder="123-45-67890"
+                          onChange={(e) => handleBusinessNumberChange(businessIndex, e)}
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...businessField}
                         name={[businessField.name, 'sellerName']}
                         label="셀러명"
                         rules={[
@@ -507,19 +606,26 @@ function SellerRegister() {
                         name={[businessField.name, 'ticker']}
                         label="Ticker"
                         rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
+                        validateStatus={
+                          tickerValidationStatus[businessIndex]
+                            ? tickerValidationStatus[businessIndex].valid
+                              ? 'success'
+                              : 'error'
+                            : undefined
+                        }
+                        help={tickerValidationStatus[businessIndex]?.message}
                       >
-                        <Input placeholder="예: SH" maxLength={10} />
-                      </Form.Item>
-
-                      <Form.Item
-                        {...businessField}
-                        name={[businessField.name, 'businessNumber']}
-                        label="사업자등록번호"
-                        rules={[
-                          { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
-                        ]}
-                      >
-                        <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
+                        <Input
+                          placeholder="예: SH"
+                          maxLength={10}
+                          disabled={tickerReadOnly[businessIndex]}
+                          onChange={(e) => handleTickerChange(businessIndex, e)}
+                          suffix={
+                            tickerReadOnly[businessIndex] ? (
+                              <span className="text-xs text-gray-500">🔒 자동</span>
+                            ) : null
+                          }
+                        />
                       </Form.Item>
 
                       <Form.Item
