@@ -182,7 +182,7 @@ function App() {
       label: '기타 데이터',
       children: [
         { key: '/territory', label: '사업권역' },
-        { key: '/standard-price?tab=1', label: '표준가격' },
+        { key: 'standard-price-label', label: '표준가격' },
         { key: '/standard-price?tab=1', label: '  ㄴ 조회/등록' },
         { key: '/standard-price?tab=2', label: '  ㄴ 추세 비교' },
       ],
@@ -190,6 +190,10 @@ function App() {
   ];
 
   const handleMenuClick = ({ key }) => {
+    // 라벨 전용 메뉴 항목은 무시
+    if (key === 'standard-price-label') {
+      return;
+    }
     navigate(key);
   };
 
