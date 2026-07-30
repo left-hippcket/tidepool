@@ -221,17 +221,16 @@ function BuyerManagement() {
                 const arrivalPrice = detail?.arrivalPricePolicy;
                 let arrivalPriceDisplay = '해당없음';
                 if (hasNunwoon) {
-                  if (arrivalPrice) {
-                    // "상차단가 + 800원" -> "+800원" 형태로 변환
-                    const match = arrivalPrice.match(/\+\s*(\d+)원/);
-                    arrivalPriceDisplay = match ? `+${match[1]}원` : arrivalPrice;
+                  if (arrivalPrice != null) {
+                    // 숫자를 "+800원" 형태로 변환
+                    arrivalPriceDisplay = `+${arrivalPrice}원`;
                   } else {
                     arrivalPriceDisplay = null; // X 표시
                   }
                 }
 
-                // 메인소싱처
-                const mainSuppliers = detail?.mainSuppliers?.split(',').map(s => s.trim()) || [];
+                // 메인소싱처 (배열로 저장되어 있음)
+                const mainSuppliers = detail?.mainSuppliers || [];
 
                 return (
                   <tr
