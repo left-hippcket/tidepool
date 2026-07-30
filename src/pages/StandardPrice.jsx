@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlusOutlined, EditOutlined, SaveOutlined, DownloadOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import StandardPriceComparison from './StandardPriceComparison';
@@ -11,7 +11,13 @@ import { FMButton } from '../components/ui/FMButton';
 
 function StandardPrice() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('1');
+  const location = useLocation();
+
+  // URL 쿼리 파라미터에서 tab 읽기
+  const searchParams = new URLSearchParams(location.search);
+  const tabFromUrl = searchParams.get('tab') || '1';
+
+  const [activeTab, setActiveTab] = useState(tabFromUrl);
   const [dataSource, setDataSource] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [editingDataSource, setEditingDataSource] = useState([]);
@@ -27,6 +33,13 @@ function StandardPrice() {
   const [downloading, setDownloading] = useState(false);
   const [pageSize, setPageSize] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // URL 파라미터 변경 감지
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tabFromUrl = searchParams.get('tab') || '1';
+    setActiveTab(tabFromUrl);
+  }, [location.search]);
 
   // 초기 데이터 로드
   useEffect(() => {

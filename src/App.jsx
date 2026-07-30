@@ -182,7 +182,14 @@ function App() {
       label: '기타 데이터',
       children: [
         { key: '/territory', label: '사업권역' },
-        { key: '/standard-price', label: '표준가격' },
+        {
+          key: 'standard-price-menu',
+          label: '표준가격',
+          children: [
+            { key: '/standard-price?tab=1', label: '조회/등록' },
+            { key: '/standard-price?tab=2', label: '추세 비교' },
+          ],
+        },
       ],
     },
   ];
@@ -192,6 +199,10 @@ function App() {
   };
 
   const getSelectedKeys = () => {
+    // 표준가격 페이지의 경우 쿼리 파라미터 포함
+    if (location.pathname === '/standard-price') {
+      return [location.pathname + location.search];
+    }
     return [location.pathname];
   };
 
@@ -200,7 +211,7 @@ function App() {
       return ['partners'];
     }
     if (location.pathname === '/territory' || location.pathname === '/standard-price') {
-      return ['data'];
+      return ['data', 'standard-price-menu'];
     }
     if (location.pathname === '/product' || location.pathname === '/product-list') {
       return ['product'];
