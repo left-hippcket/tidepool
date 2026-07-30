@@ -287,7 +287,10 @@ export const buyerGroups = [
       "최용환",
       "고영석"
     ],
-    "mainCategory": "누운고기,연어",
+    "mainCategory": [
+      "누운고기",
+      "연어"
+    ],
     "mainProducts": [
       "넙치",
       "강도다리",
@@ -297,7 +300,23 @@ export const buyerGroups = [
     "region": "하남/미사리",
     "status": "active",
     "hasCertificate": false,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "최용환",
+          "고영석"
+        ]
+      },
+      {
+        "category": "연어",
+        "managers": [
+          "최용환",
+          "고영석"
+        ]
+      }
+    ]
   },
   {
     "id": 2,
@@ -308,7 +327,10 @@ export const buyerGroups = [
       "고영석",
       "노원진"
     ],
-    "mainCategory": "누운고기,뜬고기",
+    "mainCategory": [
+      "누운고기",
+      "뜬고기"
+    ],
     "mainProducts": [
       "넙치",
       "강도다리",
@@ -319,7 +341,23 @@ export const buyerGroups = [
     "region": "인천",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "고영석",
+          "노원진"
+        ]
+      },
+      {
+        "category": "뜬고기",
+        "managers": [
+          "고영석",
+          "노원진"
+        ]
+      }
+    ]
   },
   {
     "id": 3,
@@ -329,7 +367,9 @@ export const buyerGroups = [
     "salesPersons": [
       "이시호"
     ],
-    "mainCategory": "누운고기",
+    "mainCategory": [
+      "누운고기"
+    ],
     "mainProducts": [
       "넙치",
       "강도다리"
@@ -338,7 +378,15 @@ export const buyerGroups = [
     "region": "대구",
     "status": "active",
     "hasCertificate": false,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "이시호"
+        ]
+      }
+    ]
   },
   {
     "id": 4,
@@ -348,7 +396,9 @@ export const buyerGroups = [
     "salesPersons": [
       "최용환"
     ],
-    "mainCategory": "누운고기",
+    "mainCategory": [
+      "누운고기"
+    ],
     "mainProducts": [
       "넙치"
     ],
@@ -356,7 +406,15 @@ export const buyerGroups = [
     "region": "하남/미사리",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "최용환"
+        ]
+      }
+    ]
   },
   {
     "id": 5,
@@ -367,7 +425,10 @@ export const buyerGroups = [
       "고영석",
       "노원진"
     ],
-    "mainCategory": "누운고기,뜬고기",
+    "mainCategory": [
+      "누운고기",
+      "뜬고기"
+    ],
     "mainProducts": [
       "넙치",
       "강도다리",
@@ -378,7 +439,23 @@ export const buyerGroups = [
     "region": "노량진",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "고영석",
+          "노원진"
+        ]
+      },
+      {
+        "category": "뜬고기",
+        "managers": [
+          "고영석",
+          "노원진"
+        ]
+      }
+    ]
   },
   {
     "id": 6,
@@ -389,7 +466,10 @@ export const buyerGroups = [
       "고영석",
       "노원진"
     ],
-    "mainCategory": "누운고기,뜬고기",
+    "mainCategory": [
+      "누운고기",
+      "뜬고기"
+    ],
     "mainProducts": [
       "넙치",
       "강도다리",
@@ -400,7 +480,23 @@ export const buyerGroups = [
     "region": "인천",
     "status": "active",
     "hasCertificate": false,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "고영석",
+          "노원진"
+        ]
+      },
+      {
+        "category": "뜬고기",
+        "managers": [
+          "고영석",
+          "노원진"
+        ]
+      }
+    ]
   },
   {
     "id": 7,
@@ -410,7 +506,9 @@ export const buyerGroups = [
     "salesPersons": [
       "고영석"
     ],
-    "mainCategory": "누운고기",
+    "mainCategory": [
+      "누운고기"
+    ],
     "mainProducts": [
       "넙치"
     ],
@@ -418,7 +516,15 @@ export const buyerGroups = [
     "region": "인천",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "고영석"
+        ]
+      }
+    ]
   },
   {
     "id": 8,
@@ -428,7 +534,9 @@ export const buyerGroups = [
     "salesPersons": [
       "노원진"
     ],
-    "mainCategory": "뜬고기",
+    "mainCategory": [
+      "뜬고기"
+    ],
     "mainProducts": [
       "도미",
       "농어",
@@ -438,7 +546,15 @@ export const buyerGroups = [
     "region": "인천",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "뜬고기",
+        "managers": [
+          "노원진"
+        ]
+      }
+    ]
   },
   {
     "id": 9,
@@ -448,7 +564,9 @@ export const buyerGroups = [
     "salesPersons": [
       "고영석"
     ],
-    "mainCategory": "누운고기",
+    "mainCategory": [
+      "누운고기"
+    ],
     "mainProducts": [
       "넙치"
     ],
@@ -456,7 +574,15 @@ export const buyerGroups = [
     "region": "인천",
     "status": "active",
     "hasCertificate": false,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "고영석"
+        ]
+      }
+    ]
   },
   {
     "id": 10,
@@ -467,7 +593,10 @@ export const buyerGroups = [
       "최용환",
       "노원진"
     ],
-    "mainCategory": "누운고기,뜬고기",
+    "mainCategory": [
+      "누운고기",
+      "뜬고기"
+    ],
     "mainProducts": [
       "넙치",
       "강도다리",
@@ -478,7 +607,23 @@ export const buyerGroups = [
     "region": "노량진",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "최용환",
+          "노원진"
+        ]
+      },
+      {
+        "category": "뜬고기",
+        "managers": [
+          "최용환",
+          "노원진"
+        ]
+      }
+    ]
   },
   {
     "id": 11,
@@ -488,7 +633,9 @@ export const buyerGroups = [
     "salesPersons": [
       "최용환"
     ],
-    "mainCategory": "누운고기",
+    "mainCategory": [
+      "누운고기"
+    ],
     "mainProducts": [
       "넙치"
     ],
@@ -496,7 +643,15 @@ export const buyerGroups = [
     "region": "충남",
     "status": "active",
     "hasCertificate": true,
-    "hasCompleteBusinessInfo": true
+    "hasCompleteBusinessInfo": true,
+    "categoryManagers": [
+      {
+        "category": "누운고기",
+        "managers": [
+          "최용환"
+        ]
+      }
+    ]
   }
 ];
 

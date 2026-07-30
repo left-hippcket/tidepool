@@ -77,6 +77,14 @@ function BuyerRegister() {
       filtered.some(p => p.name === productName)
     );
     form.setFieldsValue({ mainProducts: validProducts });
+
+    // categoryManagers 초기화
+    const currentCategoryManagers = form.getFieldValue('categoryManagers') || [];
+    const newCategoryManagers = (values || []).map(category => {
+      const existing = currentCategoryManagers.find(cm => cm?.category === category);
+      return existing || { category, managers: [] };
+    });
+    form.setFieldsValue({ categoryManagers: newCategoryManagers });
   };
 
   // 사업권역 변경 시 상세지역 필터링
@@ -204,6 +212,16 @@ function BuyerRegister() {
         toast.error(validation.message, { duration: 5000 });
         return;
       }
+
+      // categoryManagers에서 salesPerson 자동 설정 (첫 번째 카테고리의 첫 번째 담당자)
+      if (values.categoryManagers && values.categoryManagers.length > 0) {
+        const firstManager = values.categoryManagers[0]?.managers?.[0];
+        if (firstManager) {
+          values.salesPerson = firstManager;
+        }
+      }
+
+      console.log('저장할 데이터:', values);
 
       if (registrationType === 'new') {
         toast.success(`바이어 그룹 '${values.groupName}'이 등록되었습니다.`);
@@ -348,18 +366,6 @@ function BuyerRegister() {
             </Form.Item>
 
             <Form.Item
-              name="salesPerson"
-              label="담당영업사원"
-              rules={[{ required: true, message: '담당영업사원을 선택해주세요' }]}
-            >
-              <Select placeholder="담당자 선택">
-                {managers.map(m => (
-                  <Select.Option key={m} value={m}>{m}</Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
               name="mainCategory"
               label="주요품목분류"
               rules={[{ required: true, message: '주요품목분류를 선택해주세요' }]}
@@ -379,6 +385,40 @@ function BuyerRegister() {
                 isMulti={true}
               />
             </Form.Item>
+
+            {/* 품목분류별 담당영업사원 */}
+            {selectedCategory && selectedCategory.length > 0 && (
+              <div className="mb-4">
+                <div className="mb-2 text-sm font-medium text-gray-700">품목분류별 담당영업사원</div>
+                {selectedCategory.map((category, index) => (
+                  <Form.Item
+                    key={category}
+                    name={['categoryManagers', index, 'managers']}
+                    label={`${category}`}
+                    rules={[{ required: true, message: `${category} 담당자를 선택해주세요` }]}
+                  >
+                    <FMSelect
+                      value={form.getFieldValue(['categoryManagers', index, 'managers']) || []}
+                      onChange={(value) => {
+                        const categoryManagers = form.getFieldValue('categoryManagers') || [];
+                        categoryManagers[index] = {
+                          category,
+                          managers: value
+                        };
+                        form.setFieldsValue({ categoryManagers });
+                      }}
+                      options={managers.map(m => ({
+                        value: m,
+                        label: m
+                      }))}
+                      placeholder="담당자 선택 (복수 가능)"
+                      isSearchable={true}
+                      isMulti={true}
+                    />
+                  </Form.Item>
+                ))}
+              </div>
+            )}
 
             <Form.Item
               name="mainProducts"

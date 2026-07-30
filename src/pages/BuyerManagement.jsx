@@ -217,7 +217,10 @@ function BuyerManagement() {
                 const kakaoGroup = detail?.kakaoGroupName || null;
 
                 // 넙치도착단가
-                const hasNunwoon = record.mainCategory?.includes('누운고기');
+                const mainCategories = Array.isArray(record.mainCategory)
+                  ? record.mainCategory
+                  : (record.mainCategory ? record.mainCategory.split(',').map(c => c.trim()) : []);
+                const hasNunwoon = mainCategories.includes('누운고기');
                 const arrivalPrice = detail?.arrivalPricePolicy;
                 let arrivalPriceDisplay = '해당없음';
                 if (hasNunwoon) {
@@ -246,8 +249,18 @@ function BuyerManagement() {
                         {record.name}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{record.mainCategory}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{record.salesPerson}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {Array.isArray(record.mainCategory)
+                        ? record.mainCategory.join(', ')
+                        : record.mainCategory}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {record.categoryManagers?.length > 0
+                        ? record.categoryManagers.map(cm =>
+                            `${cm.category}:${cm.managers.join(',')}`
+                          ).join(' / ')
+                        : record.salesPerson}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       {hasCompleteBusinessInfo ? (
                         <Check className="h-5 w-5 text-gray-500 mx-auto" />
