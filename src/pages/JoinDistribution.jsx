@@ -12,6 +12,7 @@ function JoinDistribution() {
   const [selectedTerritory, setSelectedTerritory] = useState('전체');
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [selectedStatus, setSelectedStatus] = useState('활성');
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   // 이벤트 핸들러
   const handleViewDetail = (record) => {
@@ -31,7 +32,23 @@ function JoinDistribution() {
       (selectedStatus === '활성' && item.status === 'active') ||
       (selectedStatus === '비활성' && item.status === 'inactive');
 
-    return matchSalesPerson && matchTerritory && matchRegion && matchStatus;
+    // 검색 필터링
+    let matchSearch = true;
+    if (searchKeyword.trim()) {
+      const keyword = searchKeyword.toLowerCase();
+      const groupNameMatch = item.name.toLowerCase().includes(keyword);
+
+      // 해당 그룹의 사업자들에서 조인명과 ticker 검색
+      const detail = joinDetails?.[item.id];
+      const businessMatch = detail?.businesses?.some(business =>
+        business.joinName?.toLowerCase().includes(keyword) ||
+        business.ticker?.toLowerCase().includes(keyword)
+      ) || false;
+
+      matchSearch = groupNameMatch || businessMatch;
+    }
+
+    return matchSalesPerson && matchTerritory && matchRegion && matchStatus && matchSearch;
   });
 
   const sortedData = filteredData;
@@ -103,6 +120,17 @@ function JoinDistribution() {
             ]}
             className="w-28"
           />
+
+          <div className="flex flex-col gap-1 min-w-[240px]">
+            <label className="text-sm font-medium text-gray-600">검색</label>
+            <input
+              type="text"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              placeholder="조인유통그룹명, 조인명, ticker"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+            />
+          </div>
         </div>
       </div>
 
@@ -138,11 +166,17 @@ function JoinDistribution() {
                 // 카톡단톡방
                 const kakaoGroup = detail?.kakaoGroupName || null;
 
-                // 메인소싱처 (주요 양식장)
-                const mainFarms = detail?.mainFarms;
+                // 메인소싱처 (주요 양식장) - 쉼표로 구분된 문자열을 배열로 변환
+                const mainFarmsRaw = detail?.mainFarms;
+                const mainFarmsArray = mainFarmsRaw
+                  ? mainFarmsRaw.split(',').map(s => s.trim()).filter(Boolean)
+                  : [];
 
-                // 메인유통사 (주요 공급처)
-                const mainSuppliers = detail?.mainSuppliers;
+                // 메인유통사 (주요 공급처) - 쉼표로 구분된 문자열을 배열로 변환
+                const mainSuppliersRaw = detail?.mainSuppliers;
+                const mainSuppliersArray = mainSuppliersRaw
+                  ? mainSuppliersRaw.split(',').map(s => s.trim()).filter(Boolean)
+                  : [];
 
                 return (
                   <tr
@@ -185,15 +219,23 @@ function JoinDistribution() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {mainFarms ? (
-                        <span className="text-sm text-gray-900">{mainFarms}</span>
+                      {mainFarmsArray.length > 0 ? (
+                        <span className="text-sm text-gray-900">
+                          {mainFarmsArray.length === 1
+                            ? mainFarmsArray[0]
+                            : `${mainFarmsArray[0]} 외`}
+                        </span>
                       ) : (
                         <X className="h-5 w-5 text-red-500 mx-auto" />
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {mainSuppliers ? (
-                        <span className="text-sm text-gray-900">{mainSuppliers}</span>
+                      {mainSuppliersArray.length > 0 ? (
+                        <span className="text-sm text-gray-900">
+                          {mainSuppliersArray.length === 1
+                            ? mainSuppliersArray[0]
+                            : `${mainSuppliersArray[0]} 외`}
+                        </span>
                       ) : (
                         <X className="h-5 w-5 text-red-500 mx-auto" />
                       )}
