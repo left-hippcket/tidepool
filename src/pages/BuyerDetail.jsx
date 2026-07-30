@@ -41,6 +41,14 @@ function BuyerDetail() {
       filtered.some(p => p.name === productName)
     );
     form.setFieldsValue({ mainProducts: validProducts });
+
+    // categoryManagers 초기화
+    const currentCategoryManagers = form.getFieldValue('categoryManagers') || [];
+    const newCategoryManagers = (categories || []).map(category => {
+      const existing = currentCategoryManagers.find(cm => cm?.category === category);
+      return existing || { category, managers: [] };
+    });
+    form.setFieldsValue({ categoryManagers: newCategoryManagers });
   };
 
   // 사업자 추가
@@ -56,8 +64,8 @@ function BuyerDetail() {
 
     form.setFieldsValue({
       name: buyerGroup.name,
-      salesPerson: buyerGroup.salesPerson,
       mainCategory: mainCategoryArray,
+      categoryManagers: buyerGroup.categoryManagers || [],
       mainProducts: buyerGroup.mainProducts || [],
       territory: buyerGroup.territory,
       region: buyerGroup.region,
@@ -66,7 +74,7 @@ function BuyerDetail() {
       kakaoGroupName: detail.kakaoGroupName,
       paymentCycle: detail.paymentCycle,
       complaintIntensity: detail.complaintIntensity,
-      mainSuppliers: detail.mainSuppliers?.split(', ') || [],
+      mainSuppliers: detail.mainSuppliers || [],
       arrivalPricePolicy: detail.arrivalPricePolicy,
       priorityFactors: detail.priorityFactors || []
     });
@@ -234,17 +242,39 @@ function BuyerDetail() {
                 <Input />
               </Form.Item>
 
-              <Form.Item
-                name="salesPerson"
-                label="담당영업사원"
-                rules={[{ required: true, message: '담당영업사원을 선택해주세요' }]}
-              >
-                <Select>
-                  {managers.map(m => (
-                    <Select.Option key={m} value={m}>{m}</Select.Option>
+              {/* 품목분류별 담당영업사원 */}
+              {selectedCategory && selectedCategory.length > 0 && (
+                <div className="mb-4">
+                  <div className="mb-2 text-sm font-medium text-gray-700">품목분류별 담당영업사원</div>
+                  {selectedCategory.map((category, index) => (
+                    <Form.Item
+                      key={category}
+                      name={['categoryManagers', index, 'managers']}
+                      label={`${category}`}
+                      rules={[{ required: true, message: `${category} 담당자를 선택해주세요` }]}
+                    >
+                      <FMSelect
+                        value={form.getFieldValue(['categoryManagers', index, 'managers']) || []}
+                        onChange={(value) => {
+                          const categoryManagers = form.getFieldValue('categoryManagers') || [];
+                          categoryManagers[index] = {
+                            category,
+                            managers: value
+                          };
+                          form.setFieldsValue({ categoryManagers });
+                        }}
+                        options={managers.map(m => ({
+                          value: m,
+                          label: m
+                        }))}
+                        placeholder="담당자 선택 (복수 가능)"
+                        isSearchable={true}
+                        isMulti={true}
+                      />
+                    </Form.Item>
                   ))}
-                </Select>
-              </Form.Item>
+                </div>
+              )}
 
               <Form.Item
                 name="territory"
@@ -335,8 +365,28 @@ function BuyerDetail() {
                 <span className="w-4/5 text-gray-900">{buyerGroup.name}</span>
               </div>
               <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">담당영업사원:</span>
-                <span className="w-4/5 text-gray-900">{buyerGroup.salesPerson}</span>
+                <span className="w-1/5 font-medium text-gray-700">주요품목분류:</span>
+                <span className="w-4/5 text-gray-900">
+                  {Array.isArray(buyerGroup.mainCategory)
+                    ? buyerGroup.mainCategory.join(', ')
+                    : buyerGroup.mainCategory}
+                </span>
+              </div>
+              <div className="flex">
+                <span className="w-1/5 font-medium text-gray-700">품목분류별 담당자:</span>
+                <div className="w-4/5">
+                  {buyerGroup.categoryManagers?.length > 0 ? (
+                    <div className="space-y-1">
+                      {buyerGroup.categoryManagers.map((cm, index) => (
+                        <div key={index} className="text-gray-900">
+                          <span className="font-medium">{cm.category}:</span> {cm.managers.join(', ')}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-gray-900">{buyerGroup.salesPerson}</span>
+                  )}
+                </div>
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">사업권역:</span>
@@ -345,14 +395,6 @@ function BuyerDetail() {
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">상세지역:</span>
                 <span className="w-4/5 text-gray-900">{buyerGroup.region}</span>
-              </div>
-              <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">주요품목분류:</span>
-                <span className="w-4/5 text-gray-900">
-                  {Array.isArray(buyerGroup.mainCategory)
-                    ? buyerGroup.mainCategory.join(', ')
-                    : buyerGroup.mainCategory}
-                </span>
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">주요품목:</span>

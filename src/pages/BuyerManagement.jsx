@@ -256,9 +256,7 @@ function BuyerManagement() {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       {record.categoryManagers?.length > 0
-                        ? record.categoryManagers.map(cm =>
-                            `${cm.category}:${cm.managers.join(',')}`
-                          ).join(' / ')
+                        ? [...new Set(record.categoryManagers.flatMap(cm => cm.managers))].join(', ')
                         : record.salesPerson}
                     </td>
                     <td className="px-4 py-3 text-center">
