@@ -72,7 +72,9 @@ function SellerDetail() {
       lossProvision: detail.qualitativeRatings.lossProvision,
       farmArea: detail.additionalInfo.farmArea,
       annualProduction: detail.additionalInfo.annualProduction,
-      mainDistributors: detail.additionalInfo.mainDistributors?.split(', ') || []
+      mainDistributors: Array.isArray(detail.additionalInfo.mainDistributors)
+        ? detail.additionalInfo.mainDistributors
+        : (detail.additionalInfo.mainDistributors?.split(', ') || [])
     });
 
     setSelectedCategory(mainCategoryArray);
@@ -703,6 +705,15 @@ function SellerDetail() {
                               <Input placeholder="홍길동" defaultValue={account.holder} className="w-3/4" />
                             </div>
                             <div className="flex">
+                              <span className="w-1/4 font-medium text-gray-700">입금 적요:</span>
+                              <div className="w-3/4">
+                                <FMTagInput
+                                  value={account.depositDescription || []}
+                                  placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex">
                               <span className="w-1/4 font-medium text-gray-700">대표계좌:</span>
                               <div className="w-3/4">
                                 <label className="flex items-center gap-2">
@@ -787,12 +798,26 @@ function SellerDetail() {
                   {business.bankAccounts && business.bankAccounts.length > 0 && (
                     <div className="flex">
                       <span className="w-1/4 font-medium text-gray-700">은행계좌:</span>
-                      <div className="w-3/4 space-y-1">
+                      <div className="w-3/4 space-y-3">
                         {business.bankAccounts.map((account, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-gray-900">
-                            <span>{account.bank} {account.accountNumber} ({account.holder})</span>
-                            {account.isPrimary && (
-                              <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2 py-0.5 text-xs">대표계좌</span>
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-center gap-2 text-gray-900">
+                              <span>{account.bank} {account.accountNumber} ({account.holder})</span>
+                              {account.isPrimary && (
+                                <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2 py-0.5 text-xs">대표계좌</span>
+                              )}
+                            </div>
+                            {account.depositDescription && account.depositDescription.length > 0 && (
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <span className="font-medium">입금 적요:</span>
+                                <div className="flex flex-wrap gap-1">
+                                  {account.depositDescription.map((desc, descIdx) => (
+                                    <span key={descIdx} className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+                                      {desc}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
                             )}
                           </div>
                         ))}

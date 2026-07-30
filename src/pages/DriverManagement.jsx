@@ -91,49 +91,45 @@ function DriverManagement() {
 
       {/* 필터 영역 */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">차종:</label>
-            <FMSelectSimple
-              value={vehicleTypeFilter}
-              onChange={setVehicleTypeFilter}
-              options={[
-                { value: '전체', label: '전체' },
-                { value: '5.0톤', label: '5.0톤' },
-                { value: '1.0톤', label: '1.0톤' }
-              ]}
-              className="w-32"
-            />
-          </div>
+        <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
 
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">과세유형:</label>
-            <FMSelectSimple
-              value={taxTypeFilter}
-              onChange={setTaxTypeFilter}
-              options={[
-                { value: '전체', label: '전체' },
-                { value: '과세', label: '과세' },
-                { value: '면세', label: '면세' },
-                { value: '미등록', label: '미등록' }
-              ]}
-              className="w-32"
-            />
-          </div>
+        <div className="flex flex-wrap gap-3 items-start xl:flex-nowrap">
+          <FMSelectSimple
+            label="차종"
+            value={vehicleTypeFilter}
+            onChange={setVehicleTypeFilter}
+            options={[
+              { value: '전체', label: '전체' },
+              { value: '5.0톤', label: '5.0톤' },
+              { value: '1.0톤', label: '1.0톤' }
+            ]}
+            className="w-32"
+          />
 
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">상태:</label>
-            <FMSelectSimple
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={[
-                { value: '활성', label: '활성' },
-                { value: '비활성', label: '비활성' },
-                { value: '전체', label: '전체' }
-              ]}
-              className="w-28"
-            />
-          </div>
+          <FMSelectSimple
+            label="과세유형"
+            value={taxTypeFilter}
+            onChange={setTaxTypeFilter}
+            options={[
+              { value: '전체', label: '전체' },
+              { value: '과세', label: '과세' },
+              { value: '면세', label: '면세' },
+              { value: '미등록', label: '미등록' }
+            ]}
+            className="w-32"
+          />
+
+          <FMSelectSimple
+            label="상태"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { value: '활성', label: '활성' },
+              { value: '비활성', label: '비활성' },
+              { value: '전체', label: '전체' }
+            ]}
+            className="w-28"
+          />
         </div>
       </div>
 

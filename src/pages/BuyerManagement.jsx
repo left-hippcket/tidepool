@@ -53,79 +53,71 @@ function BuyerManagement() {
 
       {/* 필터 영역 */}
       <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">담당영업사원:</label>
-              <FMSelectSimple
-                value={selectedSalesPerson}
-                onChange={setSelectedSalesPerson}
-                options={[
-                  { value: '전체', label: '전체' },
-                  ...managers.map(m => ({ value: m, label: m }))
-                ]}
-                className="w-32"
-              />
-            </div>
+        <h3 className="mb-4 text-base font-semibold text-gray-900">🔍 조회 필터</h3>
 
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">주요품목분류:</label>
-              <FMSelectSimple
-                value={selectedCategory}
-                onChange={setSelectedCategory}
-                options={[
-                  { value: '전체', label: '전체' },
-                  { value: '누운고기', label: '누운고기' },
-                  { value: '뜬고기', label: '뜬고기' },
-                  { value: '갑각류', label: '갑각류' }
-                ]}
-                className="w-32"
-              />
-            </div>
+        <div className="flex flex-wrap gap-3 items-start xl:flex-nowrap">
+            <FMSelectSimple
+              label="담당영업사원"
+              value={selectedSalesPerson}
+              onChange={setSelectedSalesPerson}
+              options={[
+                { value: '전체', label: '전체' },
+                ...managers.map(m => ({ value: m, label: m }))
+              ]}
+              className="w-32"
+            />
 
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">사업권역:</label>
-              <FMSelectSimple
-                value={selectedTerritory}
-                onChange={setSelectedTerritory}
-                options={[
-                  { value: '전체', label: '전체' },
-                  ...territories
-                    .sort((a, b) => a.displayOrder - b.displayOrder)
-                    .map(t => ({ value: t.name, label: t.name }))
-                ]}
-                className="w-32"
-              />
-            </div>
+            <FMSelectSimple
+              label="주요품목분류"
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              options={[
+                { value: '전체', label: '전체' },
+                { value: '누운고기', label: '누운고기' },
+                { value: '뜬고기', label: '뜬고기' },
+                { value: '갑각류', label: '갑각류' }
+              ]}
+              className="w-32"
+            />
 
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">상세지역:</label>
-              <FMSelectSimple
-                value={selectedRegion}
-                onChange={setSelectedRegion}
-                options={[
-                  { value: '전체', label: '전체' },
-                  { value: '노량진', label: '노량진' },
-                  { value: '하남/미사리', label: '하남/미사리' },
-                  { value: '경기남부', label: '경기남부' },
-                  { value: '부산', label: '부산' }
-                ]}
-                className="w-32"
-              />
-            </div>
+            <FMSelectSimple
+              label="사업권역"
+              value={selectedTerritory}
+              onChange={setSelectedTerritory}
+              options={[
+                { value: '전체', label: '전체' },
+                ...territories
+                  .sort((a, b) => a.displayOrder - b.displayOrder)
+                  .map(t => ({ value: t.name, label: t.name }))
+              ]}
+              className="w-32"
+            />
 
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">상태:</label>
-              <FMSelectSimple
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-                options={[
-                  { value: '전체', label: '전체' },
-                  { value: '활성', label: '활성' },
-                  { value: '비활성', label: '비활성' }
-                ]}
-                className="w-28"
-              />
-            </div>
+            <FMSelectSimple
+              label="상세지역"
+              value={selectedRegion}
+              onChange={setSelectedRegion}
+              options={[
+                { value: '전체', label: '전체' },
+                { value: '노량진', label: '노량진' },
+                { value: '하남/미사리', label: '하남/미사리' },
+                { value: '경기남부', label: '경기남부' },
+                { value: '부산', label: '부산' }
+              ]}
+              className="w-32"
+            />
+
+            <FMSelectSimple
+              label="상태"
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              options={[
+                { value: '전체', label: '전체' },
+                { value: '활성', label: '활성' },
+                { value: '비활성', label: '비활성' }
+              ]}
+              className="w-28"
+            />
         </div>
       </div>
 

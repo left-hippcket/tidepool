@@ -12,6 +12,7 @@ import { sellerGroups, managers, territories, regions, productCategories, produc
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
+import { FMTagInput } from '../components/ui/FMTagInput';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -264,11 +265,17 @@ function SellerRegister() {
               label="소싱담당자"
               rules={[{ required: true, message: '소싱담당자를 선택해주세요' }]}
             >
-              <Select placeholder="담당자 선택">
-                {managers.map(m => (
-                  <Select.Option key={m} value={m}>{m}</Select.Option>
-                ))}
-              </Select>
+              <FMSelect
+                value={form.getFieldValue('manager') || []}
+                onChange={(value) => form.setFieldsValue({ manager: value })}
+                options={managers.map(m => ({
+                  value: m,
+                  label: m
+                }))}
+                placeholder="담당자 선택 (복수 선택 가능)"
+                isSearchable={true}
+                isMulti={true}
+              />
             </Form.Item>
 
             <Form.Item
@@ -430,8 +437,13 @@ function SellerRegister() {
               <InputNumber style={{ width: '100%' }} min={0} placeholder="120" />
             </Form.Item>
 
-            <Form.Item name="mainDistributors" label="메인 유통사">
-              <Input placeholder="노량진수산, 가락시장 (쉼표로 구분)" />
+            <Form.Item
+              name="mainDistributors"
+              label="메인 유통사"
+              getValueFromEvent={(value) => value}
+              getValueProps={(value) => ({ value: value || [] })}
+            >
+              <FMTagInput placeholder="유통사명 입력 후 엔터" />
             </Form.Item>
 
             <Form.Item
@@ -456,77 +468,104 @@ function SellerRegister() {
         {/* 사업자 정보 (공통) */}
         {(registrationType === 'new' || selectedGroup) && (
           <div className="rounded-xl border border-gray-200 bg-white p-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">사업자 정보</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">사업자 정보</h3>
+            </div>
 
-            <Form.Item
-              name="sellerName"
-              label="셀러명"
-              rules={[
-                { required: true, message: '셀러명을 입력해주세요' },
-                { max: 20, message: '최대 20자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
-              ]}
-            >
-              <Input placeholder="성호1호" />
-            </Form.Item>
+            <Form.List name="businesses" initialValue={[{}]}>
+              {(businessFields, { add: addBusiness, remove: removeBusiness }) => (
+                <>
+                  {businessFields.map((businessField, businessIndex) => (
+                    <div key={businessField.key} className="mb-8">
+                      <div className="flex items-center gap-2 mb-4">
+                        <h4 className="text-base font-semibold text-gray-900">사업자 #{businessIndex + 1}</h4>
+                        {businessFields.length > 1 && (
+                          <Button
+                            type="text"
+                            icon={<MinusCircleOutlined />}
+                            onClick={() => removeBusiness(businessField.name)}
+                            danger
+                            size="small"
+                          />
+                        )}
+                      </div>
 
-            <Form.Item
-              name="ticker"
-              label="Ticker"
-              rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
-            >
-              <Input placeholder="예: SH" maxLength={10} />
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'sellerName']}
+                        label="셀러명"
+                        rules={[
+                          { required: true, message: '셀러명을 입력해주세요' },
+                          { max: 20, message: '최대 20자까지 입력 가능합니다' },
+                          { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
+                        ]}
+                      >
+                        <Input placeholder="성호1호" />
+                      </Form.Item>
 
-            <Form.Item
-              name="businessNumber"
-              label="사업자등록번호"
-              rules={[
-                { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
-              ]}
-            >
-              <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'ticker']}
+                        label="Ticker"
+                        rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
+                      >
+                        <Input placeholder="예: SH" maxLength={10} />
+                      </Form.Item>
 
-            <Form.Item
-              name="businessName"
-              label="사업자등록상호"
-              rules={[
-                { max: 50, message: '최대 50자까지 입력 가능합니다' }
-              ]}
-            >
-              <Input placeholder="영어조합법인 성호수산" />
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'businessNumber']}
+                        label="사업자등록번호"
+                        rules={[
+                          { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
+                        ]}
+                      >
+                        <Input placeholder="123-45-67890" onChange={handleBusinessNumberChange} />
+                      </Form.Item>
 
-            <Form.Item
-              name="representative"
-              label="대표자"
-              rules={[
-                { max: 10, message: '최대 10자까지 입력 가능합니다' }
-              ]}
-            >
-              <Input placeholder="박성호" />
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'businessName']}
+                        label="사업자등록상호"
+                        rules={[
+                          { max: 50, message: '최대 50자까지 입력 가능합니다' }
+                        ]}
+                      >
+                        <Input placeholder="영어조합법인 성호수산" />
+                      </Form.Item>
 
-            <Form.Item
-              name="businessAddress"
-              label="사업자등록주소"
-              rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
-            >
-              <Input placeholder="경기도 수지구 동천동 230-3" />
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'representative']}
+                        label="대표자"
+                        rules={[
+                          { max: 10, message: '최대 10자까지 입력 가능합니다' }
+                        ]}
+                      >
+                        <Input placeholder="박성호" />
+                      </Form.Item>
 
-            <Form.Item
-              name="loadingAddress"
-              label="상차지 주소"
-              rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
-            >
-              <Input placeholder="전라남도 완도군 신지면 2-3" />
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'businessAddress']}
+                        label="사업자등록주소"
+                        rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
+                      >
+                        <Input placeholder="경기도 수지구 동천동 230-3" />
+                      </Form.Item>
 
-            <div className="my-4 border-t border-gray-200"></div>
-            <h4 className="text-base font-semibold text-gray-900 mb-4">은행계좌정보</h4>
-            <Form.List name="bankAccounts" initialValue={[{}]}>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'loadingAddress']}
+                        label="상차지 주소"
+                        rules={[{ max: 100, message: '최대 100자까지 입력 가능합니다' }]}
+                      >
+                        <Input placeholder="전라남도 완도군 신지면 2-3" />
+                      </Form.Item>
+
+                      <div className="my-4 border-t border-gray-200"></div>
+                      <h5 className="text-sm font-semibold text-gray-900 mb-4">은행계좌정보</h5>
+                      <Form.List name={[businessField.name, 'bankAccounts']} initialValue={[{}]}>
               {(fields, { add, remove }) => (
                 <>
                   {fields.map((field, index) => (
@@ -554,7 +593,6 @@ function SellerRegister() {
                         {...field}
                         name={[field.name, 'bank']}
                         label="은행명"
-                        rules={[{ required: true, message: '은행명 입력' }]}
                         className="mb-4"
                       >
                         <Input placeholder="하나은행" />
@@ -564,7 +602,6 @@ function SellerRegister() {
                         {...field}
                         name={[field.name, 'accountNumber']}
                         label="계좌번호"
-                        rules={[{ required: true, message: '계좌번호 입력' }]}
                         className="mb-4"
                       >
                         <Input placeholder="39484448392049" />
@@ -574,10 +611,20 @@ function SellerRegister() {
                         {...field}
                         name={[field.name, 'holder']}
                         label="예금주"
-                        rules={[{ required: true, message: '예금주 입력' }]}
-                        className="mb-0"
+                        className="mb-4"
                       >
                         <Input placeholder="박성호" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'depositDescription']}
+                        label="입금 적요"
+                        className="mb-0"
+                        getValueFromEvent={(value) => value}
+                        getValueProps={(value) => ({ value: value || [] })}
+                      >
+                        <FMTagInput placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터" />
                       </Form.Item>
 
                       {index < fields.length - 1 && <div className="my-6 border-t border-gray-200"></div>}
@@ -596,27 +643,47 @@ function SellerRegister() {
               )}
             </Form.List>
 
-            <div className="my-4 border-t border-gray-200"></div>
+                      <div className="my-4 border-t border-gray-200"></div>
 
-            <Form.Item
-              name="certificate"
-              label="사업자등록증"
-              valuePropName="fileList"
-              getValueFromEvent={(e) => e?.fileList}
-            >
-              <Upload
-                beforeUpload={() => false}
-                maxCount={1}
-                accept="image/*,.pdf"
-              >
-                <FMButton
-                  variant="green"
-                  icon={<UploadIcon className="h-4 w-4" />}
-                >
-                  사업자등록증 첨부하기
-                </FMButton>
-              </Upload>
-            </Form.Item>
+                      <Form.Item
+                        {...businessField}
+                        name={[businessField.name, 'certificate']}
+                        label="사업자등록증"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => e?.fileList}
+                      >
+                        <Upload
+                          beforeUpload={() => false}
+                          maxCount={1}
+                          accept="image/*,.pdf"
+                        >
+                          <FMButton
+                            variant="green"
+                            icon={<UploadIcon className="h-4 w-4" />}
+                          >
+                            사업자등록증 첨부하기
+                          </FMButton>
+                        </Upload>
+                      </Form.Item>
+
+                      {businessIndex < businessFields.length - 1 && (
+                        <div className="my-8 border-t-2 border-gray-300"></div>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="flex justify-end mt-6">
+                    <FMButton
+                      variant="green"
+                      icon={<Plus className="h-4 w-4" />}
+                      onClick={() => addBusiness()}
+                    >
+                      사업자 추가하기
+                    </FMButton>
+                  </div>
+                </>
+              )}
+            </Form.List>
           </div>
         )}
 

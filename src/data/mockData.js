@@ -50,161 +50,231 @@ export const regions = [
 ];
 export const sellerGroups = [
   {
-    id: 1,
-    name: '해금 그룹',
-    businessCount: 3,
-    manager: '최용환',
-    mainCategory: '누운고기',
-    territory: '호남권',
-    region: '완도/진도',
-    commissionRate: 1.0,
-    totalPurchase: 2850000000,
-    purchase3M: 650000000,
-    purchase1M: 220000000,
-    lastTradeDate: '2024-07-12',
-    status: 'active',
-    hasCertificate: true
+    "id": 1,
+    "name": "거제광어 그룹",
+    "businessCount": 2,
+    "manager": "이시호",
+    "managers": [
+      "이시호"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "경상권",
+    "region": "거제",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [
+      "피시파더",
+      "완도",
+      "노량진"
+    ],
+    "qualityEvaluationDate": "2026-06-23"
   },
   {
-    id: 2,
-    name: '갑운 그룹',
-    businessCount: 2,
-    manager: '최용환',
-    mainCategory: '누운고기',
-    territory: '호남권',
-    region: '완도/진도',
-    commissionRate: 1.0,
-    totalPurchase: 1920000000,
-    purchase3M: 480000000,
-    purchase1M: 160000000,
-    lastTradeDate: '2024-07-13',
-    status: 'active',
-    hasCertificate: true
+    "id": 2,
+    "name": "해오름 그룹",
+    "businessCount": 3,
+    "manager": "최용환",
+    "managers": [
+      "최용환"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "호남권",
+    "region": "완도/진도",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [
+      "준",
+      "ING",
+      "피시파더"
+    ],
+    "qualityEvaluationDate": "2026-05-12"
   },
   {
-    id: 3,
-    name: '성호수산',
-    businessCount: 1,
-    manager: '최용환',
-    mainCategory: '누운고기',
-    territory: '수도권',
-    region: '인천',
-    commissionRate: 1.2,
-    totalPurchase: 1650000000,
-    purchase3M: 420000000,
-    purchase1M: 140000000,
-    lastTradeDate: '2024-07-11',
-    status: 'active',
-    hasCertificate: true
+    "id": 3,
+    "name": "해금 그룹",
+    "businessCount": 4,
+    "manager": "최용환",
+    "managers": [
+      "최용환",
+      "박현재"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "호남권",
+    "region": "완도/진도",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [
+      "피시파더",
+      "섬유통"
+    ],
+    "qualityEvaluationDate": "2026-07-07"
   },
   {
-    id: 4,
-    name: '통영수산 그룹',
-    businessCount: 2,
-    manager: '이시호',
-    mainCategory: '뜬고기',
-    territory: '경상권',
-    region: '통영',
-    commissionRate: 0.8,
-    totalPurchase: 1480000000,
-    purchase3M: 380000000,
-    purchase1M: 125000000,
-    lastTradeDate: '2024-07-10',
-    status: 'active',
-    hasCertificate: true
+    "id": 4,
+    "name": "광수수산",
+    "businessCount": 1,
+    "manager": "최용환",
+    "managers": [
+      "최용환",
+      "박현재"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "호남권",
+    "region": "완도/진도",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [
+      "피시파더",
+      "믿음유통",
+      "삼도유통"
+    ],
+    "qualityEvaluationDate": "2026-04-19"
   },
   {
-    id: 5,
-    name: '거제양식',
-    businessCount: 1,
-    manager: '이시호',
-    mainCategory: '뜬고기',
-    territory: '경상권',
-    region: '거제',
-    commissionRate: 1.5,
-    totalPurchase: 1320000000,
-    purchase3M: 340000000,
-    purchase1M: 115000000,
-    lastTradeDate: '2024-07-14',
-    status: 'active',
-    hasCertificate: false
+    "id": 5,
+    "name": "세부수산",
+    "businessCount": 1,
+    "manager": "이시호",
+    "managers": [
+      "이시호"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치",
+      "강도다리"
+    ],
+    "territory": "경상권",
+    "region": "포항",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [
+      "피시파더"
+    ],
+    "qualityEvaluationDate": "2026-03-29"
   },
   {
-    id: 6,
-    name: '남해수산',
-    businessCount: 2,
-    manager: '노원진',
-    mainCategory: '누운고기',
-    territory: '경상권',
-    region: '남해/고성',
-    totalPurchase: 1180000000,
-    purchase3M: 310000000,
-    purchase1M: 105000000,
-    lastTradeDate: '2024-07-09',
-    status: 'active',
-    hasCertificate: true
+    "id": 6,
+    "name": "태평양수산",
+    "businessCount": 1,
+    "manager": "이시호",
+    "managers": [
+      "이시호"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "경상권",
+    "region": "거제",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [],
+    "qualityEvaluationDate": null
   },
   {
-    id: 7,
-    name: '제주활어',
-    businessCount: 1,
-    manager: '박현재',
-    mainCategory: '뜬고기',
-    territory: '제주권',
-    region: '제주',
-    totalPurchase: 980000000,
-    purchase3M: 260000000,
-    purchase1M: 88000000,
-    lastTradeDate: '2024-07-08',
-    status: 'active',
-    hasCertificate: true
+    "id": 7,
+    "name": "부광무역",
+    "businessCount": 1,
+    "manager": "노원진",
+    "managers": [
+      "노원진"
+    ],
+    "mainCategory": "뜬고기",
+    "mainProducts": [
+      "방어",
+      "점성어",
+      "도미"
+    ],
+    "territory": "경상권",
+    "region": "통영",
+    "commissionRate": 0.0,
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [],
+    "qualityEvaluationDate": "2026-05-01"
   },
   {
-    id: 8,
-    name: '고흥양식장',
-    businessCount: 1,
-    manager: '최용환',
-    mainCategory: '누운고기',
-    territory: '호남권',
-    region: '고흥',
-    totalPurchase: 850000000,
-    purchase3M: 230000000,
-    purchase1M: 78000000,
-    lastTradeDate: '2024-07-13',
-    status: 'active',
-    hasCertificate: true
+    "id": 8,
+    "name": "(완도)부성수산",
+    "businessCount": 1,
+    "manager": "박현재",
+    "managers": [
+      "박현재"
+    ],
+    "mainCategory": "누운고기",
+    "mainProducts": [
+      "넙치"
+    ],
+    "territory": "호남권",
+    "region": "완도/진도",
+    "commissionRate": 1.0,
+    "status": "active",
+    "hasCertificate": true,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [],
+    "qualityEvaluationDate": null
   },
   {
-    id: 9,
-    name: '포항수산',
-    businessCount: 2,
-    manager: '이시호',
-    mainCategory: '갑각류',
-    territory: '경상권',
-    region: '포항',
-    totalPurchase: 720000000,
-    purchase3M: 195000000,
-    purchase1M: 68000000,
-    lastTradeDate: '2024-07-12',
-    status: 'active',
-    hasCertificate: false
-  },
-  {
-    id: 10,
-    name: '인천수산',
-    businessCount: 1,
-    manager: '고영석',
-    mainCategory: '뜬고기',
-    territory: '수도권',
-    region: '인천',
-    totalPurchase: 650000000,
-    purchase3M: 170000000,
-    purchase1M: 58000000,
-    lastTradeDate: '2024-07-11',
-    status: 'active',
-    hasCertificate: true
+    "id": 9,
+    "name": "삼천그룹",
+    "businessCount": 3,
+    "manager": "노원진",
+    "managers": [
+      "노원진"
+    ],
+    "mainCategory": "뜬고기",
+    "mainProducts": [
+      "방어",
+      "점성어",
+      "도미"
+    ],
+    "territory": "경상권",
+    "region": "통영",
+    "commissionRate": 0.0,
+    "status": "active",
+    "hasCertificate": false,
+    "hasCompleteBusinessInfo": true,
+    "hasBankAccount": true,
+    "mainDistributors": [],
+    "qualityEvaluationDate": null
   }
 ];
+
+
+
 
 // 바이어 그룹 데이터
 export const buyerGroups = [
@@ -365,218 +435,627 @@ export const managers = ['최용환', '이시호', '노원진', '고영석', '�
 
 // 셀러 상세 정보 (소속 사업자 및 키맨 정보)
 export const sellerDetails = {
-  1: { // 해금 그룹
-    keymen: [
-      { name: '김이수', role: '대표', phone: '010-1234-5678' },
-      { name: '김철호', role: '사무장', phone: '010-2345-6789' }
+  "1": {
+    "keymen": [
+      {
+        "name": "유춘안",
+        "phone": "010-3849-1171",
+        "role": "대표"
+      }
     ],
-    qualitativeRatings: {
-      financial: '좋음',
-      quality: '최상',
-      priceCompetitive: '높음',
-      claimCooperation: '좋음',
-      lossProvision: '넉넉함'
+    "qualitativeRatings": {
+      "financial": "좋음",
+      "quality": "좋음",
+      "priceCompetitive": "보통",
+      "claimCooperation": "보통",
+      "lossProvision": "넉넉함"
     },
-    additionalInfo: {
-      farmArea: '15000',
-      annualProduction: '120',
-      mainDistributors: '노량진수산, 가락시장'
+    "additionalInfo": {
+      "farmArea": 3000,
+      "annualProduction": 300,
+      "mainDistributors": [
+        "피시파더",
+        "완도",
+        "노량진"
+      ]
     },
-    businesses: [
+    "businesses": [
       {
-        id: 101,
-        businessNumber: '123-45-67890',
-        businessName: '해금수산',
-        representative: '김이수',
-        businessAddress: '전라남도 완도군 완도읍 해변로 123',
-        sellerName: '해금1호',
-        sellerId: 'HG01',
-        loadingAddress: '전라남도 완도군 완도읍 양식장로 45',
-        commissionRate: 1.0,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-1234-5678-90', holder: '김이수', isPrimary: true },
-          { bank: '신한', accountNumber: '110-987-654321', holder: '김이수', isPrimary: false }
+        "sellerId": "SGJ",
+        "sellerName": "거제광어",
+        "businessNumber": "368-88-02367",
+        "businessName": "어업회사법인 거제광어 주식회사",
+        "representative": "유춘안",
+        "businessAddress": "경상남도 거제시 동부면 함박금길 395-1",
+        "loadingAddress": "경상남도 거제시 동부면 함박금길 395-1",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "1010-2313-2737",
+            "holder": "거제광어(주)",
+            "isPrimary": true
+          }
         ],
-        status: 'active',
-        hasCertificate: true
+        "certificate": {
+          "uploaded": false,
+          "filename": null
+        },
+        "status": "inactive"
       },
       {
-        id: 102,
-        businessNumber: '234-56-78901',
-        businessName: '해금수산 제2사업소',
-        representative: '김철호',
-        businessAddress: '전라남도 완도군 완도읍 해변로 125',
-        sellerName: '해금2호',
-        sellerId: 'HG02',
-        loadingAddress: '전라남도 완도군 완도읍 양식장로 47',
-        commissionRate: 1.0,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-2345-6789-01', holder: '김철호', isPrimary: true }
+        "sellerId": "NHB",
+        "sellerName": "뉴함박수산",
+        "businessNumber": "663-92-00198",
+        "businessName": "뉴함박수산",
+        "representative": "유춘안",
+        "businessAddress": "경상남도 거제시 동부면 함박금길 397",
+        "loadingAddress": "경상남도 거제시 동부면 함박금길 397",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "1010-2237-9291",
+            "holder": "유춘안",
+            "isPrimary": true
+          },
+          {
+            "bank": "수협",
+            "accountNumber": "2020-4428-4616",
+            "holder": "유춘안",
+            "isPrimary": false
+          }
         ],
-        status: 'active',
-        hasCertificate: true
-      },
-      {
-        id: 103,
-        businessNumber: '345-67-89012',
-        businessName: '해금양식장',
-        representative: '김이수',
-        businessAddress: '전라남도 완도군 신지면 해안로 89',
-        sellerName: '해금3호',
-        sellerId: 'HG03',
-        loadingAddress: '전라남도 완도군 신지면 양식장로 12',
-        commissionRate: 1.2,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-3456-7890-12', holder: '김이수', isPrimary: true }
-        ],
-        status: 'active',
-        hasCertificate: true
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
       }
     ]
   },
-  2: { // 갑운 그룹
-    keymen: [
-      { name: '박갑운', role: '대표', phone: '010-3456-7890' },
-      { name: '박민수', role: '광어담당', phone: '010-3456-7891' }
-    ],
-    qualitativeRatings: {
-      financial: '보통',
-      quality: '좋음',
-      priceCompetitive: '보통',
-      claimCooperation: '보통',
-      lossProvision: '적당함'
-    },
-    additionalInfo: {
-      farmArea: '12000',
-      annualProduction: '95',
-      mainDistributors: '노량진수산'
-    },
-    businesses: [
+  "2": {
+    "keymen": [
       {
-        id: 201,
-        businessNumber: '456-78-90123',
-        businessName: '갑운수산',
-        representative: '박갑운',
-        businessAddress: '전라남도 완도군 고금면 해안로 234',
-        sellerName: '갑운1호',
-        sellerId: 'GW01',
-        loadingAddress: '전라남도 완도군 고금면 양식장로 56',
-        commissionRate: 1.0,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-4567-8901-23', holder: '박갑운', isPrimary: true }
+        "name": "배수영",
+        "phone": "010-8799-7744",
+        "role": "대표"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "보통",
+      "quality": "보통",
+      "priceCompetitive": "좋음",
+      "claimCooperation": "보통",
+      "lossProvision": "보통"
+    },
+    "additionalInfo": {
+      "farmArea": 3000,
+      "annualProduction": 300,
+      "mainDistributors": [
+        "준",
+        "ING",
+        "피시파더"
+      ]
+    },
+    "businesses": [
+      {
+        "sellerId": "HOR",
+        "sellerName": "해오름수산",
+        "businessNumber": "413-98-85560",
+        "businessName": "해오름수산2",
+        "representative": "배수영",
+        "businessAddress": "전남 완도군 고금면 봉명111번길 16-127, 외 7필지",
+        "loadingAddress": "전라남도 완도군 봉명111번길 16-115",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "1010-2154-2320",
+            "holder": "배수영",
+            "isPrimary": true
+          }
         ],
-        status: 'active',
-        hasCertificate: true
+        "certificate": {
+          "uploaded": false,
+          "filename": null
+        },
+        "status": "inactive"
       },
       {
-        id: 202,
-        businessNumber: '567-89-01234',
-        businessName: '갑운양식',
-        representative: '박갑운',
-        businessAddress: '전라남도 완도군 고금면 해안로 236',
-        sellerName: '갑운2호',
-        sellerId: 'GW02',
-        loadingAddress: '전라남도 완도군 고금면 양식장로 58',
-        commissionRate: 1.0,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-5678-9012-34', holder: '박갑운', isPrimary: true }
+        "sellerId": "SSB",
+        "sellerName": "서비수산",
+        "businessNumber": "717-90-01428",
+        "businessName": "서비수산",
+        "representative": "김희섭",
+        "businessAddress": "전라남도 완도군 완도읍 대야일구길43",
+        "loadingAddress": "전라남도 완도군 완도읍 대야일구길43",
+        "bankAccounts": [
+          {
+            "bank": "농협",
+            "accountNumber": "312-0208-6683-61",
+            "holder": "김희섭",
+            "isPrimary": true
+          }
         ],
-        status: 'active',
-        hasCertificate: true
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      },
+      {
+        "sellerId": "SHL",
+        "sellerName": "현이수산",
+        "businessNumber": "101-93-02507",
+        "businessName": "현이수산",
+        "representative": "김희섭",
+        "businessAddress": "전라남도 완도군 완도읍 청해진로 1277-168",
+        "loadingAddress": "전라남도 완도군 완도읍 청해진로 1277-168",
+        "bankAccounts": [
+          {
+            "bank": "농협",
+            "accountNumber": "312-0208-6683-61",
+            "holder": "김희섭",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
       }
     ]
   },
-  3: { // 성호수산 (사업자 1개)
-    keymen: [
-      { name: '강성호', role: '대표', phone: '010-6666-7777' },
-      { name: '이경리', role: '경리', phone: '010-6666-7778' }
-    ],
-    qualitativeRatings: {
-      financial: '좋음',
-      quality: '좋음',
-      priceCompetitive: '높음',
-      claimCooperation: '좋음',
-      lossProvision: '적당함'
-    },
-    additionalInfo: {
-      farmArea: '8000',
-      annualProduction: '65',
-      mainDistributors: '노량진수산, 가락시장'
-    },
-    businesses: [
+  "3": {
+    "keymen": [
       {
-        id: 301,
-        businessNumber: '789-01-23457',
-        businessName: '성호수산',
-        representative: '강성호',
-        businessAddress: '전라남도 완도군 완도읍 항구로 567',
-        sellerName: '성호1호',
-        sellerId: 'SH01',
-        loadingAddress: '전라남도 완도군 완도읍 양식장로 99',
-        commissionRate: 1.0,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-6789-0123-45', holder: '강성호', isPrimary: true }
+        "name": "김이수",
+        "phone": "010-3815-9501",
+        "role": "대표"
+      },
+      {
+        "name": "김삼수",
+        "phone": "010-3815-9502",
+        "role": "전무"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "보통",
+      "quality": "보통",
+      "priceCompetitive": "나쁨",
+      "claimCooperation": "비협조",
+      "lossProvision": "부족함"
+    },
+    "additionalInfo": {
+      "farmArea": 6000,
+      "annualProduction": 500,
+      "mainDistributors": [
+        "피시파더",
+        "섬유통"
+      ]
+    },
+    "businesses": [
+      {
+        "sellerId": "HK",
+        "sellerName": "해금수산",
+        "businessNumber": "415-81-41901",
+        "businessName": "해금수산영어조합법인",
+        "representative": "정현희",
+        "businessAddress": "전라남도 완도군 약산면 득암리 26-14",
+        "loadingAddress": "전라남도 완도군 약산면 득암리 26-14",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "1010-0961-6865",
+            "holder": "해금수산영어조합법인",
+            "isPrimary": true
+          }
         ],
-        status: 'active',
-        hasCertificate: true
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      },
+      {
+        "sellerId": "HD3",
+        "sellerName": "(완도)해동수산",
+        "businessNumber": "835-92-01792",
+        "businessName": "해동수산",
+        "representative": "김건욱",
+        "businessAddress": "전라남도 완도군 약산면 득암4번길 48-1",
+        "loadingAddress": "전라남도 완도군 약산면 득암4번길 48-1",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "0100-8060-8144",
+            "holder": "김건옥",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      },
+      {
+        "sellerId": "HW2",
+        "sellerName": "해왕수산",
+        "businessNumber": "558-91-00230",
+        "businessName": "해왕수산",
+        "representative": "김종신",
+        "businessAddress": "전라남도 완도군 약산면 해동리 17 외",
+        "loadingAddress": "전라남도 완도군 약산면 해동리 17 외",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "0010-3844-2170",
+            "holder": "김종신",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      },
+      {
+        "sellerId": "HWW",
+        "sellerName": "해왕수산2",
+        "businessNumber": "256-92-00985",
+        "businessName": "해왕수산2",
+        "representative": "김이수",
+        "businessAddress": "전라남도 완도군 약산면 해동리 17 외 2필지",
+        "loadingAddress": "전라남도 완도군 약산면 해동리 17 외 2필지",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "0100-3815-9501",
+            "holder": "김이수",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": false,
+          "filename": null
+        },
+        "status": "active"
       }
     ]
   },
-  4: { // 거제양식 (사업자 2개)
-    keymen: [
-      { name: '김거제', role: '대표', phone: '010-7777-8888' },
-      { name: '박양식', role: '사무장', phone: '010-8888-9999' },
-      { name: '최광어', role: '광어담당', phone: '010-8888-9990' }
-    ],
-    qualitativeRatings: {
-      financial: '보통',
-      quality: '최상',
-      priceCompetitive: '보통',
-      claimCooperation: '좋음',
-      lossProvision: '넉넉함'
-    },
-    additionalInfo: {
-      farmArea: '18000',
-      annualProduction: '140',
-      mainDistributors: '부산공판장, 서울수산시장'
-    },
-    businesses: [
+  "4": {
+    "keymen": [
       {
-        id: 401,
-        businessNumber: '890-12-34568',
-        businessName: '거제양식장',
-        representative: '김거제',
-        businessAddress: '경상남도 거제시 일운면 해안로 123',
-        sellerName: '거제1호',
-        sellerId: 'GJ01',
-        loadingAddress: '경상남도 거제시 일운면 양식장로 78',
-        commissionRate: 1.0,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-7890-1234-56', holder: '김거제', isPrimary: true }
-        ],
-        status: 'active',
-        hasCertificate: true
+        "name": "전무님",
+        "phone": "010-3693-2227",
+        "role": "전무"
       },
       {
-        id: 402,
-        businessNumber: '901-23-45679',
-        businessName: '거제수산',
-        representative: '김거제',
-        businessAddress: '경상남도 거제시 장목면 해안로 456',
-        sellerName: '거제2호',
-        sellerId: 'GJ02',
-        loadingAddress: '경상남도 거제시 장목면 양식장로 90',
-        commissionRate: 1.2,
-        bankAccounts: [
-          { bank: '농협', accountNumber: '352-8901-2345-67', holder: '김거제', isPrimary: true },
-          { bank: '신한', accountNumber: '110-123-456789', holder: '박양식', isPrimary: false }
+        "name": "사모님",
+        "phone": "010-3693-0000",
+        "role": "사모"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "최상",
+      "quality": "좋음",
+      "priceCompetitive": "좋음",
+      "claimCooperation": "보통",
+      "lossProvision": "부족함"
+    },
+    "additionalInfo": {
+      "farmArea": 5000,
+      "annualProduction": 400,
+      "mainDistributors": [
+        "피시파더",
+        "믿음유통",
+        "삼도유통"
+      ]
+    },
+    "businesses": [
+      {
+        "sellerId": "SGS",
+        "sellerName": "광수수산",
+        "businessNumber": "241-86-03086",
+        "businessName": "광수물산 영어조합법인",
+        "representative": "한광수",
+        "businessAddress": "전라남도 진도군 의신면 웰빙길 192",
+        "loadingAddress": "전라남도 진도군 의신면 웰빙길 192",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "0000-2025-9999",
+            "holder": "광수물산영어조합법인",
+            "isPrimary": true
+          }
         ],
-        status: 'active',
-        hasCertificate: true
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "5": {
+    "keymen": [
+      {
+        "name": "사모님",
+        "phone": "010-3328-1777",
+        "role": "대표"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "보통",
+      "quality": "좋음",
+      "priceCompetitive": "최상",
+      "claimCooperation": "협조적",
+      "lossProvision": "넉넉함"
+    },
+    "additionalInfo": {
+      "farmArea": 1000,
+      "annualProduction": 150,
+      "mainDistributors": [
+        "피시파더"
+      ]
+    },
+    "businesses": [
+      {
+        "sellerId": "SB2",
+        "sellerName": "세부수산",
+        "businessNumber": "506-91-78284",
+        "businessName": "세부수산",
+        "representative": "박성배",
+        "businessAddress": "경상북도 포항시 남구 구룡포읍 땅끝마을길 65, 1층",
+        "loadingAddress": "경상북도 포항시 남구 구룡포읍 땅끝마을길 65, 1층",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "1010-1094-9306",
+            "holder": "세부수산",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": false,
+          "filename": null
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "6": {
+    "keymen": [],
+    "qualitativeRatings": {
+      "financial": "",
+      "quality": "",
+      "priceCompetitive": "",
+      "claimCooperation": "",
+      "lossProvision": ""
+    },
+    "additionalInfo": {
+      "farmArea": 700,
+      "annualProduction": 60,
+      "mainDistributors": []
+    },
+    "businesses": [
+      {
+        "sellerId": "TFY",
+        "sellerName": "태평양수산",
+        "businessNumber": "612-91-99643",
+        "businessName": "태평양수산",
+        "representative": "배정희 외1",
+        "businessAddress": "경상남도 거제시 동부면 함박금길 165-15",
+        "loadingAddress": "경상남도 거제시 동부면 함박금길 165-15",
+        "bankAccounts": [
+          {
+            "bank": "국민",
+            "accountNumber": "867301-01-539565",
+            "holder": "배정희",
+            "isPrimary": true
+          },
+          {
+            "bank": "농협",
+            "accountNumber": "301-0253-1281-41",
+            "holder": "선상갑",
+            "isPrimary": false
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "7": {
+    "keymen": [
+      {
+        "name": "최희종",
+        "phone": "010-4772-8750",
+        "role": "대표"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "좋음",
+      "quality": "좋음",
+      "priceCompetitive": "나쁨",
+      "claimCooperation": "비협조",
+      "lossProvision": "부족함"
+    },
+    "additionalInfo": {
+      "farmArea": null,
+      "annualProduction": null,
+      "mainDistributors": []
+    },
+    "businesses": [
+      {
+        "sellerId": "BK",
+        "sellerName": "부광무역",
+        "businessNumber": "805-88-01246",
+        "businessName": "어업회사법인 한울주식회사",
+        "representative": "최희종",
+        "businessAddress": "경상남도 통영시 미우지해안로 93",
+        "loadingAddress": "경상남도 통영시 미우지해안로 93",
+        "bankAccounts": [
+          {
+            "bank": "기업",
+            "accountNumber": "175-085861-01-017",
+            "holder": "한울",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "8": {
+    "keymen": [
+      {
+        "name": "김경록",
+        "phone": "010-6478-0981",
+        "role": "대표"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "",
+      "quality": "",
+      "priceCompetitive": "",
+      "claimCooperation": "",
+      "lossProvision": ""
+    },
+    "additionalInfo": {
+      "farmArea": null,
+      "annualProduction": null,
+      "mainDistributors": []
+    },
+    "businesses": [
+      {
+        "sellerId": "SBS2",
+        "sellerName": "(완도)부성수산",
+        "businessNumber": "415-81-48976",
+        "businessName": "2부성영어조합법인",
+        "representative": "김경록",
+        "businessAddress": "전라남도 완도군 고금면 교성길 31",
+        "loadingAddress": "전라남도 완도군 고금면 교성길 31",
+        "bankAccounts": [
+          {
+            "bank": "수협",
+            "accountNumber": "0000-6478-0981",
+            "holder": "2부성영어조합법인",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      }
+    ]
+  },
+  "9": {
+    "keymen": [
+      {
+        "name": "최광록",
+        "phone": "010-8380-7871",
+        "role": "대표"
+      },
+      {
+        "name": "모상남",
+        "phone": "010-8380-7871",
+        "role": "반장"
+      }
+    ],
+    "qualitativeRatings": {
+      "financial": "",
+      "quality": "",
+      "priceCompetitive": "",
+      "claimCooperation": "",
+      "lossProvision": ""
+    },
+    "additionalInfo": {
+      "farmArea": null,
+      "annualProduction": null,
+      "mainDistributors": []
+    },
+    "businesses": [
+      {
+        "sellerId": "SC2",
+        "sellerName": "삼천",
+        "businessNumber": "294-88-02862",
+        "businessName": "주식회사 삼천",
+        "representative": "최광록",
+        "businessAddress": "경상남도 통영시 동호안길 122(동호동)",
+        "loadingAddress": "경상남도 통영시 동호안길 122(동호동)",
+        "bankAccounts": [
+          {
+            "bank": "기업",
+            "accountNumber": "175-104380-04-011",
+            "holder": "주식회사 삼천",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      },
+      {
+        "sellerId": "SC",
+        "sellerName": "삼천해운",
+        "businessNumber": "160-10-03254",
+        "businessName": "삼천해운",
+        "representative": "모상남",
+        "businessAddress": "경상남도 통영시 동호안길 122(동호동)",
+        "loadingAddress": "경상남도 통영시 동호안길 122(동호동)",
+        "bankAccounts": [
+          {
+            "bank": "기업은행",
+            "accountNumber": "175-103583-01-015",
+            "holder": "모상남",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": true,
+          "filename": null
+        },
+        "status": "active"
+      },
+      {
+        "sellerId": "SC3",
+        "sellerName": "수호수산(삼천)",
+        "businessNumber": "869-97-01669",
+        "businessName": "수호수산",
+        "representative": "LI ZHUHU",
+        "businessAddress": "경상남도 통영시 동호안길 122(동호동)",
+        "loadingAddress": "경상남도 통영시 동호안길 122(동호동)",
+        "bankAccounts": [
+          {
+            "bank": "기업",
+            "accountNumber": "175-104572-04-012",
+            "holder": "LI ZHUHU(수호수산)",
+            "isPrimary": true
+          }
+        ],
+        "certificate": {
+          "uploaded": false,
+          "filename": null
+        },
+        "status": "inactive"
       }
     ]
   }
 };
+
 
 // 바이어 상세 정보 (소속 사업자 및 키맨 정보)
 export const buyerDetails = {
