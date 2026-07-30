@@ -303,16 +303,14 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
-          "최용환",
-          "고영석"
+          "최용환"
         ]
       },
       {
-        "category": "연어",
+        "category": "”연어”",
         "managers": [
-          "최용환",
           "고영석"
         ]
       }
@@ -344,16 +342,14 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
-          "고영석",
-          "노원진"
+          "고영석"
         ]
       },
       {
-        "category": "뜬고기",
+        "category": "”뜬고기",
         "managers": [
-          "고영석",
           "노원진"
         ]
       }
@@ -381,7 +377,7 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
           "이시호"
         ]
@@ -409,7 +405,7 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
           "최용환"
         ]
@@ -442,16 +438,14 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
-          "고영석",
-          "노원진"
+          "고영석"
         ]
       },
       {
-        "category": "뜬고기",
+        "category": "”뜬고기",
         "managers": [
-          "고영석",
           "노원진"
         ]
       }
@@ -483,16 +477,14 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
-          "고영석",
-          "노원진"
+          "고영석"
         ]
       },
       {
-        "category": "뜬고기",
+        "category": "”뜬고기",
         "managers": [
-          "고영석",
           "노원진"
         ]
       }
@@ -519,7 +511,7 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
           "고영석"
         ]
@@ -549,7 +541,7 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "뜬고기",
+        "category": "“뜬고기”",
         "managers": [
           "노원진"
         ]
@@ -577,7 +569,7 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
           "고영석"
         ]
@@ -610,16 +602,14 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
-          "최용환",
-          "노원진"
+          "최용환"
         ]
       },
       {
-        "category": "뜬고기",
+        "category": "”뜬고기",
         "managers": [
-          "최용환",
           "노원진"
         ]
       }
@@ -646,7 +636,7 @@ export const buyerGroups = [
     "hasCompleteBusinessInfo": true,
     "categoryManagers": [
       {
-        "category": "누운고기",
+        "category": "“누운고기”",
         "managers": [
           "최용환"
         ]
