@@ -241,6 +241,37 @@ function DriverRegister() {
                         />
                       </Form.Item>
 
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'status']}
+                        label="정산사업자 상태"
+                        initialValue="active"
+                        rules={[
+                          { required: true, message: '상태를 선택해주세요' }
+                        ]}
+                      >
+                        <Select
+                          placeholder="선택"
+                          options={[
+                            { value: 'active', label: '활성' },
+                            { value: 'inactive', label: '비활성' }
+                          ]}
+                          onChange={(value) => {
+                            const businesses = form.getFieldValue('settlementBusinesses') || [];
+                            if (value === 'active') {
+                              // 다른 사업자를 모두 비활성화
+                              businesses.forEach((b, idx) => {
+                                if (idx !== index) {
+                                  businesses[idx] = { ...b, status: 'inactive' };
+                                }
+                              });
+                              form.setFieldsValue({ settlementBusinesses: businesses });
+                              toast.success('다른 정산사업자가 자동으로 비활성화되었습니다.');
+                            }
+                          }}
+                        />
+                      </Form.Item>
+
                       <div className="my-4 border-t border-gray-200"></div>
                       <h5 className="text-sm font-semibold text-gray-900 mb-4">은행계좌 정보</h5>
 

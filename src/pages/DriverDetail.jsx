@@ -97,6 +97,7 @@ function DriverDetail() {
           representative: business.representative || '',
           businessAddress: business.businessAddress || '',
           taxType: business.taxType || undefined,
+          status: business.status || 'active',
           bankAccounts: business.bankAccounts?.map(acc => ({
             bank: acc.bank,
             accountNumber: acc.accountNumber,
@@ -115,6 +116,7 @@ function DriverDetail() {
           representative: settlementInfo.representative,
           businessAddress: settlementInfo.businessAddress,
           taxType: settlementInfo.taxType,
+          status: 'active',
           bankAccounts: settlementInfo.bankAccounts.map(acc => ({
             bank: acc.bank,
             accountNumber: acc.accountNumber,
@@ -127,6 +129,7 @@ function DriverDetail() {
         settlementBusinesses: [{
           settlementBusinessName: '',
           ticker: basicInfo.ticker,
+          status: 'active',
           bankAccounts: [{}]
         }]
       });
@@ -467,6 +470,36 @@ function DriverDetail() {
                         />
                       </Form.Item>
 
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'status']}
+                        label="정산사업자 상태"
+                        rules={[
+                          { required: true, message: '상태를 선택해주세요' }
+                        ]}
+                      >
+                        <Select
+                          placeholder="선택"
+                          options={[
+                            { value: 'active', label: '활성' },
+                            { value: 'inactive', label: '비활성' }
+                          ]}
+                          onChange={(value) => {
+                            const businesses = settlementForm.getFieldValue('settlementBusinesses') || [];
+                            if (value === 'active') {
+                              // 다른 사업자를 모두 비활성화
+                              businesses.forEach((b, idx) => {
+                                if (idx !== index) {
+                                  businesses[idx] = { ...b, status: 'inactive' };
+                                }
+                              });
+                              settlementForm.setFieldsValue({ settlementBusinesses: businesses });
+                              toast.success('다른 정산사업자가 자동으로 비활성화되었습니다.');
+                            }
+                          }}
+                        />
+                      </Form.Item>
+
                       <div className="my-4 border-t border-gray-200"></div>
                       <h5 className="text-sm font-semibold text-gray-900 mb-4">은행계좌 정보</h5>
 
@@ -571,7 +604,16 @@ function DriverDetail() {
               {settlementBusinesses.map((business, index) => (
                 <div key={index} className="space-y-3">
                   {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
-                  <h4 className="text-base font-semibold text-gray-900 mb-3">정산사업자 #{index + 1}</h4>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h4 className="text-base font-semibold text-gray-900">정산사업자 #{index + 1}</h4>
+                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                      business.status === 'active'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {business.status === 'active' ? '활성' : '비활성'}
+                    </span>
+                  </div>
 
                   <div className="flex">
                     <span className="w-1/5 font-medium text-gray-700">정산사업자명:</span>

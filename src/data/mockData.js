@@ -2335,17 +2335,36 @@ export const driverDetails = {
       driverLevel: '못함',
       status: 'active'
     },
-    settlementInfo: {
-      businessNumber: '123-45-67890',
-      businessName: '만진수산',
-      representative: '김만진',
-      businessAddress: '경기도 수지구 동천동 230-3',
-      taxType: '과세',
-      bankAccounts: [
-        { bank: '하나은행', accountNumber: '123-456789-01234', holder: '김만진', isPrimary: true }
-      ],
-      hasCertificate: true
-    }
+    settlementBusinesses: [
+      {
+        settlementBusinessName: '성훈',
+        ticker: 'SH02',
+        businessNumber: '123-45-67890',
+        businessName: '만진수산',
+        representative: '김만진',
+        businessAddress: '경기도 수지구 동천동 230-3',
+        taxType: '과세',
+        bankAccounts: [
+          { bank: '하나은행', accountNumber: '123-456789-01234', holder: '김만진', isPrimary: true }
+        ],
+        hasCertificate: true,
+        status: 'active'
+      },
+      {
+        settlementBusinessName: '성훈',
+        ticker: 'SH02-OLD',
+        businessNumber: '987-65-43210',
+        businessName: '해양운송',
+        representative: '박성훈',
+        businessAddress: '서울시 강남구 역삼동 456-7',
+        taxType: '과세',
+        bankAccounts: [
+          { bank: '신한은행', accountNumber: '110-234-567890', holder: '박성훈', isPrimary: true }
+        ],
+        hasCertificate: true,
+        status: 'inactive'
+      }
+    ]
   },
   5: { // 민수 (정산사업자 미등록)
     basicInfo: {
