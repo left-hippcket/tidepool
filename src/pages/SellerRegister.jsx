@@ -341,7 +341,6 @@ function SellerRegister() {
                         {...field}
                         name={[field.name, 'name']}
                         label="성명"
-                        rules={[{ required: true, message: '성명을 입력해주세요' }]}
                         className="mb-4"
                       >
                         <Input placeholder="홍길동" maxLength={20} />

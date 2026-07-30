@@ -385,10 +385,9 @@ function BuyerRegister() {
                         {...field}
                         name={[field.name, 'name']}
                         label="성명"
-                        rules={[{ max: 20, message: '최대 20자' }]}
                         className="mb-4"
                       >
-                        <Input placeholder="홍길동" />
+                        <Input placeholder="홍길동" maxLength={20} />
                       </Form.Item>
 
                       <Form.Item

@@ -11,7 +11,7 @@ function StandardPriceRegister() {
   const navigate = useNavigate();
   const [allPriceData, setAllPriceData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(1); // 누운고기
-  const [selectedProduct, setSelectedProduct] = useState(2); // 넙치
+  const [selectedProduct, setSelectedProduct] = useState(1); // 넙치
   const [selectedOrigin, setSelectedOrigin] = useState(null);
   const [applyDate, setApplyDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [source, setSource] = useState('피시파더');
@@ -37,14 +37,14 @@ function StandardPriceRegister() {
 
   // 초기 로드 시 넙치-완도 자동 설정
   useEffect(() => {
-    if (selectedProduct === 2 && allPriceData.length > 0) {
-      const wandoOrigin = origins.find(o => o.productId === 2 && o.name === '완도' && o.status === 'active');
+    if (selectedProduct === 1 && allPriceData.length > 0 && !selectedOrigin) {
+      const wandoOrigin = origins.find(o => o.productId === 1 && o.name === '완도' && o.status === 'active');
       if (wandoOrigin) {
         setSelectedOrigin(wandoOrigin.id);
         onOriginChange(wandoOrigin.id);
       }
     }
-  }, [allPriceData]);
+  }, [allPriceData, selectedProduct]);
 
   const onCategoryChange = (value) => {
     setSelectedCategory(parseInt(value));
@@ -138,18 +138,6 @@ function StandardPriceRegister() {
           </div>
 
           <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-gray-700">가격출처</label>
-            <input
-              type="text"
-              value={source}
-              onChange={(e) => setSource(e.target.value)}
-              placeholder="가격출처"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
-              required
-            />
-          </div>
-
-          <div className="flex-1">
             <label className="mb-1 block text-sm font-medium text-gray-700">품목분류</label>
             <FMSelectSimple
               value={selectedCategory}
@@ -191,36 +179,52 @@ function StandardPriceRegister() {
       <form onSubmit={handleSubmit}>
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           {selectedOrigin && (
-            <div className="mb-8">
-              <h3 className="mb-2 text-base font-semibold text-gray-900">규격별 가격</h3>
-              <div className="mb-4 text-sm text-blue-600">
-                최근 가격이 자동 입력됩니다. 수정 가능하며, 빈 칸은 업데이트되지 않습니다.
+            <>
+              <div className="mb-6">
+                <h3 className="mb-2 text-base font-semibold text-gray-900">규격별 가격</h3>
+                <div className="mb-4 text-sm text-blue-600">
+                  최근 가격이 자동 입력됩니다. 수정 가능하며, 빈 칸은 업데이트되지 않습니다.
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {priceItems.map((item, index) => (
+                    <div key={item.specId} className="flex gap-2 items-center">
+                      <input
+                        type="text"
+                        value={item.specName}
+                        disabled
+                        className="w-40 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600"
+                      />
+                      <div className="flex-1 flex gap-2 items-center">
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => handlePriceChange(index, e.target.value)}
+                          placeholder="가격 입력 (선택)"
+                          step={500}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+                        />
+                        <span className="text-sm text-gray-600">원</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                {priceItems.map((item, index) => (
-                  <div key={item.specId} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      value={item.specName}
-                      disabled
-                      className="w-40 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600"
-                    />
-                    <div className="flex-1 flex gap-2 items-center">
-                      <input
-                        type="number"
-                        value={item.price}
-                        onChange={(e) => handlePriceChange(index, e.target.value)}
-                        placeholder="가격 입력 (선택)"
-                        step={500}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
-                      />
-                      <span className="text-sm text-gray-600">원</span>
-                    </div>
-                  </div>
-                ))}
+              <div className="border-t border-gray-200 pt-6">
+                <div className="flex gap-3 items-center">
+                  <label className="text-sm font-medium text-gray-700 whitespace-nowrap">가격출처</label>
+                  <input
+                    type="text"
+                    value={source}
+                    onChange={(e) => setSource(e.target.value)}
+                    placeholder="가격출처 입력"
+                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            </>
           )}
 
         </div>

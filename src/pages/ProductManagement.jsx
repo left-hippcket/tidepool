@@ -664,9 +664,9 @@ function ProductManagement() {
           </div>
         </div>
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: '1fr 3fr 1fr 1fr' }}>
+        <div className="flex flex-wrap gap-4">
         {/* Column 1: Categories */}
-        <div>
+        <div style={{ flex: '1 1 calc(20% - 1rem)', minWidth: '250px' }}>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -734,29 +734,26 @@ function ProductManagement() {
                           }`}
                         >
                           {editMode ? (
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <div
-                                  {...listeners}
-                                  className="cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
-                                >
-                                  <HolderOutlined className="text-gray-400" />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <FMInput
-                                    value={category.name}
-                                    onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
-                                    placeholder="분류명"
-                                    maxLength={20}
-                                  />
-                                </div>
+                            <div className="flex items-center gap-2">
+                              <div
+                                {...listeners}
+                                className="cursor-grab active:cursor-grabbing touch-none"
+                                style={{ width: '24px', flexShrink: 0 }}
+                              >
+                                <HolderOutlined className="text-gray-400" />
                               </div>
-                              <div className="flex-shrink-0">
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <FMInput
+                                  value={category.name}
+                                  onChange={(value) => handleCategoryFieldChange(category.id, 'name', value)}
+                                  placeholder="분류명"
+                                  maxLength={20}
+                                />
+                              </div>
+                              <div style={{ width: '36px', flexShrink: 0 }}>
                                 <FMSwitch
                                   checked={category.status === 'active'}
                                   onChange={(checked) => handleCategoryFieldChange(category.id, 'status', checked ? 'active' : 'inactive')}
-                                  onLabel="활성"
-                                  offLabel="비활성"
                                   size="small"
                                 />
                               </div>
@@ -787,7 +784,7 @@ function ProductManagement() {
         </div>
 
         {/* Column 2: Products */}
-        <div>
+        <div style={{ flex: '1 1 calc(40% - 1rem)', minWidth: '500px' }}>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -902,51 +899,48 @@ function ProductManagement() {
                               }`}
                             >
                               {editMode ? (
-                                <div className="flex items-center justify-between gap-2">
-                                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <div
-                                      {...listeners}
-                                      className="cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
-                                    >
-                                      <HolderOutlined className="text-gray-400" />
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <FMInput
-                                        value={product.name}
-                                        onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
-                                        placeholder="품목명"
-                                        maxLength={20}
-                                      />
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <FMSelect
-                                        value={product.orderUnit}
-                                        onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
-                                        options={[
-                                          { value: '통', label: '통' },
-                                          { value: '박스', label: '박스' },
-                                          { value: 'kg', label: 'kg' }
-                                        ]}
-                                        isSearchable={false}
-                                      />
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <FMInput
-                                        type="number"
-                                        value={product.unitWeight}
-                                        onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
-                                        placeholder="중량"
-                                        step="0.1"
-                                        min="0.1"
-                                      />
-                                    </div>
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    {...listeners}
+                                    className="cursor-grab active:cursor-grabbing touch-none"
+                                    style={{ width: '24px', flexShrink: 0 }}
+                                  >
+                                    <HolderOutlined className="text-gray-400" />
                                   </div>
-                                  <div className="flex-shrink-0">
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <FMInput
+                                      value={product.name}
+                                      onChange={(value) => handleProductFieldChange(product.id, 'name', value)}
+                                      placeholder="품목명"
+                                      maxLength={20}
+                                    />
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <FMSelect
+                                      value={product.orderUnit}
+                                      onChange={(value) => handleProductFieldChange(product.id, 'orderUnit', value)}
+                                      options={[
+                                        { value: '통', label: '통' },
+                                        { value: '박스', label: '박스' },
+                                        { value: 'kg', label: 'kg' }
+                                      ]}
+                                      isSearchable={false}
+                                    />
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <FMInput
+                                      type="number"
+                                      value={product.unitWeight}
+                                      onChange={(value) => handleProductFieldChange(product.id, 'unitWeight', parseFloat(value))}
+                                      placeholder="중량"
+                                      step="0.1"
+                                      min="0.1"
+                                    />
+                                  </div>
+                                  <div style={{ width: '36px', flexShrink: 0 }}>
                                     <FMSwitch
                                       checked={product.status === 'active'}
                                       onChange={(checked) => handleProductFieldChange(product.id, 'status', checked ? 'active' : 'inactive')}
-                                      onLabel="활성"
-                                      offLabel="비활성"
                                       size="small"
                                     />
                                   </div>
@@ -981,7 +975,7 @@ function ProductManagement() {
         </div>
 
         {/* Column 3: Origins */}
-        <div>
+        <div style={{ flex: '1 1 calc(20% - 1rem)', minWidth: '250px' }}>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -1055,29 +1049,26 @@ function ProductManagement() {
                                 }`}
                               >
                                 {editMode ? (
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                      <div
-                                        {...listeners}
-                                        className="cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
-                                      >
-                                        <HolderOutlined className="text-gray-400" />
-                                      </div>
-                                      <div style={{ flex: 1, minWidth: 0 }}>
-                                        <FMInput
-                                          value={origin.name}
-                                          onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
-                                          placeholder="원산지명"
-                                          maxLength={20}
-                                        />
-                                      </div>
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      {...listeners}
+                                      className="cursor-grab active:cursor-grabbing touch-none"
+                                      style={{ width: '24px', flexShrink: 0 }}
+                                    >
+                                      <HolderOutlined className="text-gray-400" />
                                     </div>
-                                    <div className="flex-shrink-0">
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <FMInput
+                                        value={origin.name}
+                                        onChange={(value) => handleOriginFieldChange(origin.id, 'name', value)}
+                                        placeholder="원산지명"
+                                        maxLength={20}
+                                      />
+                                    </div>
+                                    <div style={{ width: '36px', flexShrink: 0 }}>
                                       <FMSwitch
                                         checked={origin.status === 'active'}
                                         onChange={(checked) => handleOriginFieldChange(origin.id, 'status', checked ? 'active' : 'inactive')}
-                                        onLabel="활성"
-                                        offLabel="비활성"
                                         size="small"
                                       />
                                     </div>
@@ -1110,7 +1101,7 @@ function ProductManagement() {
         </div>
 
         {/* Column 4: Specifications */}
-        <div>
+        <div style={{ flex: '1 1 calc(20% - 1rem)', minWidth: '250px' }}>
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -1184,29 +1175,26 @@ function ProductManagement() {
                                 }`}
                               >
                                 {editMode ? (
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                      <div
-                                        {...listeners}
-                                        className="cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
-                                      >
-                                        <HolderOutlined className="text-gray-400" />
-                                      </div>
-                                      <div style={{ flex: 1, minWidth: 0 }}>
-                                        <FMInput
-                                          value={spec.name}
-                                          onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
-                                          placeholder="규격명"
-                                          maxLength={20}
-                                        />
-                                      </div>
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      {...listeners}
+                                      className="cursor-grab active:cursor-grabbing touch-none"
+                                      style={{ width: '24px', flexShrink: 0 }}
+                                    >
+                                      <HolderOutlined className="text-gray-400" />
                                     </div>
-                                    <div className="flex-shrink-0">
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <FMInput
+                                        value={spec.name}
+                                        onChange={(value) => handleSpecFieldChange(spec.id, 'name', value)}
+                                        placeholder="규격명"
+                                        maxLength={20}
+                                      />
+                                    </div>
+                                    <div style={{ width: '36px', flexShrink: 0 }}>
                                       <FMSwitch
                                         checked={spec.status === 'active'}
                                         onChange={(checked) => handleSpecFieldChange(spec.id, 'status', checked ? 'active' : 'inactive')}
-                                        onLabel="활성"
-                                        offLabel="비활성"
                                         size="small"
                                       />
                                     </div>
