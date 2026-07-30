@@ -286,7 +286,7 @@ function JoinDistributionDetail() {
                 <Input placeholder="예: 3.0" />
               </Form.Item>
 
-              <Form.Item name="mainSuppliers" label="주요 공급처">
+              <Form.Item name="mainSuppliers" label="메인유통사">
                 <FMTagInput
                   value={form.getFieldValue('mainSuppliers') || []}
                   onChange={(value) => form.setFieldsValue({ mainSuppliers: value })}
@@ -294,7 +294,7 @@ function JoinDistributionDetail() {
                 />
               </Form.Item>
 
-              <Form.Item name="mainFarms" label="주요 양식장">
+              <Form.Item name="mainFarms" label="메인소싱처">
                 <FMTagInput
                   value={form.getFieldValue('mainFarms') || []}
                   onChange={(value) => form.setFieldsValue({ mainFarms: value })}
@@ -330,11 +330,11 @@ function JoinDistributionDetail() {
                 <span className="w-4/5 text-gray-900">{detail.commissionRate ? `${detail.commissionRate}%` : '-'}</span>
               </div>
               <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">주요 공급처:</span>
+                <span className="w-1/5 font-medium text-gray-700">메인유통사:</span>
                 <span className="w-4/5 text-gray-900">{detail.mainSuppliers || '-'}</span>
               </div>
               <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">주요 양식장:</span>
+                <span className="w-1/5 font-medium text-gray-700">메인소싱처:</span>
                 <span className="w-4/5 text-gray-900">{detail.mainFarms || '-'}</span>
               </div>
               <div className="flex">

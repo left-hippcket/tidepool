@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
-import { joinGroups, managers, territories } from '../data/mockData';
+import { Check, X } from 'lucide-react';
+import { joinGroups, joinDetails, managers, territories } from '../data/mockData';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMButton } from '../components/ui/FMButton';
 
@@ -112,61 +113,113 @@ function JoinDistribution() {
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200">
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">조인유통그룹명</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">사업자수</th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">담당영업사원</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매입액(누적)</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(누적)</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매입액(최근 3개월)</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">매출액(최근 3개월)</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">최근거래일</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자정보</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">사업자등록증</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">카톡단톡방</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">메인소싱처</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">메인유통사</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상태</th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">상세</th>
               </tr>
             </thead>
             <tbody>
-              {sortedData.map((record) => (
-                <tr
-                  key={record.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => handleViewDetail(record)}
-                >
-                  <td className="px-4 py-3 text-sm">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
-                      className="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      {record.name}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.businessCount}개</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {record.salesPersons?.length > 0
-                      ? record.salesPersons.join(', ')
-                      : record.salesPerson}
-                  </td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.totalPurchase / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.totalSales / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.purchase3M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.sales3M / 100000000).toFixed(1)}억</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.lastTradeDate}</td>
-                  <td className="px-4 py-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={record.hasCertificate}
-                      disabled
-                      className="h-4 w-4"
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      상세
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {sortedData.map((record) => {
+                const detail = joinDetails[record.id];
+
+                // 사업자정보 완성도 체크
+                const hasCompleteBusinessInfo = detail?.businesses?.every(b =>
+                  b.businessNumber && b.businessName && b.representative && b.businessAddress
+                ) || false;
+
+                // 사업자등록증 체크
+                const hasCertificate = detail?.businesses?.every(b => b.hasCertificate) || false;
+
+                // 카톡단톡방
+                const kakaoGroup = detail?.kakaoGroupName || null;
+
+                // 메인소싱처 (주요 양식장)
+                const mainFarms = detail?.mainFarms;
+
+                // 메인유통사 (주요 공급처)
+                const mainSuppliers = detail?.mainSuppliers;
+
+                return (
+                  <tr
+                    key={record.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => handleViewDetail(record)}
+                  >
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
+                        className="text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        {record.name}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {record.salesPersons?.length > 0
+                        ? record.salesPersons.join(', ')
+                        : record.salesPerson}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {hasCompleteBusinessInfo ? (
+                        <Check className="h-5 w-5 text-gray-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {hasCertificate ? (
+                        <Check className="h-5 w-5 text-gray-500 mx-auto" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {kakaoGroup ? (
+                        <span className="text-sm text-gray-900">{kakaoGroup}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {mainFarms ? (
+                        <span className="text-sm text-gray-900">{mainFarms}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {mainSuppliers ? (
+                        <span className="text-sm text-gray-900">{mainSuppliers}</span>
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 mx-auto" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                          record.status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {record.status === 'active' ? '활성' : '비활성'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleViewDetail(record); }}
+                        className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      >
+                        상세
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
