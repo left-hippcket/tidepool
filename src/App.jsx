@@ -198,9 +198,10 @@ function App() {
   };
 
   const getSelectedKeys = () => {
-    // 표준가격 페이지의 경우 쿼리 파라미터 포함
+    // 표준가격 페이지의 경우 쿼리 파라미터 포함 (라벨은 선택 안 함)
     if (location.pathname === '/standard-price') {
-      return [location.pathname + location.search];
+      const fullPath = location.pathname + location.search;
+      return [fullPath];
     }
     return [location.pathname];
   };
@@ -268,6 +269,7 @@ function App() {
         <Menu
           theme="dark"
           mode="inline"
+          multiple={false}
           selectedKeys={getSelectedKeys()}
           openKeys={openKeys}
           onOpenChange={setOpenKeys}
