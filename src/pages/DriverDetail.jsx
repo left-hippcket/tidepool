@@ -288,16 +288,6 @@ function DriverDetail() {
                       {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="text-base font-semibold text-gray-900">정산사업자 #{index + 1}</h4>
-                        {fields.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => remove(name)}
-                            className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
-                          >
-                            <MinusCircleOutlined />
-                            <span>삭제</span>
-                          </button>
-                        )}
                       </div>
 
                       <Form.Item
