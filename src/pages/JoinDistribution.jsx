@@ -139,7 +139,11 @@ function JoinDistribution() {
                     </button>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">{record.businessCount}개</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{record.salesPerson}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {record.salesPersons?.length > 0
+                      ? record.salesPersons.join(', ')
+                      : record.salesPerson}
+                  </td>
                   <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.totalPurchase / 100000000).toFixed(1)}억</td>
                   <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.totalSales / 100000000).toFixed(1)}억</td>
                   <td className="px-4 py-3 text-right text-sm text-gray-500">{(record.purchase3M / 100000000).toFixed(1)}억</td>

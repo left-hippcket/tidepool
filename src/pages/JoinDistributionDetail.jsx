@@ -28,6 +28,7 @@ function JoinDistributionDetail() {
     form.setFieldsValue({
       name: joinGroup.name,
       salesPerson: joinGroup.salesPerson,
+      salesPersons: joinGroup.salesPersons || [joinGroup.salesPerson],
       territory: joinGroup.territory,
       region: joinGroup.region,
       status: joinGroup.status,
@@ -176,15 +177,27 @@ function JoinDistributionDetail() {
               </Form.Item>
 
               <Form.Item
-                name="salesPerson"
+                name="salesPersons"
                 label="담당영업사원"
                 rules={[{ required: true, message: '담당영업사원을 선택해주세요' }]}
               >
-                <Select>
-                  {managers.map(m => (
-                    <Select.Option key={m} value={m}>{m}</Select.Option>
-                  ))}
-                </Select>
+                <FMSelect
+                  value={form.getFieldValue('salesPersons') || []}
+                  onChange={(value) => {
+                    form.setFieldsValue({ salesPersons: value });
+                    // 첫 번째 담당자를 salesPerson에 자동 설정
+                    if (value && value.length > 0) {
+                      form.setFieldsValue({ salesPerson: value[0] });
+                    }
+                  }}
+                  options={managers.map(m => ({
+                    value: m,
+                    label: m
+                  }))}
+                  placeholder="담당자 선택 (복수 가능)"
+                  isSearchable={true}
+                  isMulti={true}
+                />
               </Form.Item>
 
               <Form.Item
@@ -230,7 +243,11 @@ function JoinDistributionDetail() {
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">담당영업사원:</span>
-                <span className="w-4/5 text-gray-900">{joinGroup.salesPerson}</span>
+                <span className="w-4/5 text-gray-900">
+                  {joinGroup.salesPersons?.length > 0
+                    ? joinGroup.salesPersons.join(', ')
+                    : joinGroup.salesPerson}
+                </span>
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">사업권역:</span>
