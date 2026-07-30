@@ -182,8 +182,7 @@ function App() {
       label: '기타 데이터',
       children: [
         { key: '/territory', label: '사업권역' },
-        { key: '/standard-price', label: '표준가격조회/등록' },
-        { key: '/standard-price-comparison', label: '표준가격추세비교' },
+        { key: '/standard-price', label: '표준가격' },
       ],
     },
   ];
@@ -200,7 +199,7 @@ function App() {
     if (location.pathname === '/seller' || location.pathname === '/buyer' || location.pathname === '/join-distribution' || location.pathname === '/driver') {
       return ['partners'];
     }
-    if (location.pathname === '/territory' || location.pathname === '/standard-price' || location.pathname === '/standard-price-comparison') {
+    if (location.pathname === '/territory' || location.pathname === '/standard-price') {
       return ['data'];
     }
     if (location.pathname === '/product' || location.pathname === '/product-list') {
