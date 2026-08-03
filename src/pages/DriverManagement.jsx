@@ -11,6 +11,7 @@ function DriverManagement() {
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState('전체');
   const [taxTypeFilter, setTaxTypeFilter] = useState('전체');
   const [statusFilter, setStatusFilter] = useState('활성');
+  const [searchKeyword, setSearchKeyword] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
 
   // 필터링
@@ -23,9 +24,27 @@ function DriverManagement() {
       }
       if (statusFilter === '활성' && driver.status !== 'active') return false;
       if (statusFilter === '비활성' && driver.status !== 'inactive') return false;
+
+      // 검색 필터링
+      if (searchKeyword.trim()) {
+        const keyword = searchKeyword.toLowerCase();
+        const driverNameMatch = driver.name.toLowerCase().includes(keyword);
+
+        // 상세 정보에서 정산사업자명과 전화번호 검색
+        const detail = driverDetails[driver.id];
+        const activeSettlement = detail?.settlementBusinesses?.find(b => b.status === 'active')
+          || detail?.settlementInfo;
+        const settlementNameMatch = activeSettlement?.settlementBusinessName?.toLowerCase().includes(keyword) || false;
+        const phoneMatch = (detail?.basicInfo?.phone || driver.phone || '').toLowerCase().includes(keyword);
+
+        if (!driverNameMatch && !settlementNameMatch && !phoneMatch) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [vehicleTypeFilter, taxTypeFilter, statusFilter]);
+  }, [vehicleTypeFilter, taxTypeFilter, statusFilter, searchKeyword]);
 
   // 정렬
   const sortedDrivers = useMemo(() => {
@@ -104,7 +123,7 @@ function DriverManagement() {
               { value: '5.0톤', label: '5.0톤' },
               { value: '1.0톤', label: '1.0톤' }
             ]}
-            className="w-32"
+            className="flex-1 min-w-[150px]"
           />
 
           <FMSelectSimple
@@ -117,7 +136,7 @@ function DriverManagement() {
               { value: '면세', label: '면세' },
               { value: '미등록', label: '미등록' }
             ]}
-            className="w-32"
+            className="flex-1 min-w-[150px]"
           />
 
           <FMSelectSimple
@@ -129,8 +148,19 @@ function DriverManagement() {
               { value: '비활성', label: '비활성' },
               { value: '전체', label: '전체' }
             ]}
-            className="w-28"
+            className="flex-1 min-w-[150px]"
           />
+
+          <div className="flex flex-col gap-1 flex-1 min-w-[150px]">
+            <label className="text-sm font-medium text-gray-600">검색</label>
+            <input
+              type="text"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              placeholder="드라이버명, 정산사업자명, 전화번호"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500"
+            />
+          </div>
         </div>
       </div>
 

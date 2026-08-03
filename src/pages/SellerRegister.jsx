@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
 import { generateGroupName, shouldUpdateGroupName } from '../utils/groupNameGenerator';
 import { addNewGroup, addBusinessToGroup, getStoredGroups, getStoredDetails, updateGroup } from '../utils/dataStorage';
+import { generateTicker, extractAllTickers } from '../utils/tickerGenerator';
 
 function SellerRegister() {
   const navigate = useNavigate();
@@ -31,6 +32,21 @@ function SellerRegister() {
   const [availableRegions, setAvailableRegions] = useState([]);
   const [tickerReadOnly, setTickerReadOnly] = useState({});
   const [tickerValidationStatus, setTickerValidationStatus] = useState({});
+  const [existingTickers, setExistingTickers] = useState([]);
+
+  // 기존 ticker 목록 로드
+  useEffect(() => {
+    const groups = getStoredGroups('seller');
+    const details = {};
+    groups.forEach(group => {
+      const detail = getStoredDetails('seller', group.id);
+      if (detail) {
+        details[group.id] = detail;
+      }
+    });
+    const tickers = extractAllTickers('seller', groups, details);
+    setExistingTickers(tickers);
+  }, []);
 
   // URL 쿼리 파라미터 처리
   useEffect(() => {
@@ -151,6 +167,42 @@ function SellerRegister() {
           [businessIndex]: false
         }));
       }
+    }
+  };
+
+  // 셀러명 변경 시 ticker 자동 생성
+  const handleSellerNameChange = (businessIndex, e) => {
+    const sellerName = e.target.value;
+
+    if (sellerName && !tickerReadOnly[businessIndex]) {
+      // ticker 자동 생성
+      const businesses = form.getFieldValue('businesses') || [];
+      const currentBusiness = businesses[businessIndex] || {};
+
+      // 폼의 현재 ticker들 제외 (자기 자신 제외)
+      const formTickers = businesses
+        .map((b, idx) => idx !== businessIndex ? b?.sellerId : null)
+        .filter(Boolean);
+
+      const allTickers = [...existingTickers, ...formTickers];
+      const generatedTicker = generateTicker(sellerName, allTickers);
+
+      // 생성된 ticker 자동 입력
+      const updatedBusinesses = [...businesses];
+      updatedBusinesses[businessIndex] = {
+        ...currentBusiness,
+        sellerId: generatedTicker,
+      };
+      form.setFieldsValue({ businesses: updatedBusinesses });
+
+      // 검증 상태 업데이트
+      setTickerValidationStatus(prev => ({
+        ...prev,
+        [businessIndex]: {
+          status: 'success',
+          message: '✓ 자동 생성된 ticker입니다.'
+        }
+      }));
     }
   };
 
@@ -649,32 +701,30 @@ function SellerRegister() {
                           { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
                         ]}
                       >
-                        <Input placeholder="성호1호" />
+                        <Input
+                          placeholder="성호1호"
+                          onChange={(e) => handleSellerNameChange(businessIndex, e)}
+                        />
                       </Form.Item>
 
                       <Form.Item
                         {...businessField}
-                        name={[businessField.name, 'ticker']}
-                        label="Ticker"
+                        name={[businessField.name, 'sellerId']}
+                        label="Ticker (자동생성)"
                         rules={[{ required: true, message: 'Ticker를 입력해주세요' }]}
                         validateStatus={
                           tickerValidationStatus[businessIndex]
-                            ? tickerValidationStatus[businessIndex].valid
-                              ? 'success'
-                              : 'error'
+                            ? tickerValidationStatus[businessIndex].status
                             : undefined
                         }
                         help={tickerValidationStatus[businessIndex]?.message}
                       >
                         <Input
-                          placeholder="예: SH"
+                          disabled
+                          placeholder="셀러명 입력 시 자동 생성됩니다"
                           maxLength={10}
-                          disabled={tickerReadOnly[businessIndex]}
-                          onChange={(e) => handleTickerChange(businessIndex, e)}
                           suffix={
-                            tickerReadOnly[businessIndex] ? (
-                              <span className="text-xs text-gray-500">🔒 자동</span>
-                            ) : null
+                            <span className="text-xs text-gray-400">💡 초성 기반</span>
                           }
                         />
                       </Form.Item>

@@ -11,6 +11,8 @@ import { FMTagInput } from '../components/ui/FMTagInput';
 import toast from 'react-hot-toast';
 import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
 import { generateGroupName, shouldUpdateGroupName } from '../utils/groupNameGenerator';
+import { addNewGroup, addBusinessToGroup, getStoredGroups, getStoredDetails, updateGroup } from '../utils/dataStorage';
+import { generateTicker, extractAllTickers } from '../utils/tickerGenerator';
 
 function JoinDistributionRegister() {
   const navigate = useNavigate();
@@ -22,6 +24,21 @@ function JoinDistributionRegister() {
   const [availableRegions, setAvailableRegions] = useState([]);
   const [tickerReadOnly, setTickerReadOnly] = useState(false);
   const [tickerValidationStatus, setTickerValidationStatus] = useState(null);
+  const [existingTickers, setExistingTickers] = useState([]);
+
+  // 기존 ticker 목록 로드
+  useEffect(() => {
+    const groups = getStoredGroups('join');
+    const details = {};
+    groups.forEach(group => {
+      const detail = getStoredDetails('join', group.id);
+      if (detail) {
+        details[group.id] = detail;
+      }
+    });
+    const tickers = extractAllTickers('join', groups, details);
+    setExistingTickers(tickers);
+  }, []);
 
   useEffect(() => {
     const groupId = searchParams.get('groupId');
@@ -98,6 +115,30 @@ function JoinDistributionRegister() {
         // 신규 사업자
         setTickerReadOnly(false);
       }
+    }
+  };
+
+  // 조인유통명 변경 시 ticker 자동 생성
+  const handleJoinNameChange = (e) => {
+    const joinName = e.target.value;
+
+    if (joinName && !tickerReadOnly) {
+      // ticker 자동 생성
+      const generatedTicker = generateTicker(joinName, existingTickers);
+
+      // 생성된 ticker 자동 입력
+      form.setFieldsValue({ ticker: generatedTicker });
+
+      // 그룹명도 자동 업데이트 (신규 생성 모드일 때)
+      if (registrationType === 'new') {
+        form.setFieldsValue({ groupName: joinName });
+      }
+
+      // 검증 상태 업데이트
+      setTickerValidationStatus({
+        status: 'success',
+        message: '✓ 자동 생성된 ticker입니다.'
+      });
     }
   };
 
@@ -405,41 +446,25 @@ function JoinDistributionRegister() {
             >
               <Input
                 placeholder="동주본점"
-                onChange={(e) => {
-                  // 조인유통명 변경 시 그룹명 자동 업데이트 (신규 등록인 경우만)
-                  if (registrationType === 'new') {
-                    const joinName = e.target.value;
-                    form.setFieldsValue({ groupName: joinName });
-                  }
-                }}
+                onChange={handleJoinNameChange}
               />
             </Form.Item>
 
             <Form.Item
               name="ticker"
-              label="Ticker"
+              label="Ticker (자동생성)"
               rules={[
-                { required: true, message: 'Ticker를 입력해주세요' },
-                { max: 10, message: '최대 10자' },
-                { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+                { required: true, message: 'Ticker를 입력해주세요' }
               ]}
-              validateStatus={
-                tickerValidationStatus
-                  ? tickerValidationStatus.valid
-                    ? 'success'
-                    : 'error'
-                  : undefined
-              }
+              validateStatus={tickerValidationStatus?.status}
               help={tickerValidationStatus?.message}
             >
               <Input
-                placeholder="DJ01"
-                disabled={tickerReadOnly}
-                onChange={handleTickerChange}
+                disabled
+                placeholder="조인유통명 입력 시 자동 생성됩니다"
+                maxLength={10}
                 suffix={
-                  tickerReadOnly ? (
-                    <span className="text-xs text-gray-500">🔒 자동</span>
-                  ) : null
+                  <span className="text-xs text-gray-400">💡 초성 기반</span>
                 }
               />
             </Form.Item>

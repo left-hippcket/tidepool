@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Upload } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined } from '@ant-design/icons';
@@ -8,10 +8,64 @@ import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
 import { FMRadioGroup } from '../components/ui/FMRadioGroup';
 import toast from 'react-hot-toast';
+import { getStoredGroups, getStoredDetails } from '../utils/dataStorage';
+import { generateTicker, extractAllTickers } from '../utils/tickerGenerator';
 
 function DriverRegister() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [existingTickers, setExistingTickers] = useState([]);
+  const [tickerValidationStatus, setTickerValidationStatus] = useState({});
+
+  // 기존 ticker 목록 로드
+  useEffect(() => {
+    const groups = getStoredGroups('driver');
+    const details = {};
+    groups.forEach(group => {
+      const detail = getStoredDetails('driver', group.id);
+      if (detail) {
+        details[group.id] = detail;
+      }
+    });
+    const tickers = extractAllTickers('driver', groups, details);
+    setExistingTickers(tickers);
+  }, []);
+
+  // 정산사업자명 변경 시 ticker 자동 생성
+  const handleSettlementBusinessNameChange = (businessIndex, e) => {
+    const settlementBusinessName = e.target.value;
+
+    if (settlementBusinessName) {
+      // ticker 자동 생성
+      const businesses = form.getFieldValue('settlementBusinesses') || [];
+      const currentBusiness = businesses[businessIndex] || {};
+
+      // 폼의 현재 ticker들 제외 (자기 자신 제외)
+      const formTickers = businesses
+        .map((b, idx) => idx !== businessIndex ? b?.ticker : null)
+        .filter(Boolean);
+
+      const allTickers = [...existingTickers, ...formTickers];
+      const generatedTicker = generateTicker(settlementBusinessName, allTickers);
+
+      // 생성된 ticker 자동 입력
+      const updatedBusinesses = [...businesses];
+      updatedBusinesses[businessIndex] = {
+        ...currentBusiness,
+        ticker: generatedTicker,
+      };
+      form.setFieldsValue({ settlementBusinesses: updatedBusinesses });
+
+      // 검증 상태 업데이트
+      setTickerValidationStatus(prev => ({
+        ...prev,
+        [businessIndex]: {
+          status: 'success',
+          message: '✓ 자동 생성된 ticker입니다.'
+        }
+      }));
+    }
+  };
 
   const handleBusinessNumberChange = (businessIndex, e) => {
     const value = e.target.value;
@@ -175,20 +229,30 @@ function DriverRegister() {
                           { max: 50, message: '최대 50자' }
                         ]}
                       >
-                        <Input placeholder="예: 정훈" />
+                        <Input
+                          placeholder="예: 정훈"
+                          onChange={(e) => handleSettlementBusinessNameChange(index, e)}
+                        />
                       </Form.Item>
 
                       <Form.Item
                         {...restField}
                         name={[name, 'ticker']}
-                        label="ticker"
+                        label="Ticker (자동생성)"
                         rules={[
-                          { required: true, message: 'ticker를 입력해주세요' },
-                          { max: 10, message: '최대 10자' },
-                          { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+                          { required: true, message: 'ticker를 입력해주세요' }
                         ]}
+                        validateStatus={tickerValidationStatus[index]?.status}
+                        help={tickerValidationStatus[index]?.message}
                       >
-                        <Input placeholder="예: JH01" />
+                        <Input
+                          disabled
+                          placeholder="정산사업자명 입력 시 자동 생성됩니다"
+                          maxLength={10}
+                          suffix={
+                            <span className="text-xs text-gray-400">💡 초성 기반</span>
+                          }
+                        />
                       </Form.Item>
 
                       <Form.Item
