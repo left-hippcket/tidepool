@@ -107,6 +107,21 @@ function SellerDetail() {
       const basicValues = await form.validateFields();
       const businessesValues = await businessForm.validateFields();
 
+      // 비활성화 시 활성 사업자 확인
+      if (basicValues.status === 'inactive') {
+        const hasActiveBusiness = detail.businesses.some(b => b.status === 'active');
+        if (hasActiveBusiness) {
+          Modal.error({
+            title: '비활성화 불가',
+            content: '소속 사업자 중 활성 상태인 사업자가 있습니다. 모든 사업자를 먼저 비활성화해주세요.',
+            onOk: () => {
+              form.setFieldsValue({ status: 'active' });
+            }
+          });
+          return;
+        }
+      }
+
       // 그룹 기본 정보 업데이트
       updateGroup('seller', parseInt(id), {
         name: basicValues.name,
@@ -147,22 +162,6 @@ function SellerDetail() {
   const handleCancel = () => {
     setEditMode(false);
     form.resetFields();
-  };
-
-  // 상태 변경 핸들러
-  const handleStatusChange = (value) => {
-    if (value === 'inactive') {
-      const hasActiveBusiness = detail.businesses.some(b => b.status === 'active');
-      if (hasActiveBusiness) {
-        Modal.warning({
-          title: '비활성화 불가',
-          content: '소속 사업자 중 활성 상태인 사업자가 있습니다. 모든 사업자를 먼저 비활성화해주세요.',
-          onOk: () => {
-            form.setFieldsValue({ status: 'active' });
-          }
-        });
-      }
-    }
   };
 
   // 소속 사업자 상태 변경 핸들러
@@ -408,10 +407,6 @@ function SellerDetail() {
                 <FMSwitch
                   onLabel="활성"
                   offLabel="비활성"
-                  onChange={(checked) => {
-                    const newStatus = checked ? 'active' : 'inactive';
-                    handleStatusChange(newStatus);
-                  }}
                 />
               </Form.Item>
             </>
