@@ -165,6 +165,17 @@ function SellerDetail() {
     }
   };
 
+  // 소속 사업자 상태 변경 핸들러
+  const handleBusinessStatusChange = (businessIndex, checked) => {
+    const updatedDetail = {
+      ...detail,
+      businesses: detail.businesses.map((b, idx) =>
+        idx === businessIndex ? { ...b, status: checked ? 'active' : 'inactive' } : b
+      )
+    };
+    setDetail(updatedDetail);
+  };
+
 
 
   const qualitativeLabels = {
@@ -716,9 +727,7 @@ function SellerDetail() {
                     <div className="w-3/4">
                       <FMSwitch
                         checked={business.status === 'active'}
-                        onChange={(checked) => {
-                          // 상태 변경 로직 (실제 구현 시 업데이트 필요)
-                        }}
+                        onChange={(checked) => handleBusinessStatusChange(businessIndex, checked)}
                         onLabel="활성"
                         offLabel="비활성"
                       />

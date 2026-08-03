@@ -35,6 +35,17 @@ function JoinDistributionDetail() {
     navigate(`/join-distribution/register?groupId=${id}&mode=add`);
   };
 
+  // 소속 사업자 상태 변경 핸들러
+  const handleBusinessStatusChange = (businessIndex, checked) => {
+    const updatedDetail = {
+      ...detail,
+      businesses: detail.businesses.map((b, idx) =>
+        idx === businessIndex ? { ...b, status: checked ? 'active' : 'inactive' } : b
+      )
+    };
+    setDetail(updatedDetail);
+  };
+
   // 편집 모드 진입
   const handleEditMode = () => {
     form.setFieldsValue({
@@ -464,7 +475,7 @@ function JoinDistributionDetail() {
                     <div className="w-3/4">
                       <FMSwitch
                         checked={business.status === 'active'}
-                        onChange={(checked) => {}}
+                        onChange={(checked) => handleBusinessStatusChange(businessIndex, checked)}
                         onLabel="활성"
                         offLabel="비활성"
                       />
