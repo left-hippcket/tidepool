@@ -408,23 +408,18 @@ function BuyerDetail() {
                 />
               </Form.Item>
 
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-sm font-medium text-gray-700" style={{width: '20%'}}>상태:</span>
-                <div style={{width: '80%'}}>
-                  <Form.Item name="status" noStyle shouldUpdate>
-                    {() => (
-                      <FMSwitch
-                        checked={form.getFieldValue('status') === 'active'}
-                        onChange={(checked) => {
-                          form.setFieldsValue({ status: checked ? 'active' : 'inactive' });
-                        }}
-                        onLabel="활성"
-                        offLabel="비활성"
-                      />
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
+              <Form.Item
+                label="상태"
+                name="status"
+                valuePropName="checked"
+                getValueFromEvent={(checked) => checked ? 'active' : 'inactive'}
+                getValueProps={(value) => ({ checked: value === 'active' })}
+              >
+                <FMSwitch
+                  onLabel="활성"
+                  offLabel="비활성"
+                />
+              </Form.Item>
             </>
           ) : (
             <div className="space-y-3">
