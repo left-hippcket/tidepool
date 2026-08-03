@@ -136,6 +136,22 @@ function DriverDetail() {
         setEditMode(false);
       };
 
+      // 비활성화 시 정산사업자 상태 확인
+      if (basicValues.status === 'inactive') {
+        const activeSettlementCount = settlementValues.settlementBusinesses?.filter(b => b.status === 'active').length || 0;
+        if (activeSettlementCount > 0) {
+          Modal.error({
+            title: '비활성화 불가',
+            content: `소속된 정산사업자가 ${activeSettlementCount}개 활성 상태로 남아있어 드라이버를 비활성화할 수 없습니다. 모든 정산사업자를 먼저 비활성화해주세요.`,
+            onOk: () => {
+              form.setFieldsValue({ status: 'active' });
+            }
+          });
+          return;
+        }
+      }
+
+      // 상태 변경 확인
       if (basicValues.status === 'inactive' && basicInfo.status === 'active') {
         Modal.confirm({
           title: '드라이버 비활성화',
@@ -277,12 +293,12 @@ function DriverDetail() {
                 />
               </Form.Item>
 
-              <Form.Item name="status" hidden>
-                <Input />
-              </Form.Item>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-sm font-medium text-gray-700" style={{width: '20%'}}>상태:</span>
                 <div style={{width: '80%'}}>
+                  <Form.Item name="status" noStyle>
+                    <Input type="hidden" />
+                  </Form.Item>
                   <FMSwitch
                     checked={form.getFieldValue('status') === 'active'}
                     onChange={(checked) => {

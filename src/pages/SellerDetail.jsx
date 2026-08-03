@@ -398,12 +398,12 @@ function SellerDetail() {
                 <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} />
               </Form.Item>
 
-              <Form.Item name="status" hidden>
-                <Input />
-              </Form.Item>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-sm font-medium text-gray-700" style={{width: '20%'}}>상태:</span>
                 <div style={{width: '80%'}}>
+                  <Form.Item name="status" noStyle>
+                    <Input type="hidden" />
+                  </Form.Item>
                   <FMSwitch
                     checked={form.getFieldValue('status') === 'active'}
                     onChange={(checked) => {
