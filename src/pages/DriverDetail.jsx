@@ -277,19 +277,21 @@ function DriverDetail() {
                 />
               </Form.Item>
 
-              <Form.Item name="status" label="상태" hidden>
+              <Form.Item name="status" hidden>
                 <Input />
               </Form.Item>
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-sm font-medium text-gray-700">상태:</span>
-                <FMSwitch
-                  checked={form.getFieldValue('status') === 'active'}
-                  onChange={(checked) => {
-                    form.setFieldsValue({ status: checked ? 'active' : 'inactive' });
-                  }}
-                  onLabel="활성"
-                  offLabel="비활성"
-                />
+                <span className="text-sm font-medium text-gray-700" style={{width: '20%'}}>상태:</span>
+                <div style={{width: '80%'}}>
+                  <FMSwitch
+                    checked={form.getFieldValue('status') === 'active'}
+                    onChange={(checked) => {
+                      form.setFieldsValue({ status: checked ? 'active' : 'inactive' });
+                    }}
+                    onLabel="활성"
+                    offLabel="비활성"
+                  />
+                </div>
               </div>
             </>
           ) : (
