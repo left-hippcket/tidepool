@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusOutlined } from '@ant-design/icons';
 import { Check, X } from 'lucide-react';
-import { sellerGroups, sellerDetails, managers, territories, regions } from '../data/mockData';
+import { sellerDetails, managers, territories, regions } from '../data/mockData';
+import { getStoredGroups } from '../utils/dataStorage';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMButton } from '../components/ui/FMButton';
 
 function SellerManagement() {
   const navigate = useNavigate();
+  const [sellerGroups, setSellerGroups] = useState([]);
   const [selectedManager, setSelectedManager] = useState('전체');
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedTerritory, setSelectedTerritory] = useState('전체');
@@ -16,6 +18,12 @@ function SellerManagement() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  // localStorage에서 데이터 로드
+  useEffect(() => {
+    const storedGroups = getStoredGroups('seller');
+    setSellerGroups(storedGroups);
+  }, []);
 
   // 날짜 차이 계산 함수 (일 단위)
   const getDaysAgo = (dateStr) => {

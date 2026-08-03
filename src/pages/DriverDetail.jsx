@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Upload, Image, Modal, Radio } from 'antd';
+import { Form, Input, Select, Upload, Image, Modal } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
 import { driverDetails } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
+import { FMRadioGroup } from '../components/ui/FMRadioGroup';
 import toast from 'react-hot-toast';
 
 function DriverDetail() {
@@ -358,10 +359,18 @@ function DriverDetail() {
                         name={[name, 'taxType']}
                         label="사업자 과세유형"
                       >
-                        <Radio.Group>
-                          <Radio value="과세">과세</Radio>
-                          <Radio value="면세">면세</Radio>
-                        </Radio.Group>
+                        <FMRadioGroup
+                          value={settlementForm.getFieldValue(['settlementBusinesses', index, 'taxType'])}
+                          onChange={(value) => {
+                            const businesses = settlementForm.getFieldValue('settlementBusinesses') || [];
+                            businesses[index] = { ...businesses[index], taxType: value };
+                            settlementForm.setFieldsValue({ settlementBusinesses: businesses });
+                          }}
+                          options={[
+                            { label: '과세', value: '과세' },
+                            { label: '면세', value: '면세' }
+                          ]}
+                        />
                       </Form.Item>
 
                       <div className="flex items-center mb-4">

@@ -15,6 +15,7 @@ import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
 import toast from 'react-hot-toast';
 import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
+import { generateGroupName, shouldUpdateGroupName } from '../utils/groupNameGenerator';
 
 function BuyerRegister() {
   const navigate = useNavigate();
@@ -228,7 +229,22 @@ function BuyerRegister() {
         // TODO: 상세 페이지로 이동
         navigate('/buyer');
       } else {
-        toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        // 기존 그룹에 사업자 추가 - 1→2 전환 체크
+        const oldCount = selectedGroup.businessCount || 0;
+        const newCount = oldCount + 1;
+
+        if (shouldUpdateGroupName(oldCount, newCount)) {
+          // 그룹명 변경 필요 (1→2 전환)
+          const newGroupName = `${selectedGroup.name} 그룹`;
+          toast.success(
+            `그룹명이 "${selectedGroup.name}"에서 "${newGroupName}"으로 변경되었습니다.`,
+            { duration: 5000 }
+          );
+          // TODO: 실제 백엔드 API 호출 시 그룹명 업데이트 필요
+          // updateGroupName(selectedGroup.id, newGroupName);
+        } else {
+          toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        }
         navigate(`/buyer/${selectedGroup.id}`);
       }
     } catch (error) {
@@ -322,14 +338,15 @@ function BuyerRegister() {
 
             <Form.Item
               name="groupName"
-              label="바이어그룹명"
-              rules={[
-                { required: true, message: '바이어그룹명을 입력해주세요' },
-                { max: 30, message: '최대 30자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
-              ]}
+              label="바이어그룹명 (자동생성)"
             >
-              <Input placeholder="예: 명성횟집 그룹" />
+              <Input
+                disabled
+                placeholder="바이어명 입력 시 자동 생성됩니다"
+                suffix={
+                  <span className="text-xs text-gray-400">💡 사업자명 기반</span>
+                }
+              />
             </Form.Item>
 
             <Form.Item
@@ -441,6 +458,7 @@ function BuyerRegister() {
             <Form.Item
               name="arrivalPricePolicy"
               label="넙치 도착단가 정책"
+              initialValue={900}
             >
               <div className="flex flex-col gap-1">
                 <InputNumber
@@ -615,7 +633,16 @@ function BuyerRegister() {
                 { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용' }
               ]}
             >
-              <Input placeholder="대박집" />
+              <Input
+                placeholder="대박집"
+                onChange={(e) => {
+                  // 바이어명 변경 시 그룹명 자동 업데이트 (신규 등록인 경우만)
+                  if (registrationType === 'new') {
+                    const buyerName = e.target.value;
+                    form.setFieldsValue({ groupName: buyerName });
+                  }
+                }}
+              />
             </Form.Item>
 
             <Form.Item

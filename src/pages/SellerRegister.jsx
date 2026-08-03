@@ -16,6 +16,8 @@ import { FMTagInput } from '../components/ui/FMTagInput';
 import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
+import { generateGroupName, shouldUpdateGroupName } from '../utils/groupNameGenerator';
+import { addNewGroup, addBusinessToGroup, getStoredGroups, getStoredDetails, updateGroup } from '../utils/dataStorage';
 
 function SellerRegister() {
   const navigate = useNavigate();
@@ -204,9 +206,50 @@ function SellerRegister() {
       }
 
       if (registrationType === 'new') {
-        toast.success(`셀러 그룹 '${values.groupName}'이 등록되었습니다.`);
+        // 신규 그룹 생성 - localStorage에 저장
+        const groupName = generateGroupName(values.businesses || [], 'seller');
+
+        addNewGroup('seller', {
+          name: groupName,
+          manager: values.manager,
+          territory: values.territory,
+          region: values.region,
+          mainCategory: values.mainCategory,
+          mainProducts: values.mainProducts,
+          commissionRate: values.commissionRate
+        }, values.businesses || []);
+
+        toast.success(`셀러 그룹 '${groupName}'이 등록되었습니다.`);
       } else {
-        toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        // 기존 그룹에 사업자 추가 - localStorage 저장
+        const oldCount = selectedGroup.businessCount || 0;
+
+        // 사업자 추가
+        if (values.businesses && values.businesses.length > 0) {
+          values.businesses.forEach(business => {
+            addBusinessToGroup('seller', selectedGroup.id, business);
+          });
+        }
+
+        const newCount = oldCount + (values.businesses?.length || 1);
+
+        // 1→2 전환 시 그룹명 변경
+        if (shouldUpdateGroupName(oldCount, newCount)) {
+          const detail = getStoredDetails('seller', selectedGroup.id);
+          const firstBusiness = detail?.businesses?.[0];
+          const newGroupName = firstBusiness?.sellerName
+            ? `${firstBusiness.sellerName} 그룹`
+            : `${selectedGroup.name} 그룹`;
+
+          updateGroup('seller', selectedGroup.id, { name: newGroupName });
+
+          toast.success(
+            `그룹명이 "${selectedGroup.name}"에서 "${newGroupName}"으로 변경되었습니다.`,
+            { duration: 5000 }
+          );
+        } else {
+          toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        }
       }
 
       navigate('/seller');
@@ -246,6 +289,13 @@ function SellerRegister() {
         labelCol={{ flex: '20%' }}
         wrapperCol={{ flex: '80%' }}
         labelAlign="left"
+        onValuesChange={(changedValues, allValues) => {
+          // 사업자 정보 변경 시 그룹명 자동 업데이트
+          if (changedValues.businesses && registrationType === 'new') {
+            const generatedName = generateGroupName(allValues.businesses || [], 'seller');
+            form.setFieldsValue({ groupName: generatedName });
+          }
+        }}
       >
         {/* 기존 그룹 검색 (기존 그룹 추가 시) */}
         {registrationType === 'existing' && (
@@ -290,14 +340,15 @@ function SellerRegister() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">셀러그룹 기본 정보</h3>
             <Form.Item
               name="groupName"
-              label="셀러그룹명"
-              rules={[
-                { required: true, message: '셀러그룹명을 입력해주세요' },
-                { max: 30, message: '최대 30자까지 입력 가능합니다' },
-                { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용됩니다' }
-              ]}
+              label="셀러그룹명 (자동생성)"
             >
-              <Input placeholder="예: 성호수산" />
+              <Input
+                disabled
+                placeholder="첫 번째 사업자명 입력 시 자동 생성됩니다"
+                suffix={
+                  <span className="text-xs text-gray-400">💡 사업자명 기반</span>
+                }
+              />
             </Form.Item>
 
             <Form.Item

@@ -171,9 +171,13 @@ function JoinDistributionDetail() {
               <Form.Item
                 name="name"
                 label="조인유통 그룹명"
-                rules={[{ required: true, message: '그룹명을 입력해주세요' }]}
               >
-                <Input />
+                <Input
+                  disabled
+                  suffix={
+                    <span className="text-xs text-gray-400">💡 자동생성 (사업자명 기반)</span>
+                  }
+                />
               </Form.Item>
 
               <Form.Item

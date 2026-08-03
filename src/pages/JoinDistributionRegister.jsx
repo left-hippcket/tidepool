@@ -10,6 +10,7 @@ import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
 import toast from 'react-hot-toast';
 import { findPartnerByBusinessNumber, validateTicker, PARTNER_TYPE_NAMES } from '../utils/tickerValidation';
+import { generateGroupName, shouldUpdateGroupName } from '../utils/groupNameGenerator';
 
 function JoinDistributionRegister() {
   const navigate = useNavigate();
@@ -138,7 +139,22 @@ function JoinDistributionRegister() {
       if (registrationType === 'new') {
         toast.success(`조인유통 그룹 '${values.groupName}'이 등록되었습니다.`);
       } else {
-        toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        // 기존 그룹에 사업자 추가 - 1→2 전환 체크
+        const oldCount = selectedGroup.businessCount || 0;
+        const newCount = oldCount + 1;
+
+        if (shouldUpdateGroupName(oldCount, newCount)) {
+          // 그룹명 변경 필요 (1→2 전환)
+          const newGroupName = `${selectedGroup.name} 그룹`;
+          toast.success(
+            `그룹명이 "${selectedGroup.name}"에서 "${newGroupName}"으로 변경되었습니다.`,
+            { duration: 5000 }
+          );
+          // TODO: 실제 백엔드 API 호출 시 그룹명 업데이트 필요
+          // updateGroupName(selectedGroup.id, newGroupName);
+        } else {
+          toast.success(`사업자가 '${selectedGroup.name}'에 추가되었습니다.`);
+        }
       }
 
       navigate('/join-distribution');
@@ -227,13 +243,15 @@ function JoinDistributionRegister() {
 
             <Form.Item
               name="groupName"
-              label="조인유통그룹명"
-              rules={[
-                { required: true, message: '조인유통그룹명을 입력해주세요' },
-                { max: 30, message: '최대 30자까지 입력 가능합니다' },
-              ]}
+              label="조인유통그룹명 (자동생성)"
             >
-              <Input placeholder="동주유통" />
+              <Input
+                disabled
+                placeholder="조인유통명 입력 시 자동 생성됩니다"
+                suffix={
+                  <span className="text-xs text-gray-400">💡 사업자명 기반</span>
+                }
+              />
             </Form.Item>
 
             <Form.Item
@@ -315,7 +333,7 @@ function JoinDistributionRegister() {
               <Input placeholder="예: 월 2회 정산" />
             </Form.Item>
 
-            <Form.Item name="arrivalPricePolicy" label="넙치 도착단가 정책">
+            <Form.Item name="arrivalPricePolicy" label="넙치 도착단가 정책" initialValue={0}>
               <div className="flex flex-col gap-1">
                 <InputNumber
                   style={{ width: '100%' }}
@@ -329,7 +347,7 @@ function JoinDistributionRegister() {
               </div>
             </Form.Item>
 
-            <Form.Item name="commissionRate" label="상차 수수료율(%)">
+            <Form.Item name="commissionRate" label="상차 수수료율(%)" initialValue={0}>
               <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} placeholder="예: 1" />
             </Form.Item>
 
@@ -385,7 +403,16 @@ function JoinDistributionRegister() {
                 { pattern: /^[가-힣0-9() ]+$/, message: '한글, 숫자, 괄호()만 허용' }
               ]}
             >
-              <Input placeholder="동주본점" />
+              <Input
+                placeholder="동주본점"
+                onChange={(e) => {
+                  // 조인유통명 변경 시 그룹명 자동 업데이트 (신규 등록인 경우만)
+                  if (registrationType === 'new') {
+                    const joinName = e.target.value;
+                    form.setFieldsValue({ groupName: joinName });
+                  }
+                }}
+              />
             </Form.Item>
 
             <Form.Item

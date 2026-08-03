@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, InputNumber, Modal, Upload, Image } from 'antd';
 import { MinusCircleOutlined, ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Plus, Edit2, Save, X, Upload as UploadIcon } from 'lucide-react';
-import { sellerGroups, sellerDetails, managers, territories, regions, productCategories, products } from '../data/mockData';
+import { managers, territories, regions, productCategories, products } from '../data/mockData';
+import { getStoredGroups, getStoredDetails, updateGroup, updateDetails } from '../utils/dataStorage';
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
 import { FMSelect } from '../components/ui/FMSelect';
@@ -17,10 +18,20 @@ function SellerDetail() {
   const [editMode, setEditMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
+  const [sellerGroup, setSellerGroup] = useState(null);
+  const [detail, setDetail] = useState(null);
   const [form] = Form.useForm();
+  const [businessForm] = Form.useForm();
 
-  const sellerGroup = sellerGroups.find(s => s.id === parseInt(id));
-  const detail = sellerDetails[id];
+  // localStorage에서 데이터 로드
+  useEffect(() => {
+    const groups = getStoredGroups('seller');
+    const group = groups.find(g => g.id === parseInt(id));
+    setSellerGroup(group);
+
+    const storedDetail = getStoredDetails('seller', id);
+    setDetail(storedDetail);
+  }, [id]);
 
   // 주요품목분류 변경 시 주요품목 필터링
   const handleCategoryChange = (categories) => {
@@ -93,11 +104,41 @@ function SellerDetail() {
   // 저장
   const handleSave = async () => {
     try {
-      const values = await form.validateFields();
+      const basicValues = await form.validateFields();
+      const businessesValues = await businessForm.validateFields();
+
+      // 그룹 기본 정보 업데이트
+      updateGroup('seller', parseInt(id), {
+        name: basicValues.name,
+        manager: basicValues.manager,
+        territory: basicValues.territory,
+        region: basicValues.region,
+        mainCategory: basicValues.mainCategory,
+        mainProducts: basicValues.mainProducts,
+        commissionRate: basicValues.commissionRate
+      });
+
+      // 상세 정보 (사업자 포함) 업데이트
+      updateDetails('seller', id, {
+        ...detail,
+        keymen: basicValues.keymen,
+        businesses: businessesValues.businesses || []
+      });
+
       toast.success('셀러그룹 정보가 수정되었습니다.');
       setEditMode(false);
+
+      // 데이터 새로고침
+      const updatedGroups = getStoredGroups('seller');
+      const updatedGroup = updatedGroups.find(g => g.id === parseInt(id));
+      setSellerGroup(updatedGroup);
+
+      const updatedDetail = getStoredDetails('seller', id);
+      setDetail(updatedDetail);
+
     } catch (error) {
       console.error('Validation failed:', error);
+      toast.error('저장에 실패했습니다.');
     }
   };
 
@@ -235,9 +276,13 @@ function SellerDetail() {
               <Form.Item
                 name="name"
                 label="셀러그룹명"
-                rules={[{ required: true, message: '셀러그룹명을 입력해주세요' }]}
               >
-                <Input />
+                <Input
+                  disabled
+                  suffix={
+                    <span className="text-xs text-gray-400">💡 자동생성 (사업자명 기반)</span>
+                  }
+                />
               </Form.Item>
 
               <Form.Item

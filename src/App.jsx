@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { initializeStorage } from './utils/dataStorage';
 import TerritoryManagement from './pages/TerritoryManagement';
 import SellerManagement from './pages/SellerManagement';
 import SellerDetail from './pages/SellerDetail';
@@ -47,6 +48,9 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
+    // localStorage 초기화 (최초 1회)
+    initializeStorage();
+
     // 페이지 로드 시 sessionStorage에서 인증 상태 확인
     const authStatus = sessionStorage.getItem(AUTH_KEY);
     if (authStatus === 'true') {

@@ -724,7 +724,12 @@ function ProductManagement() {
                     <SortableItem key={category.id} id={category.id} disabled={!editMode}>
                       {(listeners) => (
                         <div
-                          onClick={() => !editMode && setSelectedCategory(category)}
+                          onClick={() => {
+                            if (!editMode) {
+                              setSelectedCategory(category);
+                              setSelectedProduct(null); // 품목분류 변경 시 선택된 품목 초기화
+                            }
+                          }}
                           className={`rounded-lg border p-3 transition-all ${
                             editMode
                               ? 'cursor-default border-gray-200 bg-white'
