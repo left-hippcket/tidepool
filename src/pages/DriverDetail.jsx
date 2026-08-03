@@ -308,12 +308,14 @@ function DriverDetail() {
                         name={[name, 'ticker']}
                         label="ticker"
                         rules={[
-                          { required: true, message: 'ticker를 입력해주세요' },
-                          { max: 10, message: '최대 10자' },
-                          { pattern: /^[A-Za-z0-9]+$/, message: '영문, 숫자만 허용' }
+                          { required: true, message: 'ticker를 입력해주세요' }
                         ]}
                       >
-                        <Input placeholder="예: JH01" />
+                        <Input
+                          disabled
+                          placeholder="예: JH01"
+                          className="bg-gray-50"
+                        />
                       </Form.Item>
 
                       <Form.Item
@@ -324,7 +326,11 @@ function DriverDetail() {
                           { pattern: /^\d{3}-\d{2}-\d{5}$/, message: 'XXX-XX-XXXXX 형식' }
                         ]}
                       >
-                        <Input placeholder="123-45-67890" />
+                        <Input
+                          disabled
+                          placeholder="123-45-67890"
+                          className="bg-gray-50"
+                        />
                       </Form.Item>
 
                       <Form.Item
