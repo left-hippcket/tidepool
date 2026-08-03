@@ -277,7 +277,11 @@ function DriverDetail() {
                 />
               </Form.Item>
 
-              <Form.Item label="상태">
+              <Form.Item name="status" label="상태" hidden>
+                <Input />
+              </Form.Item>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-sm font-medium text-gray-700">상태:</span>
                 <FMSwitch
                   checked={form.getFieldValue('status') === 'active'}
                   onChange={(checked) => {
@@ -286,7 +290,7 @@ function DriverDetail() {
                   onLabel="활성"
                   offLabel="비활성"
                 />
-              </Form.Item>
+              </div>
             </>
           ) : (
             <div className="space-y-3">

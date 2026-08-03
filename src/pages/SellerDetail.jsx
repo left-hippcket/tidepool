@@ -398,20 +398,24 @@ function SellerDetail() {
                 <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} />
               </Form.Item>
 
-              <Form.Item
-                label="상태"
-              >
-                <FMSwitch
-                  checked={form.getFieldValue('status') === 'active'}
-                  onChange={(checked) => {
-                    const newStatus = checked ? 'active' : 'inactive';
-                    form.setFieldsValue({ status: newStatus });
-                    handleStatusChange(newStatus);
-                  }}
-                  onLabel="활성"
-                  offLabel="비활성"
-                />
+              <Form.Item name="status" hidden>
+                <Input />
               </Form.Item>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-sm font-medium text-gray-700" style={{width: '20%'}}>상태:</span>
+                <div style={{width: '80%'}}>
+                  <FMSwitch
+                    checked={form.getFieldValue('status') === 'active'}
+                    onChange={(checked) => {
+                      const newStatus = checked ? 'active' : 'inactive';
+                      form.setFieldsValue({ status: newStatus });
+                      handleStatusChange(newStatus);
+                    }}
+                    onLabel="활성"
+                    offLabel="비활성"
+                  />
+                </div>
+              </div>
             </>
           ) : (
             <div className="space-y-3">
