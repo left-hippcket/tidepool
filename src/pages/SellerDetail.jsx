@@ -115,7 +115,8 @@ function SellerDetail() {
         region: basicValues.region,
         mainCategory: basicValues.mainCategory,
         mainProducts: basicValues.mainProducts,
-        commissionRate: basicValues.commissionRate
+        commissionRate: basicValues.commissionRate,
+        status: basicValues.status
       });
 
       // 상세 정보 (사업자 포함) 업데이트

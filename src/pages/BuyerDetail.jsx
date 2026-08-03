@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Modal, Upload, Image } from 'antd';
 import { MinusCircleOutlined, ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
@@ -10,6 +10,7 @@ import { FMSelect } from '../components/ui/FMSelect';
 import { FMTagInput } from '../components/ui/FMTagInput';
 import { FMSwitch } from '../components/ui/FMSwitch';
 import toast from 'react-hot-toast';
+import { getStoredGroups, getStoredDetails, updateGroup, updateDetails } from '../utils/dataStorage';
 
 function BuyerDetail() {
   const { id } = useParams();
@@ -18,9 +19,18 @@ function BuyerDetail() {
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [form] = Form.useForm();
+  const [buyerGroup, setBuyerGroup] = useState(null);
+  const [detail, setDetail] = useState(null);
 
-  const buyerGroup = buyerGroups.find(b => b.id === parseInt(id));
-  const detail = buyerDetails[id];
+  // localStorage에서 데이터 로드
+  useEffect(() => {
+    const groups = getStoredGroups('buyer');
+    const group = groups.find(g => g.id === parseInt(id));
+    setBuyerGroup(group);
+
+    const storedDetail = getStoredDetails('buyer', id);
+    setDetail(storedDetail);
+  }, [id]);
 
   // 주요품목분류 변경 시 주요품목 필터링
   const handleCategoryChange = (categories) => {
@@ -110,8 +120,45 @@ function BuyerDetail() {
         }
       }
 
+      // 그룹 기본 정보 업데이트
+      updateGroup('buyer', parseInt(id), {
+        name: values.name,
+        territory: values.territory,
+        region: values.region,
+        mainCategory: values.mainCategory,
+        mainProducts: values.mainProducts,
+        arrivalPricePolicy: values.arrivalPricePolicy,
+        categoryManagers: values.categoryManagers,
+        status: values.status
+      });
+
+      // 상세 정보 업데이트
+      updateDetails('buyer', id, {
+        ...detail,
+        keymen: values.keymen,
+        qualitativeRatings: {
+          ...detail.qualitativeRatings,
+          priority1: values.priority1,
+          priority2: values.priority2,
+          priority3: values.priority3,
+          priority4: values.priority4,
+          priority5: values.priority5,
+          priority6: values.priority6,
+          priority7: values.priority7
+        }
+      });
+
       toast.success('바이어그룹 정보가 수정되었습니다.');
       setEditMode(false);
+
+      // 데이터 새로고침
+      const updatedGroups = getStoredGroups('buyer');
+      const updatedGroup = updatedGroups.find(g => g.id === parseInt(id));
+      setBuyerGroup(updatedGroup);
+
+      const updatedDetail = getStoredDetails('buyer', id);
+      setDetail(updatedDetail);
+
     } catch (error) {
       console.error('Validation failed:', error);
     }

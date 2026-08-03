@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Modal, Upload, Image } from 'antd';
 import { ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
@@ -10,15 +10,25 @@ import { FMSwitch } from '../components/ui/FMSwitch';
 import { FMSelect } from '../components/ui/FMSelect';
 import toast from 'react-hot-toast';
 import { Star } from 'lucide-react';
+import { getStoredGroups, getStoredDetails, updateGroup, updateDetails } from '../utils/dataStorage';
 
 function JoinDistributionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm();
+  const [joinGroup, setJoinGroup] = useState(null);
+  const [detail, setDetail] = useState(null);
 
-  const joinGroup = joinGroups.find(j => j.id === parseInt(id));
-  const detail = joinDetails[id];
+  // localStorage에서 데이터 로드
+  useEffect(() => {
+    const groups = getStoredGroups('join');
+    const group = groups.find(g => g.id === parseInt(id));
+    setJoinGroup(group);
+
+    const storedDetail = getStoredDetails('join', id);
+    setDetail(storedDetail);
+  }, [id]);
 
   // 사업자 추가
   const handleAddBusiness = () => {
@@ -62,8 +72,39 @@ function JoinDistributionDetail() {
         }
       }
 
+      // 그룹 기본 정보 업데이트
+      updateGroup('join', parseInt(id), {
+        name: values.name,
+        salesPerson: values.salesPerson || (values.salesPersons && values.salesPersons[0]),
+        salesPersons: values.salesPersons,
+        territory: values.territory,
+        region: values.region,
+        status: values.status
+      });
+
+      // 상세 정보 업데이트
+      updateDetails('join', id, {
+        ...detail,
+        kakaoGroupName: values.kakaoGroupName,
+        paymentCycle: values.paymentCycle,
+        arrivalPricePolicy: values.arrivalPricePolicy,
+        commissionRate: values.commissionRate,
+        mainSuppliers: values.mainSuppliers?.join(', ') || '',
+        mainFarms: values.mainFarms?.join(', ') || '',
+        financial: values.financial
+      });
+
       toast.success('조인유통 그룹 정보가 수정되었습니다.');
       setEditMode(false);
+
+      // 데이터 새로고침
+      const updatedGroups = getStoredGroups('join');
+      const updatedGroup = updatedGroups.find(g => g.id === parseInt(id));
+      setJoinGroup(updatedGroup);
+
+      const updatedDetail = getStoredDetails('join', id);
+      setDetail(updatedDetail);
+
     } catch (error) {
       console.error('Validation failed:', error);
     }
