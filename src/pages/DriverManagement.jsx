@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { Check, X } from 'lucide-react';
 import { drivers, driverDetails } from '../data/mockData';
 import { FMSelectSimple } from '../components/ui/FMSelectSimple';
 import { FMButton } from '../components/ui/FMButton';
+import { getStoredGroups, getAllStoredDetails } from '../utils/dataStorage';
 
 function DriverManagement() {
   const navigate = useNavigate();
@@ -13,10 +14,20 @@ function DriverManagement() {
   const [statusFilter, setStatusFilter] = useState('활성');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+  const [driversData, setDriversData] = useState([]);
+  const [driverDetailsData, setDriverDetailsData] = useState({});
+
+  // localStorage에서 데이터 로드
+  useEffect(() => {
+    const storedDrivers = getStoredGroups('driver');
+    const storedDetails = getAllStoredDetails('driver');
+    setDriversData(storedDrivers);
+    setDriverDetailsData(storedDetails);
+  }, []);
 
   // 필터링
   const filteredDrivers = useMemo(() => {
-    return drivers.filter(driver => {
+    return driversData.filter(driver => {
       if (vehicleTypeFilter !== '전체' && driver.vehicleType !== vehicleTypeFilter) return false;
       if (taxTypeFilter !== '전체') {
         if (taxTypeFilter === '미등록' && driver.taxType !== null) return false;
@@ -31,7 +42,7 @@ function DriverManagement() {
         const driverNameMatch = driver.name.toLowerCase().includes(keyword);
 
         // 상세 정보에서 정산사업자명과 전화번호 검색
-        const detail = driverDetails[driver.id];
+        const detail = driverDetailsData[driver.id];
         const activeSettlement = detail?.settlementBusinesses?.find(b => b.status === 'active')
           || detail?.settlementInfo;
         const settlementNameMatch = activeSettlement?.settlementBusinessName?.toLowerCase().includes(keyword) || false;
@@ -44,7 +55,7 @@ function DriverManagement() {
 
       return true;
     });
-  }, [vehicleTypeFilter, taxTypeFilter, statusFilter, searchKeyword]);
+  }, [driversData, driverDetailsData, vehicleTypeFilter, taxTypeFilter, statusFilter, searchKeyword]);
 
   // 정렬
   const sortedDrivers = useMemo(() => {
@@ -183,7 +194,7 @@ function DriverManagement() {
             </thead>
             <tbody>
               {sortedDrivers.map((record) => {
-                const detail = driverDetails[record.id];
+                const detail = driverDetailsData[record.id];
 
                 // 활성 정산사업자 찾기
                 const activeSettlement = detail?.settlementBusinesses?.find(b => b.status === 'active')

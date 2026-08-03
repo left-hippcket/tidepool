@@ -1,23 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Upload, Image, Modal } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
-import { driverDetails } from '../data/mockData';
+import { drivers, driverDetails } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
 import { FMRadioGroup } from '../components/ui/FMRadioGroup';
 import toast from 'react-hot-toast';
+import { getStoredGroups, getStoredDetails, updateGroup, updateDetails } from '../utils/dataStorage';
 
 function DriverDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [settlementForm] = Form.useForm();
-
-  const driverData = driverDetails[id];
-
   const [editMode, setEditMode] = useState(false);
+  const [driverData, setDriverData] = useState(null);
+  const [driverGroup, setDriverGroup] = useState(null);
+
+  // localStorage에서 데이터 로드
+  useEffect(() => {
+    const groups = getStoredGroups('driver');
+    const group = groups.find(g => g.id === parseInt(id));
+    setDriverGroup(group);
+
+    const storedDetail = getStoredDetails('driver', id);
+    setDriverData(storedDetail);
+  }, [id]);
 
   if (!driverData) {
     return <div className="p-6">드라이버를 찾을 수 없습니다.</div>;
@@ -91,6 +101,41 @@ function DriverDetail() {
       const basicValues = await form.validateFields();
       const settlementValues = await settlementForm.validateFields();
 
+      const saveData = () => {
+        // 그룹 기본 정보 업데이트 (drivers 배열)
+        updateGroup('driver', parseInt(id), {
+          name: basicValues.name,
+          phone: basicValues.phone,
+          vehicleType: basicValues.vehicleType,
+          tankCount: basicValues.tankCount,
+          status: basicValues.status
+        });
+
+        // 상세 정보 업데이트 (driverDetails)
+        updateDetails('driver', id, {
+          basicInfo: {
+            ...basicInfo,
+            name: basicValues.name,
+            phone: basicValues.phone,
+            vehicleType: basicValues.vehicleType,
+            tankCount: basicValues.tankCount,
+            status: basicValues.status
+          },
+          settlementBusinesses: settlementValues.settlementBusinesses || [],
+          settlementInfo: settlementInfo
+        });
+
+        // 데이터 새로고침
+        const updatedGroups = getStoredGroups('driver');
+        const updatedGroup = updatedGroups.find(g => g.id === parseInt(id));
+        setDriverGroup(updatedGroup);
+
+        const updatedDetail = getStoredDetails('driver', id);
+        setDriverData(updatedDetail);
+
+        setEditMode(false);
+      };
+
       if (basicValues.status === 'inactive' && basicInfo.status === 'active') {
         Modal.confirm({
           title: '드라이버 비활성화',
@@ -98,16 +143,16 @@ function DriverDetail() {
           okText: '확인',
           cancelText: '취소',
           onOk: () => {
+            saveData();
             toast.success('드라이버가 비활성화되었습니다.');
-            setEditMode(false);
           }
         });
       } else if (basicValues.status === 'active' && basicInfo.status === 'inactive') {
+        saveData();
         toast.success('드라이버가 활성화되었습니다.');
-        setEditMode(false);
       } else {
+        saveData();
         toast.success('드라이버 정보가 수정되었습니다.');
-        setEditMode(false);
       }
     } catch (error) {
       console.error('Validation failed:', error);

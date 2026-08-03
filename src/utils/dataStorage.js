@@ -4,7 +4,9 @@ import {
   buyerGroups as initialBuyerGroups,
   buyerDetails as initialBuyerDetails,
   joinGroups as initialJoinGroups,
-  joinDetails as initialJoinDetails
+  joinDetails as initialJoinDetails,
+  drivers as initialDrivers,
+  driverDetails as initialDriverDetails
 } from '../data/mockData';
 
 // 초기화 - 최초 1회만 실행
@@ -27,6 +29,12 @@ export function initializeStorage() {
     }
     if (!localStorage.getItem('joinDetails')) {
       localStorage.setItem('joinDetails', JSON.stringify(initialJoinDetails));
+    }
+    if (!localStorage.getItem('driverGroups')) {
+      localStorage.setItem('driverGroups', JSON.stringify(initialDrivers));
+    }
+    if (!localStorage.getItem('driverDetails')) {
+      localStorage.setItem('driverDetails', JSON.stringify(initialDriverDetails));
     }
   } catch (error) {
     console.error('Storage initialization failed:', error);
