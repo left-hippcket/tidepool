@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Form, Input, Select, Radio, Upload, InputNumber } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons';
-import { Upload as UploadIcon, Plus } from 'lucide-react';
+import { Upload as UploadIcon, Plus, Star } from 'lucide-react';
 import { joinGroups, managers, territories, regions, businessRegistry } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
@@ -392,24 +392,24 @@ function JoinDistributionRegister() {
               <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.1} placeholder="예: 1" />
             </Form.Item>
 
-            <Form.Item name="mainSuppliers" label="주요 공급처">
+            <Form.Item name="mainSuppliers" label="메인 유통사">
               <FMTagInput
                 value={form.getFieldValue('mainSuppliers') || []}
                 onChange={(value) => form.setFieldsValue({ mainSuppliers: value })}
-                placeholder="공급처명 입력 후 엔터키"
+                placeholder="유통사명 입력 후 엔터키"
               />
             </Form.Item>
 
-            <Form.Item name="mainFarms" label="주요 양식장">
+            <Form.Item name="mainFarms" label="메인 소싱처">
               <FMTagInput
                 value={form.getFieldValue('mainFarms') || []}
                 onChange={(value) => form.setFieldsValue({ mainFarms: value })}
-                placeholder="양식장명 입력 후 엔터키"
+                placeholder="소싱처명 입력 후 엔터키"
               />
             </Form.Item>
 
             <Form.Item name="financial" label="재무상황">
-              <Select placeholder="선택">
+              <Select placeholder="선택(담당자의 레퍼런스 체크 및 정성평가)">
                 <Select.Option value="우수">우수</Select.Option>
                 <Select.Option value="양호">양호</Select.Option>
                 <Select.Option value="보통">보통</Select.Option>
@@ -518,11 +518,17 @@ function JoinDistributionRegister() {
                       {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
                       <div className="flex items-center gap-2 mb-4">
                         <h5 className="text-sm font-medium text-gray-700">계좌 #{index + 1}</h5>
+                        {index === 0 && (
+                          <span className="inline-flex items-center gap-1 rounded border font-semibold bg-purple-100 border-purple-300 text-purple-600 px-2.5 py-1 text-xs">
+                            <Star className="h-3 w-3" />
+                            대표계좌
+                          </span>
+                        )}
                         {fields.length > 1 && (
                           <button
                             type="button"
                             onClick={() => remove(name)}
-                            className="text-red-500 hover:text-red-700"
+                            className="text-red-500 hover:text-red-700 ml-auto"
                           >
                             <MinusCircleOutlined />
                           </button>

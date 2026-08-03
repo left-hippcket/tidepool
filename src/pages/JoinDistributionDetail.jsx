@@ -7,7 +7,9 @@ import { joinGroups, joinDetails, managers, territories, regions } from '../data
 import { FMButton } from '../components/ui/FMButton';
 import { FMTagInput } from '../components/ui/FMTagInput';
 import { FMSwitch } from '../components/ui/FMSwitch';
+import { FMSelect } from '../components/ui/FMSelect';
 import toast from 'react-hot-toast';
+import { Star } from 'lucide-react';
 
 function JoinDistributionDetail() {
   const { id } = useParams();
@@ -438,6 +440,12 @@ function JoinDistributionDetail() {
                           {idx > 0 && <div className="my-6 border-t border-gray-200"></div>}
                           <div className="flex items-center gap-2 mb-4">
                             <h6 className="text-sm font-medium text-gray-700">계좌 #{idx + 1}</h6>
+                            {(idx === 0 || account.isPrimary) && (
+                              <span className="inline-flex items-center gap-1 rounded border font-semibold bg-purple-100 border-purple-300 text-purple-600 px-2.5 py-1 text-xs">
+                                <Star className="h-3 w-3" />
+                                대표계좌
+                              </span>
+                            )}
                           </div>
 
                           <div className="space-y-3">
@@ -542,8 +550,11 @@ function JoinDistributionDetail() {
                         {business.bankAccounts.map((account, idx) => (
                           <div key={idx} className="flex items-center gap-2 text-gray-900">
                             <span>{account.bank} {account.accountNumber} ({account.holder})</span>
-                            {account.isPrimary && (
-                              <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2 py-0.5 text-xs">대표계좌</span>
+                            {(idx === 0 || account.isPrimary) && business.bankAccounts.length > 1 && (
+                              <span className="inline-flex items-center gap-1 rounded border font-semibold bg-purple-100 border-purple-300 text-purple-600 px-2.5 py-1 text-xs">
+                                <Star className="h-3 w-3" />
+                                대표계좌
+                              </span>
                             )}
                           </div>
                         ))}
