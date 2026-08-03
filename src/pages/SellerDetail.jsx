@@ -123,7 +123,7 @@ function SellerDetail() {
       updateDetails('seller', id, {
         ...detail,
         keymen: basicValues.keymen,
-        businesses: businessesValues.businesses || []
+        businesses: detail.businesses // 변경된 사업자 상태 포함
       });
 
       toast.success('셀러그룹 정보가 수정되었습니다.');

@@ -143,9 +143,10 @@ function BuyerDetail() {
         status: values.status
       });
 
-      // 상세 정보 업데이트
+      // 상세 정보 업데이트 (businesses 포함)
       updateDetails('buyer', id, {
         ...detail,
+        businesses: detail.businesses, // 변경된 사업자 상태 포함
         keymen: values.keymen,
         qualitativeRatings: {
           ...detail.qualitativeRatings,
