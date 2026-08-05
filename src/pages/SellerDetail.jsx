@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Select, InputNumber, Modal, Upload, Image } from 'antd';
+import { Form, Input, Select, InputNumber, Modal, Upload, Image, Checkbox } from 'antd';
 import { MinusCircleOutlined, ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
 import { Plus, Edit2, Save, X, Upload as UploadIcon } from 'lucide-react';
 import { managers, territories, regions, productCategories, products } from '../data/mockData';
@@ -110,7 +110,6 @@ function SellerDetail() {
   const handleSave = async () => {
     try {
       const basicValues = await form.validateFields();
-      const businessesValues = await businessForm.validateFields();
 
       // 비활성화 시 활성 사업자 확인
       if (basicValues.status === 'inactive') {
@@ -126,6 +125,30 @@ function SellerDetail() {
           return;
         }
       }
+
+      // 정성평가 최근 확인일 업데이트 여부 판단
+      let shouldUpdateQualitativeDate = false;
+
+      // 케이스 1: 정성평가 항목 중 하나라도 변경됨
+      const qualitativeFieldsChanged =
+        basicValues.financial !== detail.qualitativeRatings.financial ||
+        basicValues.quality !== detail.qualitativeRatings.quality ||
+        basicValues.priceCompetitive !== detail.qualitativeRatings.priceCompetitive ||
+        basicValues.claimCooperation !== detail.qualitativeRatings.claimCooperation ||
+        basicValues.lossProvision !== detail.qualitativeRatings.lossProvision;
+
+      // 케이스 2: 변경사항 없지만 확인 완료 체크박스 체크됨
+      const confirmedWithoutChange = !qualitativeFieldsChanged && basicValues.qualitativeConfirmed;
+
+      if (qualitativeFieldsChanged || confirmedWithoutChange) {
+        shouldUpdateQualitativeDate = true;
+      }
+
+      // 최근 확인일 업데이트
+      const today = new Date().toISOString().split('T')[0];
+      const newQualitativeLastChecked = shouldUpdateQualitativeDate
+        ? today
+        : detail.qualitativeRatings.lastChecked;
 
       // 그룹 기본 정보 업데이트
       updateGroup('seller', parseInt(id), {
@@ -143,10 +166,30 @@ function SellerDetail() {
       updateDetails('seller', id, {
         ...detail,
         keymen: basicValues.keymen,
-        businesses: detail.businesses // 변경된 사업자 상태 포함
+        businesses: detail.businesses, // 변경된 사업자 상태 포함
+        qualitativeRatings: {
+          financial: basicValues.financial,
+          quality: basicValues.quality,
+          priceCompetitive: basicValues.priceCompetitive,
+          claimCooperation: basicValues.claimCooperation,
+          lossProvision: basicValues.lossProvision,
+          lastChecked: newQualitativeLastChecked
+        },
+        additionalInfo: {
+          ...detail.additionalInfo,
+          farmArea: basicValues.farmArea,
+          annualProduction: basicValues.annualProduction,
+          mainDistributors: basicValues.mainDistributors
+        }
       });
 
       toast.success('셀러그룹 정보가 수정되었습니다.');
+
+      // 정성평가 확인 완료 시 추가 메시지
+      if (confirmedWithoutChange) {
+        toast.info('정성평가가 확인되었습니다.');
+      }
+
       setEditMode(false);
 
       // 데이터 새로고침
@@ -550,7 +593,9 @@ function SellerDetail() {
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">정성평가</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-15</span>
+            <span className="text-xs text-gray-500">
+              최근 확인일: {detail.qualitativeRatings?.lastChecked || '-'}
+            </span>
           </div>
 
           {editMode ? (
@@ -597,6 +642,21 @@ function SellerDetail() {
                 <Select.Option value="부족함">부족함</Select.Option>
               </Select>
             </Form.Item>
+
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <Form.Item
+                name="qualitativeConfirmed"
+                valuePropName="checked"
+                className="mb-0"
+              >
+                <Checkbox>
+                  <span className="font-medium">정성평가 확인 완료</span>
+                </Checkbox>
+              </Form.Item>
+              <p className="text-sm text-gray-500 ml-6 mt-1">
+                정성평가를 확인했으나 변경사항이 없는 경우 체크 후 저장해주세요
+              </p>
+            </div>
             </>
           ) : (
             <div className="space-y-3">

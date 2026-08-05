@@ -663,7 +663,8 @@ export const sellerDetails = {
       "quality": "좋음",
       "priceCompetitive": "보통",
       "claimCooperation": "보통",
-      "lossProvision": "넉넉함"
+      "lossProvision": "넉넉함",
+      "lastChecked": "2026-07-15"
     },
     "additionalInfo": {
       "farmArea": 3000,
@@ -740,7 +741,8 @@ export const sellerDetails = {
       "quality": "보통",
       "priceCompetitive": "좋음",
       "claimCooperation": "보통",
-      "lossProvision": "보통"
+      "lossProvision": "보통",
+      "lastChecked": "2026-06-20"
     },
     "additionalInfo": {
       "farmArea": 3000,
@@ -838,7 +840,8 @@ export const sellerDetails = {
       "quality": "보통",
       "priceCompetitive": "나쁨",
       "claimCooperation": "비협조",
-      "lossProvision": "부족함"
+      "lossProvision": "부족함",
+      "lastChecked": "2026-05-18"
     },
     "additionalInfo": {
       "farmArea": 6000,
@@ -957,7 +960,8 @@ export const sellerDetails = {
       "quality": "좋음",
       "priceCompetitive": "좋음",
       "claimCooperation": "보통",
-      "lossProvision": "부족함"
+      "lossProvision": "부족함",
+      "lastChecked": "2026-07-10"
     },
     "additionalInfo": {
       "farmArea": 5000,
@@ -1006,7 +1010,8 @@ export const sellerDetails = {
       "quality": "좋음",
       "priceCompetitive": "최상",
       "claimCooperation": "협조적",
-      "lossProvision": "넉넉함"
+      "lossProvision": "넉넉함",
+      "lastChecked": "2026-06-25"
     },
     "additionalInfo": {
       "farmArea": 1000,
@@ -1047,7 +1052,8 @@ export const sellerDetails = {
       "quality": "",
       "priceCompetitive": "",
       "claimCooperation": "",
-      "lossProvision": ""
+      "lossProvision": "",
+      "lastChecked": "2026-04-15"
     },
     "additionalInfo": {
       "farmArea": 700,
@@ -1098,7 +1104,8 @@ export const sellerDetails = {
       "quality": "좋음",
       "priceCompetitive": "나쁨",
       "claimCooperation": "비협조",
-      "lossProvision": "부족함"
+      "lossProvision": "부족함",
+      "lastChecked": "2026-05-30"
     },
     "additionalInfo": {
       "farmArea": null,
@@ -1143,7 +1150,8 @@ export const sellerDetails = {
       "quality": "",
       "priceCompetitive": "",
       "claimCooperation": "",
-      "lossProvision": ""
+      "lossProvision": "",
+      "lastChecked": "2026-03-22"
     },
     "additionalInfo": {
       "farmArea": null,
@@ -1193,7 +1201,8 @@ export const sellerDetails = {
       "quality": "",
       "priceCompetitive": "",
       "claimCooperation": "",
-      "lossProvision": ""
+      "lossProvision": "",
+      "lastChecked": "2026-05-05"
     },
     "additionalInfo": {
       "farmArea": null,
