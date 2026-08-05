@@ -717,7 +717,11 @@ function SellerDetail() {
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">메인유통처:</span>
-                <span className="w-4/5 text-gray-900">{detail.additionalInfo.mainDistributors || '-'}</span>
+                <span className="w-4/5 text-gray-900">
+                  {Array.isArray(detail.additionalInfo.mainDistributors)
+                    ? detail.additionalInfo.mainDistributors.join(', ')
+                    : detail.additionalInfo.mainDistributors || '-'}
+                </span>
               </div>
             </div>
           )}
