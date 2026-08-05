@@ -1930,7 +1930,7 @@ export const joinDetails = {
     commissionRate: 0.0,
     mainSuppliers: '해금 그룹, 갑운 그룹',
     mainFarms: '성호수산, 거제양식',
-    financial: '좋음',
+    financial: '양호',
     businesses: [
       {
         id: 1,
@@ -2030,7 +2030,7 @@ export const joinDetails = {
     commissionRate: 0.0,
     mainSuppliers: '동주유통, ING',
     mainFarms: '성호수산, 갑운수산',
-    financial: '좋음',
+    financial: '양호',
     businesses: [
       {
         id: 6,

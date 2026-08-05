@@ -419,6 +419,70 @@ function JoinDistributionRegister() {
           </div>
         )}
 
+        {/* 키맨 정보 */}
+        {(registrationType === 'new' || selectedGroup) && (
+          <div className="rounded-xl border border-gray-200 bg-white p-6 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">키맨 정보</h3>
+
+            <Form.List name="keymen" initialValue={[{}]}>
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, ...restField }, index) => (
+                    <div key={key} className="mb-6 last:mb-0">
+                      {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
+                      <div className="flex items-center gap-2 mb-4">
+                        <h5 className="text-sm font-medium text-gray-700">키맨 #{index + 1}</h5>
+                        {fields.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => remove(name)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <MinusCircleOutlined />
+                          </button>
+                        )}
+                      </div>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'name']}
+                        label="성명"
+                      >
+                        <Input placeholder="홍길동" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'phone']}
+                        label="연락처"
+                      >
+                        <Input placeholder="010-1234-5678" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'role']}
+                        label="역할"
+                      >
+                        <Input placeholder="예: 대표, 영업담당" />
+                      </Form.Item>
+                    </div>
+                  ))}
+                  <div className="flex justify-end mt-4">
+                    <FMButton
+                      variant="green"
+                      icon={<Plus className="h-4 w-4" />}
+                      onClick={() => add()}
+                    >
+                      키맨 추가
+                    </FMButton>
+                  </div>
+                </>
+              )}
+            </Form.List>
+          </div>
+        )}
+
         {/* 사업자 정보 */}
         {(registrationType === 'new' || selectedGroup) && (
           <div className="rounded-xl border border-gray-200 bg-white p-6 mb-4">
@@ -460,7 +524,8 @@ function JoinDistributionRegister() {
               help={tickerValidationStatus?.message}
             >
               <Input
-                disabled
+                readOnly
+                className="bg-gray-50"
                 placeholder="조인유통명 입력 시 자동 생성됩니다"
                 maxLength={10}
                 suffix={
@@ -557,9 +622,20 @@ function JoinDistributionRegister() {
                         {...restField}
                         name={[name, 'holder']}
                         label="예금주"
-                        className="mb-0"
+                        className="mb-4"
                       >
                         <Input placeholder="홍길동" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'depositDescription']}
+                        label="입금 적요"
+                        className="mb-0"
+                      >
+                        <FMTagInput
+                          placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
+                        />
                       </Form.Item>
                     </div>
                   ))}

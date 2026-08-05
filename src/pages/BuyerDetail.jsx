@@ -286,10 +286,7 @@ function BuyerDetail() {
       >
         {/* 바이어그룹 기본 정보 */}
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">바이어그룹 기본 정보</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-20</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">바이어그룹 기본 정보</h3>
 
           {editMode ? (
             <>
@@ -590,7 +587,7 @@ function BuyerDetail() {
                 </Select>
               </Form.Item>
 
-              <Form.Item name="mainSuppliers" label="메인공급처">
+              <Form.Item name="mainSuppliers" label="메인소싱처">
                 <FMTagInput
                   value={form.getFieldValue('mainSuppliers') || []}
                   onChange={(value) => form.setFieldsValue({ mainSuppliers: value })}
@@ -619,7 +616,7 @@ function BuyerDetail() {
                 </span>
               </div>
               <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">메인공급처:</span>
+                <span className="w-1/5 font-medium text-gray-700">메인소싱처:</span>
                 <span className="w-4/5 text-gray-900">{detail.mainSuppliers || '-'}</span>
               </div>
               <div className="flex">
@@ -673,10 +670,7 @@ function BuyerDetail() {
       {/* 소속 사업자 목록 */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold text-gray-900">소속 사업자</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-22</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900">소속 사업자</h3>
           {editMode && (
             <FMButton
               variant="green"
@@ -737,6 +731,15 @@ function BuyerDetail() {
                   <div className="flex">
                     <span className="w-1/4 font-medium text-gray-700">세금계산서 이메일:</span>
                     <Input defaultValue={business.taxInvoiceEmail} className="w-3/4" />
+                  </div>
+                  <div className="flex">
+                    <span className="w-1/4 font-medium text-gray-700">입금 적요:</span>
+                    <div className="w-3/4">
+                      <FMTagInput
+                        value={business.depositDescription || []}
+                        placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
+                      />
+                    </div>
                   </div>
                   <div className="flex items-center">
                     <span className="w-1/4 font-medium text-gray-700">상태:</span>
@@ -806,6 +809,18 @@ function BuyerDetail() {
                     <span className="w-1/4 font-medium text-gray-700">세금계산서 이메일:</span>
                     <span className="w-3/4 text-gray-900">{business.taxInvoiceEmail || '-'}</span>
                   </div>
+                  {business.depositDescription && business.depositDescription.length > 0 && (
+                    <div className="flex">
+                      <span className="w-1/4 font-medium text-gray-700">입금 적요:</span>
+                      <div className="w-3/4 flex flex-wrap gap-1">
+                        {business.depositDescription.map((desc, descIdx) => (
+                          <span key={descIdx} className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+                            {desc}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex">
                     <span className="w-1/4 font-medium text-gray-700">사업자등록증:</span>
                     <span className="w-3/4 text-gray-900">

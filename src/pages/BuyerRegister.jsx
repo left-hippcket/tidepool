@@ -690,7 +690,8 @@ function BuyerRegister() {
               help={tickerValidationStatus?.message}
             >
               <Input
-                disabled
+                readOnly
+                className="bg-gray-50"
                 placeholder="바이어명 입력 시 자동 생성됩니다"
                 maxLength={10}
                 suffix={
@@ -743,6 +744,15 @@ function BuyerRegister() {
               ]}
             >
               <Input placeholder="daebak@email.com" />
+            </Form.Item>
+
+            <Form.Item
+              name="depositDescription"
+              label="입금 적요"
+            >
+              <FMTagInput
+                placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
+              />
             </Form.Item>
 
             <Form.Item

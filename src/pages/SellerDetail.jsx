@@ -66,9 +66,14 @@ function SellerDetail() {
       ? sellerGroup.mainCategory
       : [sellerGroup.mainCategory];
 
+    // managers 배열 우선, 없으면 manager 단일값을 배열로 변환
+    const managerArray = sellerGroup.managers && sellerGroup.managers.length > 0
+      ? sellerGroup.managers
+      : (Array.isArray(sellerGroup.manager) ? sellerGroup.manager : [sellerGroup.manager]);
+
     form.setFieldsValue({
       name: sellerGroup.name,
-      manager: sellerGroup.manager,
+      manager: managerArray,
       mainCategory: mainCategoryArray,
       mainProducts: sellerGroup.mainProducts || [],
       territory: sellerGroup.territory,
@@ -277,10 +282,7 @@ function SellerDetail() {
       >
         {/* 셀러그룹 기본 정보 */}
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">셀러그룹 기본 정보</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-20</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">셀러그룹 기본 정보</h3>
 
           {editMode ? (
             <>
@@ -301,11 +303,17 @@ function SellerDetail() {
                 label="소싱담당자"
                 rules={[{ required: true, message: '소싱담당자를 선택해주세요' }]}
               >
-                <Select>
-                  {managers.map(m => (
-                    <Select.Option key={m} value={m}>{m}</Select.Option>
-                  ))}
-                </Select>
+                <FMSelect
+                  value={form.getFieldValue('manager') || []}
+                  onChange={(value) => form.setFieldsValue({ manager: value })}
+                  options={managers.map(m => ({
+                    value: m,
+                    label: m
+                  }))}
+                  placeholder="담당자 선택 (복수 선택 가능)"
+                  isSearchable={true}
+                  isMulti={true}
+                />
               </Form.Item>
 
               <Form.Item
@@ -335,18 +343,6 @@ function SellerDetail() {
                     .map(r => (
                       <Select.Option key={r.id} value={r.name}>{r.name}</Select.Option>
                     ))}
-                </Select>
-              </Form.Item>
-
-              <Form.Item
-                name="mainCategory"
-                label="주요품목분류"
-                rules={[{ required: true, message: '주요품목분류를 선택해주세요' }]}
-              >
-                <Select>
-                  {productCategories.map(c => (
-                    <Select.Option key={c.id} value={c.name}>{c.name}</Select.Option>
-                  ))}
                 </Select>
               </Form.Item>
 
@@ -418,7 +414,13 @@ function SellerDetail() {
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">소싱담당자:</span>
-                <span className="w-4/5 text-gray-900">{sellerGroup.manager}</span>
+                <span className="w-4/5 text-gray-900">
+                  {sellerGroup.managers && sellerGroup.managers.length > 0
+                    ? sellerGroup.managers.join(', ')
+                    : (Array.isArray(sellerGroup.manager)
+                      ? sellerGroup.manager.join(', ')
+                      : sellerGroup.manager)}
+                </span>
               </div>
               <div className="flex">
                 <span className="w-1/5 font-medium text-gray-700">사업권역:</span>
@@ -628,7 +630,7 @@ function SellerDetail() {
               <Input placeholder="예: 150톤" />
             </Form.Item>
 
-            <Form.Item name="mainDistributors" label="주요 납품처">
+            <Form.Item name="mainDistributors" label="메인유통처">
               <FMTagInput
                 value={form.getFieldValue('mainDistributors') || []}
                 onChange={(value) => form.setFieldsValue({ mainDistributors: value })}
@@ -647,7 +649,7 @@ function SellerDetail() {
                 <span className="w-4/5 text-gray-900">{detail.additionalInfo.annualProduction || '-'}</span>
               </div>
               <div className="flex">
-                <span className="w-1/5 font-medium text-gray-700">주요 납품처:</span>
+                <span className="w-1/5 font-medium text-gray-700">메인유통처:</span>
                 <span className="w-4/5 text-gray-900">{detail.additionalInfo.mainDistributors || '-'}</span>
               </div>
             </div>
@@ -658,10 +660,7 @@ function SellerDetail() {
       {/* 소속 사업자 목록 */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold text-gray-900">소속 사업자</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-22</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900">소속 사업자</h3>
           {editMode && (
             <FMButton
               variant="green"
@@ -757,15 +756,6 @@ function SellerDetail() {
                               <Input placeholder="홍길동" defaultValue={account.holder} className="w-3/4" />
                             </div>
                             <div className="flex">
-                              <span className="w-1/4 font-medium text-gray-700">입금 적요:</span>
-                              <div className="w-3/4">
-                                <FMTagInput
-                                  value={account.depositDescription || []}
-                                  placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex">
                               <span className="w-1/4 font-medium text-gray-700">대표계좌:</span>
                               <div className="w-3/4">
                                 <label className="flex items-center gap-2">
@@ -859,18 +849,6 @@ function SellerDetail() {
                                 <span className="inline-flex items-center gap-1 rounded border font-semibold bg-yellow-100 border-yellow-300 text-yellow-600 px-2 py-0.5 text-xs">대표계좌</span>
                               )}
                             </div>
-                            {account.depositDescription && account.depositDescription.length > 0 && (
-                              <div className="flex items-center gap-1 text-sm text-gray-600">
-                                <span className="font-medium">입금 적요:</span>
-                                <div className="flex flex-wrap gap-1">
-                                  {account.depositDescription.map((desc, descIdx) => (
-                                    <span key={descIdx} className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
-                                      {desc}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>

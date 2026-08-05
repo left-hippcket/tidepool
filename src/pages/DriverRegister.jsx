@@ -7,6 +7,7 @@ import { businessRegistry } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
 import { FMRadioGroup } from '../components/ui/FMRadioGroup';
+import { FMTagInput } from '../components/ui/FMTagInput';
 import toast from 'react-hot-toast';
 import { getStoredGroups, getStoredDetails } from '../utils/dataStorage';
 import { generateTicker, extractAllTickers } from '../utils/tickerGenerator';
@@ -246,7 +247,8 @@ function DriverRegister() {
                         help={tickerValidationStatus[index]?.message}
                       >
                         <Input
-                          disabled
+                          readOnly
+                          className="bg-gray-50"
                           placeholder="정산사업자명 입력 시 자동 생성됩니다"
                           maxLength={10}
                           suffix={
@@ -392,9 +394,20 @@ function DriverRegister() {
                                   {...bankRestField}
                                   name={[bankName, 'holder']}
                                   label="예금주"
-                                  className="mb-0"
+                                  className="mb-3"
                                 >
                                   <Input placeholder="김만진" />
+                                </Form.Item>
+
+                                <Form.Item
+                                  {...bankRestField}
+                                  name={[bankName, 'depositDescription']}
+                                  label="입금 적요"
+                                  className="mb-0"
+                                >
+                                  <FMTagInput
+                                    placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
+                                  />
                                 </Form.Item>
                               </div>
                             ))}

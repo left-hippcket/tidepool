@@ -720,7 +720,8 @@ function SellerRegister() {
                         help={tickerValidationStatus[businessIndex]?.message}
                       >
                         <Input
-                          disabled
+                          readOnly
+                          className="bg-gray-50"
                           placeholder="셀러명 입력 시 자동 생성됩니다"
                           maxLength={10}
                           suffix={
@@ -781,7 +782,7 @@ function SellerRegister() {
                         {index === 0 && (
                           <span className="inline-flex items-center gap-1 rounded border font-semibold bg-purple-100 border-purple-300 text-purple-600 px-2.5 py-1 text-xs">
                             <Star className="h-3 w-3" />
-                            주사용계좌
+                            대표계좌
                           </span>
                         )}
                         {fields.length > 1 && (
@@ -817,20 +818,9 @@ function SellerRegister() {
                         {...field}
                         name={[field.name, 'holder']}
                         label="예금주"
-                        className="mb-4"
+                        className="mb-0"
                       >
                         <Input placeholder="박성호" />
-                      </Form.Item>
-
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'depositDescription']}
-                        label="입금 적요"
-                        className="mb-0"
-                        getValueFromEvent={(value) => value}
-                        getValueProps={(value) => ({ value: value || [] })}
-                      >
-                        <FMTagInput placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터" />
                       </Form.Item>
 
                       {index < fields.length - 1 && <div className="my-6 border-t border-gray-200"></div>}

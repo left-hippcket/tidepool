@@ -61,7 +61,8 @@ function JoinDistributionDetail() {
       commissionRate: detail.commissionRate,
       mainSuppliers: detail.mainSuppliers?.split(', ') || [],
       mainFarms: detail.mainFarms?.split(', ') || [],
-      financial: detail.financial
+      financial: detail.financial,
+      keymen: detail.keymen || [{}]
     });
     setEditMode(true);
   };
@@ -97,6 +98,7 @@ function JoinDistributionDetail() {
       updateDetails('join', id, {
         ...detail,
         businesses: detail.businesses, // 변경된 사업자 상태 포함
+        keymen: values.keymen,
         kakaoGroupName: values.kakaoGroupName,
         paymentCycle: values.paymentCycle,
         arrivalPricePolicy: values.arrivalPricePolicy,
@@ -216,10 +218,7 @@ function JoinDistributionDetail() {
       >
         {/* 조인유통 그룹 기본 정보 */}
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">조인유통 그룹 기본 정보</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-20</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">조인유통 그룹 기본 정보</h3>
 
           {editMode ? (
             <>
@@ -320,6 +319,100 @@ function JoinDistributionDetail() {
           )}
         </div>
 
+        {/* 키맨 정보 */}
+        <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">키맨 정보</h3>
+            <span className="text-xs text-gray-500">최근 수정일: 2026-07-18</span>
+          </div>
+
+          {editMode ? (
+            <Form.List name="keymen" initialValue={detail.keymen || [{}]}>
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, ...restField }, index) => (
+                    <div key={key} className="mb-6 last:mb-0">
+                      {index > 0 && <div className="my-6 border-t border-gray-200"></div>}
+                      <div className="flex items-center gap-2 mb-4">
+                        <h5 className="text-sm font-medium text-gray-700">키맨 #{index + 1}</h5>
+                        {fields.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => remove(name)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <MinusCircleOutlined />
+                          </button>
+                        )}
+                      </div>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'name']}
+                        label="성명"
+                      >
+                        <Input placeholder="홍길동" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'phone']}
+                        label="연락처"
+                      >
+                        <Input placeholder="010-1234-5678" />
+                      </Form.Item>
+
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'role']}
+                        label="역할"
+                      >
+                        <Input placeholder="예: 대표, 영업담당" />
+                      </Form.Item>
+                    </div>
+                  ))}
+                  <div className="flex justify-end mt-4">
+                    <FMButton
+                      variant="green"
+                      icon={<Plus className="h-4 w-4" />}
+                      onClick={() => add()}
+                    >
+                      키맨 추가
+                    </FMButton>
+                  </div>
+                </>
+              )}
+            </Form.List>
+          ) : (
+            detail.keymen && detail.keymen.length > 0 ? (
+              <div className="space-y-4">
+                {detail.keymen.map((keyman, index) => (
+                  <div key={index} className="p-4 rounded-lg bg-gray-50">
+                    <div className="space-y-2">
+                      <div className="flex">
+                        <span className="w-1/5 font-medium text-gray-700">성명:</span>
+                        <span className="w-4/5 text-gray-900">{keyman.name}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-1/5 font-medium text-gray-700">연락처:</span>
+                        <span className="w-4/5 text-gray-900">{keyman.phone}</span>
+                      </div>
+                      {keyman.role && (
+                        <div className="flex">
+                          <span className="w-1/5 font-medium text-gray-700">역할:</span>
+                          <span className="w-4/5 text-gray-900">{keyman.role}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">등록된 키맨 정보가 없습니다.</div>
+            )
+          )}
+        </div>
+
         {/* 거래 정보 */}
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
@@ -410,10 +503,7 @@ function JoinDistributionDetail() {
       {/* 소속 사업자 목록 */}
       <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold text-gray-900">소속 사업자</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-22</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900">소속 사업자</h3>
           {editMode && (
             <FMButton
               variant="green"
@@ -515,6 +605,15 @@ function JoinDistributionDetail() {
                               <Input placeholder="홍길동" defaultValue={account.holder} className="w-3/4" />
                             </div>
                             <div className="flex">
+                              <span className="w-1/4 font-medium text-gray-700">입금 적요:</span>
+                              <div className="w-3/4">
+                                <FMTagInput
+                                  value={account.depositDescription || []}
+                                  placeholder="입금시 통장에 찍히는 텍스트 입력 후 엔터"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex">
                               <span className="w-1/4 font-medium text-gray-700">대표계좌:</span>
                               <div className="w-3/4">
                                 <label className="flex items-center gap-2">
@@ -599,15 +698,29 @@ function JoinDistributionDetail() {
                   {business.bankAccounts && business.bankAccounts.length > 0 && (
                     <div className="flex">
                       <span className="w-1/4 font-medium text-gray-700">은행계좌:</span>
-                      <div className="w-3/4 space-y-1">
+                      <div className="w-3/4 space-y-3">
                         {business.bankAccounts.map((account, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-gray-900">
-                            <span>{account.bank} {account.accountNumber} ({account.holder})</span>
-                            {(idx === 0 || account.isPrimary) && business.bankAccounts.length > 1 && (
-                              <span className="inline-flex items-center gap-1 rounded border font-semibold bg-purple-100 border-purple-300 text-purple-600 px-2.5 py-1 text-xs">
-                                <Star className="h-3 w-3" />
-                                대표계좌
-                              </span>
+                          <div key={idx} className="space-y-1">
+                            <div className="flex items-center gap-2 text-gray-900">
+                              <span>{account.bank} {account.accountNumber} ({account.holder})</span>
+                              {(idx === 0 || account.isPrimary) && business.bankAccounts.length > 1 && (
+                                <span className="inline-flex items-center gap-1 rounded border font-semibold bg-purple-100 border-purple-300 text-purple-600 px-2.5 py-1 text-xs">
+                                  <Star className="h-3 w-3" />
+                                  대표계좌
+                                </span>
+                              )}
+                            </div>
+                            {account.depositDescription && account.depositDescription.length > 0 && (
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <span className="font-medium">입금 적요:</span>
+                                <div className="flex flex-wrap gap-1">
+                                  {account.depositDescription.map((desc, descIdx) => (
+                                    <span key={descIdx} className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+                                      {desc}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
                             )}
                           </div>
                         ))}

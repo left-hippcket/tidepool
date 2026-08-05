@@ -235,10 +235,7 @@ function DriverDetail() {
         >
         {/* 드라이버 기본 정보 */}
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">드라이버 기본 정보</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-29</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">드라이버 기본 정보</h3>
 
           {editMode ? (
             <>
@@ -338,10 +335,7 @@ function DriverDetail() {
           labelAlign="left"
         >
         <div className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">정산사업자 정보</h3>
-            <span className="text-xs text-gray-500">최근 수정일: 2026-07-28</span>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">정산사업자 정보</h3>
 
           {editMode ? (
             <Form.List name="settlementBusinesses">
@@ -521,10 +515,24 @@ function DriverDetail() {
                                   {...bankRestField}
                                   name={[bankName, 'holder']}
                                   label="예금주"
-                                  className="mb-0"
+                                  className="mb-3"
                                 >
                                   <Input placeholder="김만진" />
                                 </Form.Item>
+
+                                <div className="flex items-start">
+                                  <label className="text-sm font-medium text-gray-700 w-24">대표계좌:</label>
+                                  <label className="flex items-center gap-2">
+                                    <input
+                                      type="radio"
+                                      name={`primary_account_${name}`}
+                                      defaultChecked={bankFields.length === 1 || bankIndex === 0}
+                                      disabled={bankFields.length === 1}
+                                      className="h-4 w-4 border-gray-300"
+                                    />
+                                    <span className="text-sm text-gray-600">대표계좌로 설정</span>
+                                  </label>
+                                </div>
                               </div>
                             ))}
                             <div className="flex justify-end">
