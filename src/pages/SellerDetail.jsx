@@ -21,7 +21,6 @@ function SellerDetail() {
   const [sellerGroup, setSellerGroup] = useState(null);
   const [detail, setDetail] = useState(null);
   const [form] = Form.useForm();
-  const [businessForm] = Form.useForm();
 
   // localStorage에서 데이터 로드
   useEffect(() => {
@@ -183,15 +182,6 @@ function SellerDetail() {
         }
       });
 
-      toast.success('셀러그룹 정보가 수정되었습니다.');
-
-      // 정성평가 확인 완료 시 추가 메시지
-      if (confirmedWithoutChange) {
-        toast.info('정성평가가 확인되었습니다.');
-      }
-
-      setEditMode(false);
-
       // 데이터 새로고침
       const updatedGroups = getStoredGroups('seller');
       const updatedGroup = updatedGroups.find(g => g.id === parseInt(id));
@@ -200,9 +190,26 @@ function SellerDetail() {
       const updatedDetail = getStoredDetails('seller', id);
       setDetail(updatedDetail);
 
+      setEditMode(false);
+
+      // 성공 메시지는 모든 작업이 완료된 후 표시
+      toast.success('셀러그룹 정보가 수정되었습니다.');
+
+      // 정성평가 확인 완료 시 추가 메시지
+      if (confirmedWithoutChange) {
+        toast.info('정성평가가 확인되었습니다.');
+      }
+
     } catch (error) {
       console.error('Validation failed:', error);
-      toast.error('저장에 실패했습니다.');
+      if (error.errorFields && error.errorFields.length > 0) {
+        const firstError = error.errorFields[0];
+        console.error('First error field:', firstError);
+        toast.error(`저장에 실패했습니다: ${firstError.errors[0]}`);
+      } else {
+        console.error('Error details:', error);
+        toast.error('저장에 실패했습니다.');
+      }
     }
   };
 
