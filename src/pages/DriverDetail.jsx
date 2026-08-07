@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Upload, Image, Modal } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined, FileImageOutlined } from '@ant-design/icons';
-import { Edit2, Plus, Upload as UploadIcon } from 'lucide-react';
+import { Edit2, Plus, Upload as UploadIcon, Save, X } from 'lucide-react';
 import { drivers, driverDetails } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
@@ -775,18 +775,20 @@ function DriverDetail() {
           <div className="border-t border-gray-200 pt-6">
             <div className="grid grid-cols-2 gap-4">
               <FMButton
-                variant="secondary"
+                variant="primary"
                 onClick={handleCancel}
+                icon={<X className="w-4 h-4" />}
                 className="w-full"
               >
-                취소
+                취소하기
               </FMButton>
               <FMButton
-                variant="primary"
+                variant="green"
                 onClick={handleSave}
+                icon={<Save className="w-4 h-4" />}
                 className="w-full"
               >
-                저장
+                저장하기
               </FMButton>
             </div>
           </div>

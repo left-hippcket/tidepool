@@ -28,11 +28,8 @@ import DriverRegister from './pages/DriverRegister';
 import ProductManagement from './pages/ProductManagement';
 import StandardPrice from './pages/StandardPrice';
 import StandardPriceRegister from './pages/StandardPriceRegister';
-import TransactionLedger from './pages/TransactionLedger';
-import TransactionLedgerRegister from './pages/TransactionLedgerRegister';
-import ClaimAdjustmentList from './pages/ClaimAdjustmentList';
-import ClaimAdjustmentRegister from './pages/ClaimAdjustmentRegister';
-import ClaimAdjustmentEdit from './pages/ClaimAdjustmentEdit';
+import TransactionLedgerV2 from './pages/TransactionLedgerV2';
+import TransactionLedgerV2Edit from './pages/TransactionLedgerV2Edit';
 
 const { Header, Sider, Content } = Layout;
 
@@ -155,10 +152,9 @@ function App() {
     {
       key: 'ledger',
       icon: <BookOutlined />,
-      label: '거래장부',
+      label: '장부관리',
       children: [
-        { key: '/transaction-ledger', label: '장부 조회' },
-        { key: '/claim-adjustment', label: '클레임/조정' },
+        { key: '/transaction-ledger-v2', label: '거래장부' },
       ],
     },
     {
@@ -220,7 +216,7 @@ function App() {
     if (location.pathname === '/product' || location.pathname === '/product-list') {
       return ['product'];
     }
-    if (location.pathname === '/transaction-ledger') {
+    if (location.pathname === '/transaction-ledger' || location.pathname === '/transaction-ledger-v2' || location.pathname.startsWith('/transaction-ledger-v2/')) {
       return ['ledger'];
     }
     return [];
@@ -337,11 +333,8 @@ function App() {
             <Route path="/driver/register" element={<DriverRegister />} />
             <Route path="/driver/:id" element={<DriverDetail />} />
             <Route path="/product" element={<ProductManagement />} />
-            <Route path="/transaction-ledger" element={<TransactionLedger />} />
-            <Route path="/transaction-ledger/register" element={<TransactionLedgerRegister />} />
-            <Route path="/claim-adjustment" element={<ClaimAdjustmentList />} />
-            <Route path="/claim-adjustment/register" element={<ClaimAdjustmentRegister />} />
-            <Route path="/claim-adjustment/:id/edit" element={<ClaimAdjustmentEdit />} />
+            <Route path="/transaction-ledger-v2" element={<TransactionLedgerV2 />} />
+            <Route path="/transaction-ledger-v2/:transactionCode/edit" element={<TransactionLedgerV2Edit />} />
             <Route path="/standard-price" element={<StandardPrice />} />
             <Route path="/standard-price/register" element={<StandardPriceRegister />} />
           </Routes>

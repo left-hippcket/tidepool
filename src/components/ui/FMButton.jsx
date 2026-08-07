@@ -7,6 +7,7 @@ export function FMButton({
   href,
   type = 'button',
   variant = 'primary',
+  size = 'medium',
   disabled = false,
   icon,
   className = '',
@@ -15,13 +16,23 @@ export function FMButton({
   const baseClasses = 'inline-flex items-center rounded-lg border border-gray outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50';
 
   const variantClasses = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600',
-    secondary: 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300',
-    indigo: 'bg-indigo-500 text-white hover:bg-indigo-600',
-    green: 'bg-green-600 text-white hover:bg-green-700',
+    primary: 'bg-blue-500 text-white hover:bg-blue-600 border-blue-500',
+    secondary: 'bg-blue-500 text-white hover:bg-blue-600 border-blue-500',
+    indigo: 'bg-indigo-500 text-white hover:bg-indigo-600 border-indigo-500',
+    green: 'bg-green-600 text-white hover:bg-green-700 border-green-600',
+    yellow: 'bg-yellow-500 text-white hover:bg-yellow-600 border-yellow-500',
+    danger: 'bg-red-500 text-white hover:bg-red-700 border-red-500',
+    'danger-outline': 'bg-white text-red-600 hover:bg-red-50 border-red-600',
+    outline: 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300',
   };
 
-  const sizeClasses = 'px-3 py-2 text-sm font-semibold justify-center';
+  const sizeClassesMap = {
+    small: 'px-2 py-1 text-xs font-semibold justify-center',
+    medium: 'px-3 py-2 text-sm font-semibold justify-center',
+    large: 'px-4 py-3 text-base font-semibold justify-center',
+  };
+
+  const sizeClasses = sizeClassesMap[size] || sizeClassesMap.medium;
 
   const content = (
     <>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Upload } from 'antd';
 import { ArrowLeftOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { Upload as UploadIcon, Plus } from 'lucide-react';
+import { Upload as UploadIcon, Plus, Save, X } from 'lucide-react';
 import { businessRegistry } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMSwitch } from '../components/ui/FMSwitch';
@@ -467,18 +467,20 @@ function DriverRegister() {
         <div className="mt-8 border-t border-gray-200 pt-6">
           <div className="grid grid-cols-2 gap-4">
             <FMButton
-              variant="secondary"
+              variant="primary"
               onClick={handleCancel}
+              icon={<X className="w-4 h-4" />}
               className="w-full"
             >
-              취소
+              취소하기
             </FMButton>
             <FMButton
-              variant="primary"
+              variant="green"
               onClick={handleSubmit}
+              icon={<Save className="w-4 h-4" />}
               className="w-full"
             >
-              저장
+              저장하기
             </FMButton>
           </div>
         </div>

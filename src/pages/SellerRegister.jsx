@@ -7,7 +7,7 @@ import {
 import {
   ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined, UploadOutlined
 } from '@ant-design/icons';
-import { Upload as UploadIcon, Plus } from 'lucide-react';
+import { Upload as UploadIcon, Plus, Save, X } from 'lucide-react';
 import { sellerGroups, managers, territories, regions, productCategories, products, businessRegistry } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMInput } from '../components/ui/FMInput';
@@ -886,17 +886,20 @@ function SellerRegister() {
         {/* 하단 버튼 */}
         <div className="grid grid-cols-2 gap-3 w-full mt-6">
           <FMButton
-            variant="secondary"
+            variant="primary"
             onClick={() => navigate('/seller')}
+            icon={<X className="w-4 h-4" />}
             className="w-full"
           >
-            취소
+            취소하기
           </FMButton>
           <FMButton
+            variant="green"
             onClick={handleSubmit}
+            icon={<Save className="w-4 h-4" />}
             className="w-full"
           >
-            저장
+            저장하기
           </FMButton>
         </div>
       </Form>

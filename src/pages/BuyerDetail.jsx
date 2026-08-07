@@ -863,18 +863,20 @@ function BuyerDetail() {
         <div className="mt-8 border-t border-gray-200 pt-6">
           <div className="grid grid-cols-2 gap-4">
             <FMButton
-              variant="secondary"
+              variant="primary"
               onClick={handleCancel}
+              icon={<X className="w-4 h-4" />}
               className="w-full"
             >
-              취소
+              취소하기
             </FMButton>
             <FMButton
-              variant="primary"
+              variant="green"
               onClick={handleSave}
+              icon={<Save className="w-4 h-4" />}
               className="w-full"
             >
-              저장
+              저장하기
             </FMButton>
           </div>
         </div>

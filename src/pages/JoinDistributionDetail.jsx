@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, Modal, Upload, Image } from 'antd';
 import { ArrowLeftOutlined, FileImageOutlined } from '@ant-design/icons';
-import { Plus, Edit2, Upload as UploadIcon } from 'lucide-react';
+import { Plus, Edit2, Upload as UploadIcon, Save, X } from 'lucide-react';
 import { joinGroups, joinDetails, managers, territories, regions } from '../data/mockData';
 import { FMButton } from '../components/ui/FMButton';
 import { FMTagInput } from '../components/ui/FMTagInput';
@@ -769,18 +769,20 @@ function JoinDistributionDetail() {
         <div className="mt-8 border-t border-gray-200 pt-6">
           <div className="grid grid-cols-2 gap-4">
             <FMButton
-              variant="secondary"
+              variant="primary"
               onClick={handleCancel}
+              icon={<X className="w-4 h-4" />}
               className="w-full"
             >
-              취소
+              취소하기
             </FMButton>
             <FMButton
-              variant="primary"
+              variant="green"
               onClick={handleSave}
+              icon={<Save className="w-4 h-4" />}
               className="w-full"
             >
-              저장
+              저장하기
             </FMButton>
           </div>
         </div>
