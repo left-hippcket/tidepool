@@ -634,12 +634,9 @@ const TransactionLedgerV2 = () => {
     <div className="p-6">
       {/* 헤더 */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          거래장부 ver2
+        <h1 className="text-2xl font-bold text-gray-800">
+          거래장부
         </h1>
-        <p className="text-sm text-gray-600">
-          거래 내역 조회 및 관리 ({displayData.length}건 조회 중)
-        </p>
       </div>
 
       {/* 필터 섹션 */}
